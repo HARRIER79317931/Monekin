@@ -1,75 +1,75 @@
 {
   "GENERAL": {
     "cancel": "取消",
-    "or": "或",
-    "understood": "明白了",
+    "or": "もしくは",
+    "understood": "理解した",
     "unspecified": "未指定",
     "confirm": "確認",
-    "continue_text": "繼續",
-    "quick_actions": "快速行動",
+    "continue_text": "続行",
+    "quick_actions": "クイックアクション",
     "save": "保存",
-    "save_changes": "儲存變更",
-    "close_and_save": "儲存並關閉",
-    "add": "添加",
-    "edit": "編輯",
-    "balance": "平衡",
-    "delete": "刪除",
-    "account": "帳戶",
-    "accounts": "帳戶",
-    "categories": "類別",
-    "category": "類別",
-    "today": "今天",
-    "yesterday": "昨天",
-    "filters": "過濾器",
-    "see-more": "查看更多",
-    "select-all": "全選",
-    "deselect-all": "取消全選",
-    "empty-warn": "哦！這裡非常空",
-    "insufficient-data": "數據不足",
-    "show-more-fields": "顯示更多欄位",
-    "show-less-fields": "顯示較少的欄位",
-    "tap-to-search": "點擊即可搜尋",
+    "save_changes": "変更を保存",
+    "close_and_save": "保存して閉じる",
+    "add": "追加",
+    "edit": "編集",
+    "balance": "バランス",
+    "delete": "削除",
+    "account": "アカウント",
+    "accounts": "アカウント",
+    "categories": "カテゴリ",
+    "category": "カテゴリ",
+    "today": "今日",
+    "yesterday": "昨日",
+    "filters": "フィルター",
+    "see-more": "もっと見る",
+    "select-all": "すべて選択",
+    "deselect-all": "選択解除",
+    "empty-warn": "おっと!ここは空です",
+    "insufficient-data": "データ不足",
+    "show-more-fields": "もっとフィールドを表示",
+    "show-less-fields": "フィールドを折りたたむ",
+    "tap-to-search": "タップして検索",
     "CLIPBOARD": {
-      "success": "{{x}}已複製到剪貼簿",
-      "error": "複製錯誤"
+      "success": "{{x}}がクリップボードにコピーされました",
+      "error": "コピーエラー"
     },
     "TIME": {
-      "start-date": "開始日期",
-      "end-date": "結束日期",
-      "from-date": "從日期",
-      "until-date": "截止日期",
-      "date": "日期",
-      "datetime": "約會時間",
+      "start-date": "開始日",
+      "end-date": "終了日",
+      "from-date": "日から",
+      "until-date": "日まで",
+      "date": "日",
+      "datetime": "日時",
       "time": "時間",
-      "each": "每個",
+      "each": "毎",
       "after": "後",
       "RANGES": {
-        "display": "時間範圍",
-        "it-repeat": "重複",
-        "it-ends": "結束",
+        "display": "時間の範囲",
+        "it-repeat": "反復",
+        "it-ends": "終了",
         "forever": "永遠",
         "TYPES": {
           "cycle": "循環",
-          "last_days": "最後一天",
-          "last_days_form": "前{{x}}天",
-          "all": "總是",
-          "date_range": "自訂範圍"
+          "last_days": "最終日",
+          "last_days_form": "{{x}}日前",
+          "all": "常に",
+          "date_range": "設定した範囲"
         },
         "each-range": {
-          "one": "每個{{range}}",
-          "other": "每{{n}}{{range}}"
+          "one": "毎{{range}}",
+          "other": "毎{{n}}{{range}}"
         },
         "each-range-until-date": {
-          "one": "每{{range}}直到{{day}}",
-          "other": "每 {{n}}{{range}}直到{{day}}"
+          "one": "毎{{range}}まで{{day}}",
+          "other": "毎{{n}}{{range}}まで{{day}}"
         },
         "each-range-until-times": {
-          "one": "每{{range}}{{limit}}次",
-          "other": "每{{n}}{{range}}{{limit}}次"
+          "one": "{{range}}{{limit}}ごとに",
+          "other": "{{n}}{{range}}{{limit}}ごとに"
         },
         "each-range-until-once": {
-          "one": "每{{range}}一次",
-          "other": "每{{n}}{{range}}一次"
+          "one": "{{range}}ごとに一回",
+          "other": "{{n}}{{range}}ごとに一回"
         },
         "month": {
           "one": "月",
@@ -80,12 +80,12 @@
           "other": "年"
         },
         "day": {
-          "one": "天",
-          "other": "天"
+          "one": "日",
+          "other": "日"
         },
         "week": {
-          "one": "星期",
-          "other": "幾週"
+          "one": "週間",
+          "other": "週間"
         }
       },
       "PERIODICITY": {
