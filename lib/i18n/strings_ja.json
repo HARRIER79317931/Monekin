@@ -12,7 +12,7 @@
     "close_and_save": "保存して閉じる",
     "add": "追加",
     "edit": "編集",
-    "balance": "バランス",
+    "balance": "収支",
     "delete": "削除",
     "account": "アカウント",
     "accounts": "アカウント",
@@ -45,7 +45,7 @@
       "after": "後",
       "RANGES": {
         "display": "時間の範囲",
-        "it-repeat": "反復",
+        "it-repeat": "繰り返し",
         "it-ends": "終了",
         "forever": "永遠",
         "TYPES": {
@@ -90,82 +90,82 @@
       },
       "PERIODICITY": {
         "display": "週期性",
-        "no-repeat": "不再重複",
+        "no-repeat": "繰り返しなし",
         "repeat": {
-          "one": "重複",
-          "other": "重複"
+          "one": "繰り返し",
+          "other": "繰り返し"
         },
-        "diary": "日常的",
-        "monthly": "每月",
-        "annually": "每年",
-        "quaterly": "季刊",
-        "weekly": "每週",
-        "custom": "風俗",
-        "infinite": "總是"
+        "diary": "毎日",
+        "monthly": "毎月",
+        "annually": "毎年",
+        "quaterly": "毎四半期",
+        "weekly": "毎週",
+        "custom": "カスタム",
+        "infinite": "常に"
       },
       "CURRENT": {
-        "Monthly": "這個月",
+        "Monthly": "今月",
         "Annually": "今年",
-        "Quaterly": "本季",
-        "Weekly": "本星期",
-        "Infinite": "永遠",
-        "Custom": "自訂範圍"
+        "Quaterly": "今四半期",
+        "Weekly": "今週",
+        "Infinite": "常に",
+        "Custom": "カスタム"
       },
       "ALL": {
-        "diary": "每天",
-        "Monthly": "每月",
-        "Annually": "每年",
-        "Quaterly": "每季",
-        "Weekly": "每週"
+        "diary": "毎日",
+        "Monthly": "毎月",
+        "Annually": "毎年",
+        "Quaterly": "毎四半期",
+        "Weekly": "毎週"
       }
     },
     "TRANSACTION-ORDER": {
-      "display": "訂單交易",
-      "Category": "按類別",
-      "Quantity": "按數量",
-      "Date": "按日期"
+      "display": "注文取引",
+      "Category": "カテゴリー別",
+      "Quantity": "数量別",
+      "Date": "日付別"
     },
     "VALIDATIONS": {
-      "form_error": "修正表單中指示的欄位以繼續",
-      "required": "必填項目",
-      "positive": "應該是積極的",
-      "min_number": "應該大於{{x}}",
-      "max_number": "應小於{{x}}"
+      "form_error": "表示されたフィールドを修正して続行",
+      "required": "必須項目",
+      "positive": "正であるべき",
+      "min_number": "{{x}}より大きい",
+      "max_number": "{{x}}より小さい"
     }
   },
   "INTRO": {
     "start": "開始",
-    "skip": "跳過",
-    "next": "下一個",
-    "select-your-currency": "選擇您的貨幣",
-    "welcome.subtitle": "您的個人財務管家",
-    "welcome.subtitle2": "100% 開放，100% 免費",
-    "welcome.footer": "登入即表示您同意<a href='https://github.com/enrique-lozano/Monekin/blob/main/docs/PRIVACY_POLICY.md'>隱私權政策</a>和<a href= 'https: //github.com/enrique-lozano/Monekin/blob/main/docs/TERMS_OF_USE.md'>應用程式的使用條款</a>",
-    "offline.descr.title": "離線帳戶：",
-    "offline.descr": "您的資料只會儲存在您的裝置上，只要您不卸載應用程式或更換手機，資料就安全。為防止資料遺失，建議定期從應用程式設定中進行備份。",
-    "offline.start": "離線啟動會話",
-    "sl1Title": "選擇您的貨幣",
-    "sl1Descr": "您的預設貨幣將用於報告和一般圖表。您以後可以隨時在應用程式設定中更改貨幣和應用程式語言",
-    "sl2Title": "安全、隱私、可靠",
-    "sl2Descr": "您的資料只屬於您。我們將資訊直接儲存在您的設備上，無需通過外部伺服器。這使得即使沒有互聯網也可以使用該應用程式",
-    "sl2Descr2": "此外，該應用程式的源代碼是公開的，任何人都可以對其進行協作並查看它是如何工作的",
-    "lastSlideTitle": "一切準備就緒",
-    "lastSlideDescr": "有了 Monekin，您終於可以實現您想要的財務獨立。您將擁有圖表、預算、提示、統計數據以及更多有關您的資金的信息。",
-    "lastSlideDescr2": "我們希望您享受這次體驗！如有疑問、建議，請隨時與我們聯繫......"
+    "skip": "スキップ",
+    "next": "次",
+    "select-your-currency": "通貨を選択",
+    "welcome.subtitle": "あなたのパーソナルファイナンスマネージャ",
+    "welcome.subtitle2": "100% オープン，100% フリー",
+    "welcome.footer": "ログインすることで<a href='https://github.com/enrique-lozano/Monekin/blob/main/docs/PRIVACY_POLICY.md'>プライバシーポリシー</a>と<a href= 'https: //github.com/enrique-lozano/Monekin/blob/main/docs/TERMS_OF_USE.md'>利用規約</a>に同意したとします",
+    "offline.descr.title": "オフラインアカウント：",
+    "offline.descr": "データは端末にのみ保存され、アプリのアンインストールや機種変更をしない限り安全です。データの損失を防ぐために、アプリの設定から定期的にバックアップを取ることをおすすめします。",
+    "offline.start": "オフラインセッションを開始",
+    "sl1Title": "通貨を選択",
+    "sl1Descr": "デフォルトの通貨は、レポートや一般的なチャートで使用されます。通貨と言語は、設定からいつでも変更できます。",
+    "sl2Title": "安全、プライバシー、信頼",
+    "sl2Descr": "あなたのデータはあなたのものです。外部サーバーを経由することなく、端末に直接情報を保存します。そのため、インターネットがなくてもアプリを使用することができます。",
+    "sl2Descr2": "また、アプリケーションのソースコードは公開されているため、誰でも貢献でき、どのように機能するかを確認することができます。",
+    "lastSlideTitle": "準備完了",
+    "lastSlideDescr": "Monekinを使えば、あなたがとても望んでいる経済的自立を達成できます。あなたのお金に関するグラフ、予算、ヒント、統計、その他多くの情報を得ることができます。",
+    "lastSlideDescr2": "楽しい体験になるよう願っています！ご不明な点やご提案がございましたら、お気軽にお問い合わせください。"
   },
   "HOME": {
-    "title": "儀表板",
-    "filter-transactions": "過濾交易",
-    "hello-day": "早安，",
-    "hello-night": "晚安，",
-    "total-balance": "總餘額",
-    "my-accounts": "我的帳戶",
-    "active-accounts": "活躍帳戶",
-    "no-accounts": "尚未建立帳戶",
-    "no-accounts.descr": "開始使用 Monekin 的所有魔力。創建至少一個帳戶以開始添加交易",
-    "last-transactions": "最後的交易",
-    "should-create-account.header": "哎呀！",
-    "should-create-account.message": "您必須至少擁有一個非存檔帳戶才能開始創建交易"
+    "title": "ダッシュボード",
+    "filter-transactions": "取引の絞り込み",
+    "hello-day": "おはよう，",
+    "hello-night": "おやすみ，",
+    "total-balance": "合計収支",
+    "my-accounts": "マイアカウント",
+    "active-accounts": "アクティブアカウント",
+    "no-accounts": "アカウントがありません",
+    "no-accounts.descr": "Monekinの魔法を使い始めましょう。少なくとも1つのアカウントを作成することで取引を追加できます",
+    "last-transactions": "最後の取引",
+    "should-create-account.header": "おっと!",
+    "should-create-account.message": "取引を作成する前に、少なくとも1つのアーカイブなしアカウントを持っている必要があります。"
   },
   "FINANCIAL-HEALTH": {
     "display": "財務健康",
