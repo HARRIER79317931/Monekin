@@ -168,15 +168,15 @@
     "should-create-account.message": "取引を作成する前に、少なくとも1つのアーカイブなしアカウントを持っている必要があります。"
   },
   "FINANCIAL-HEALTH": {
-    "display": "財務健康",
+    "display": "財務の健全性",
     "review": {
-      "very_good(context=GenderContext)": { "male,female": "很好！" },
-      "good(context=GenderContext)": { "male,female": "好" },
-      "normal(context=GenderContext)": { "male,female": "平均" },
-      "bad(context=GenderContext)": { "male,female": "一般" },
-      "very_bad(context=GenderContext)": { "male,female": "非常糟糕" },
+      "very_good(context=GenderContext)": { "male,female": "とても良い！" },
+      "good(context=GenderContext)": { "male,female": "良い" },
+      "normal(context=GenderContext)": { "male,female": "普通" },
+      "bad(context=GenderContext)": { "male,female": "悪い" },
+      "very_bad(context=GenderContext)": { "male,female": "とても悪い" },
       "insufficient_data(context=GenderContext)": {
-        "male,female": "數據不足"
+        "male,female": "情報不足"
       },
 
       "descr": {
