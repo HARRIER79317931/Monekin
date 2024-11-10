@@ -265,8 +265,7 @@ class _TransactionFormPageState extends State<TransactionFormPage>
         date: date,
         type: transactionType,
         accountID: fromAccount!.id,
-        value: transactionType.isIncomeOrExpense &&
-                selectedCategory!.type.isExpense
+        value: transactionType == TransactionType.E
             ? transactionValue * -1
             : transactionValue,
         isHidden: false,
@@ -392,7 +391,7 @@ class _TransactionFormPageState extends State<TransactionFormPage>
           isDense: false,
         ),
         keyboardType: TextInputType.number,
-        inputFormatters: decimalDigitFormatter,
+        inputFormatters: twoDecimalDigitFormatter,
         validator: (value) {
           final defaultNumberValidatorResult = fieldValidator(value,
               isRequired: false, validator: ValidatorType.double);
