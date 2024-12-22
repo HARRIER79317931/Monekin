@@ -281,20 +281,20 @@
       "skip-dialog.msg": "この操作は取り消せません。次の日付を{{date}}に移動します",
       "accept-today": "今日承認する",
       "accept-in-required-date": "期日({{date}})に承認する",
-      "accept-dialog.title": "接受交易",
-      "accept-dialog.msg-single": "該交易的新狀態將為空。您可以隨時重新編輯該交易的狀態",
-      "accept-dialog.msg": "此操作將建立日期為{{date}}的新交易。您將能夠在交易頁面上查看此交易的詳細資訊",
-      "recurrent-rule-finished": "循環規則已完成，無需再支付！"
+      "accept-dialog.title": "取引の承認",
+      "accept-dialog.msg-single": "取引の状態は空になります。状態はいつでも編集することができます",
+      "accept-dialog.msg": "新しい取引が{{date}}に作成されます。詳細は取引タブから確認できます",
+      "recurrent-rule-finished": "定期的な支払は完了しました。もう支払の必要はありません!"
     },
     "LIST": {
-      "empty": "未發現此處顯示的交易。在應用程式中添加一些交易，也許您下次會有更好的運氣",
-      "searcher.placeholder": "按類別、描述搜尋...",
-      "searcher.no-results": "未找到符合搜尋條件的交易",
-      "loading": "正在加載更多交易...",
-      "selected.short": { "one": "{{n}} 已選取", "other": "{{n}} 已選取" },
+      "empty": "表示する取引がありません。取引を追加すれば幸運が訪れるかもしれません。",
+      "searcher.placeholder": "カテゴリ、詳細で検索...",
+      "searcher.no-results": "条件と一致する取引がありませんでした",
+      "loading": "取引をロードしています...",
+      "selected.short": { "one": "{{n}} 選択されました", "other": "{{n}} 選択されました" },
       "selected.long": {
-        "one": "已選擇 {{n}} 筆交易",
-        "other": "選擇 {{n}} 筆交易"
+        "one": " {{n}} 取引が選択されました",
+        "other": "{{n}} 取引が選択されました"
       },
       "BULK_EDIT": {
         "dates": "編輯日期",
