@@ -297,18 +297,18 @@
         "other": "{{n}} 取引が選択されました"
       },
       "BULK_EDIT": {
-        "dates": "編輯日期",
-        "categories": "編輯類別",
-        "status": "編輯狀態"
+        "dates": "日付を編集",
+        "categories": "カテゴリを編集",
+        "status": "状態を編集"
       }
     },
     "FILTERS": {
-      "from_value": "從金額",
-      "to_value": "最多金額",
-      "from_value_def": "來自 {{x}}",
-      "to_value_def": "最多 {{x}}",
-      "from_date_def": "從{{date}}開始",
-      "to_date_def": "截至 {{date}}"
+      "from_value": "金額から",
+      "to_value": "金額まで",
+      "from_value_def": "{{x}}から",
+      "to_value_def": "{{x}}まで",
+      "from_date_def": "{{date}}から",
+      "to_date_def": "{{date}}まで"
     },
     "FORM": {
       "VALIDATORS": {
