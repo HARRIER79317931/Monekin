@@ -312,21 +312,21 @@
     },
     "FORM": {
       "VALIDATORS": {
-        "zero": "一筆交易的價值不能等於零",
-        "date-max": "所選日期晚於當前日期。交易將新增為待處理",
-        "date-after-account-creation": "您無法建立日期早於所屬帳戶建立日期的交易",
-        "negative-transfer": "轉帳的貨幣價值不能為負數",
-        "transfer-between-same-accounts": "來源帳號與目標帳號不能符合"
+        "zero": "取引額を0にすることはできません",
+        "date-max": "選択された日付が現在よりも後です。取引は保留として追加されます",
+        "date-after-account-creation": "口座が作成されるより前にその口座に属する取引を作成することはできません",
+        "negative-transfer": "転送額をマイナスにすることはできません",
+        "transfer-between-same-accounts": "転送元と転送先の口座を同じにすることはできません"
       },
-      "title": "交易標題",
-      "title.short": "資質",
-      "value": "交易價值",
-      "tap-to-see-more": "點擊查看更多詳細資訊",
-      "no-tags": "-- 無標籤 --",
-      "description": "描述",
-      "description-info": "點擊此處輸入有關此交易的更詳細描述",
-      "exchange-to-preferred-title": "匯率為{{currency}}",
-      "exchange-to-preferred-in-date": "交易日"
+      "title": "取引のタイトル",
+      "title.short": "タイトル",
+      "value": "取引額",
+      "tap-to-see-more": "タップして詳細を見る",
+      "no-tags": "-- タグなし --",
+      "description": "説明",
+      "description-info": "タップして取引についての詳細な説明を見る",
+      "exchange-to-preferred-title": "{currency}}への両替レート",
+      "exchange-to-preferred-in-date": "取引日"
     },
     "REVERSED": {
       "title": "逆向交易",
