@@ -329,19 +329,19 @@
       "exchange-to-preferred-in-date": "取引日"
     },
     "REVERSED": {
-      "title": "逆向交易",
-      "title.short": "逆向交易",
-      "description-for-expenses": "儘管是收入交易，但它的金額為正數。這些類型的交易可用於表示先前記錄的收入的返還，例如退款或償還債務。",
-      "description-for-incomes": "儘管是一項收入交易，但其金額為負數。這些類型的交易可用於作廢或更正錯誤記錄的收入，反映資金的返還或退款或記錄債務的支付。"
+      "title": "逆の取引",
+      "title.short": "逆取引",
+      "description-for-expenses": "支出の取引ですが、プラスの値になっています。こうした取引は債務の返済や返金など、過去の支出の返金などを表すために使用します。",
+      "description-for-incomes": "収入の取引ですが、マイナスの値になっています。こうした取引は以前の誤った記録を無効や修正したり、返金などを反映させたり、債務の支払を記録するために使用します。"
     },
     "STATUS": {
       "display": {
-        "one": "地位",
-        "other": "狀態"
+        "one": "状態",
+        "other": "状態"
       },
-      "display_long": "交易狀態",
-      "tr_status": "{{status}}交易",
-      "none": "無國籍",
+      "display_long": "取引の状態",
+      "tr_status": "{{status}}取引",
+      "none": "状態なし",
       "none.descr": "沒有特定狀態的交易",
       "reconciled": "和好了",
       "reconciled.descr": "此交易已經過驗證，並且與您銀行的真實交易相對應",
@@ -422,14 +422,14 @@
       "saving.descr": "您只能從其他帳戶中添加和提取資金。非常適合開始存錢"
     },
     "FORM": {
-      "name": "帳戶名稱",
-      "name.placeholder": "例如：儲蓄帳戶",
-      "notes": "筆記",
-      "notes.placeholder": "輸入有關此帳戶的一些註釋/描述",
-      "initial-balance": "初始餘額",
-      "current-balance": "當前餘額",
-      "create": "創建帳戶",
-      "edit": "編輯帳戶",
+      "name": "口座名",
+      "name.placeholder": "例：貯蓄口座",
+      "notes": "メモ",
+      "notes.placeholder": "この口座についての説明やメモを入力してください",
+      "initial-balance": "初期残高",
+      "current-balance": "現在残高",
+      "create": "口座の作成",
+      "edit": "口座の編集",
       "currency-not-found-warn": "您沒有該貨幣的匯率資訊。1.0 將用作預設匯率。您可以在設定中修改",
       "already-exists": "已經有另一個同名，請再寫一個",
       "tr-before-opening-date": "該帳戶中有日期早於開戶日期的交易",
@@ -694,20 +694,20 @@
       }
     },
     "HELP_US": {
-      "display": "幫助我們",
-      "description": "了解如何幫助 Monekin 變得越來越好",
-      "rate-us": "評價我們",
-      "rate-us.descr": "歡迎任何價格！",
-      "share": "分享 Monekin",
-      "share.descr": "與朋友和家人分享我們的應用程式",
-      "share.text": "Monekin！最好的個人理財應用程式。在這裡下載",
-      "thanks": "謝謝你！",
-      "thanks_long": "您對 Monekin 和其他大大小小的開源專案的貢獻使得這樣偉大的專案成為可能。感謝您花時間做出貢獻。",
-      "donate": "做捐贈",
-      "donate.descr": "透過您的捐款，您將幫助該應用程式繼續改進。還有什麼比邀請我喝咖啡來感謝所做的工作更好的方式呢？",
-      "donate.success": "捐款已完成。非常感謝您的貢獻！❤️",
-      "donate.err": "糟糕！接收您的付款時出現錯誤",
-      "report": "報告錯誤、留下建議…"
+      "display": "我々を支援",
+      "description": "どうしたらMonekinをより良くできるか見てみましょう",
+      "rate-us": "評価する",
+      "rate-us.descr": "どのような評価も歓迎します!",
+      "share": "Monekinを共有する",
+      "share.descr": "家族や友人に広めましょう",
+      "share.text": "Monekin! 最高のパーソナルファイナンスアプリ。ダウンロードはこちら",
+      "thanks": "ありがとうございます!",
+      "thanks_long": "Monekinやその他のオープンソースプロジェクトへの貢献は、大小関わらず、このような素晴らしいプロジェクトを可能にします。時間をかけて貢献してくださりありがとうございます。",
+      "donate": "寄付する",
+      "donate.descr": "寄付することで、私たちがアプリを改善し続けることを支援できます。仕事への感謝を表すのにコーヒーに誘うより良い方法があるでしょうか?",
+      "donate.success": "寄付が完了しました。あなたの貢献に心から感謝します!❤️",
+      "donate.err": "おっと! 支払の受取時にエラーが発生したようです",
+      "report": "バグの報告、提案の追加…"
     }
   }
 }
