@@ -678,19 +678,19 @@
       "delete-all-message2": "刪除帳戶後，您將刪除所有儲存的個人資料。您的帳戶、交易、預算和類別將被刪除且無法恢復。您同意嗎？"
     },
     "ABOUT_US": {
-      "display": "應用程式資訊",
-      "description": "查看有關 Monekin 的條款和其他相關資訊。透過報告錯誤、留下建議與社區取得聯繫......",
+      "display": "このアプリについて",
+      "description": "Monekinについての規約やその他関連情報を確認しましょう。バグを報告したり、提案したりして、コミュニティと関わりましょう。",
       "LEGAL": {
-        "display": "法律資訊",
-        "privacy": "隱私權政策",
-        "terms": "使用條款",
-        "licenses": "許可證"
+        "display": "法的情報",
+        "privacy": "プライバシーポリシー",
+        "terms": "利用規約",
+        "licenses": "ライセンス"
       },
       "PROJECT": {
-        "display": "專案",
-        "contributors": "合作者",
-        "contributors.descr": "所有讓 Monekin 成長的開發者",
-        "contact": "聯絡我們"
+        "display": "プロジェクト",
+        "contributors": "貢献者",
+        "contributors.descr": "Monekinを発展させてくれたすべての開発者たち",
+        "contact": "お問い合わせ"
       }
     },
     "HELP_US": {
