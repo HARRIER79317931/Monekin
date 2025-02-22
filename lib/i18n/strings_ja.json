@@ -342,7 +342,7 @@
       "display_long": "取引の状態",
       "tr_status": "{{status}}取引",
       "none": "状態なし",
-      "none.descr": "沒有特定狀態的交易",
+      "none.descr": "特に状態のない取引",
       "reconciled": "和好了",
       "reconciled.descr": "此交易已經過驗證，並且與您銀行的真實交易相對應",
       "unreconciled": "不甘心",
@@ -354,29 +354,29 @@
     },
     "TYPES": {
       "display": {
-        "one": "交易類型",
-        "other": "交易類型"
+        "one": "取引の種類",
+        "other": "取引の種類"
       },
       "income": {
-        "one": "收入",
-        "other": "收入"
+        "one": "収入",
+        "other": "収入"
       },
       "expense": {
         "one": "支出",
         "other": "支出"
       },
       "transfer": {
-        "one": "轉移",
-        "other": "轉移"
+        "one": "振替",
+        "other": "振替"
       }
     }
   },
   "TRANSFER": {
-    "display": "轉移",
-    "transfers": "轉移",
-    "transfer-to": "轉移至{{account}}",
-    "create": "轉移",
-    "need-two-accounts.warning.header": "Ops!",
+    "display": "振替",
+    "transfers": "振替",
+    "transfer-to": "{{account}}へ振替",
+    "create": "新規振替",
+    "need-two-accounts.warning.header": "おっと!",
     "need-two-accounts.warning.message": "至少需要兩個帳戶才能執行此操作。如果您需要調整或編輯該帳戶的當前餘額，請點擊編輯按鈕",
     "FORM": {
       "from": "原始帳戶",
@@ -388,7 +388,7 @@
     }
   },
   "RECURRENT-TRANSACTIONS": {
-    "title": "經常交易",
+    "title": "定期振替",
     "title.short": "經常交易",
     "empty": "您似乎沒有任何經常交易。創建每月、每年或每週的經常交易，它將顯示在此處",
     "total-expense.title": "每個期間的總收入",
@@ -416,9 +416,9 @@
     "TYPES": {
       "title": "帳戶類型",
       "warning": "帳戶類型一旦選擇，以後將無法更改",
-      "normal": "普通帳戶",
+      "normal": "普通口座",
       "normal.descr": "對於記錄您的日常財務很有用。這是最常見的帳戶，它可以讓您添加支出、收入......",
-      "saving": "儲蓄帳戶",
+      "saving": "貯金口座",
       "saving.descr": "您只能從其他帳戶中添加和提取資金。非常適合開始存錢"
     },
     "FORM": {
