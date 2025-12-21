@@ -1,19 +1,48 @@
 {
-  "GENERAL": {
+  "UI-ACTIONS": {
     "cancel": "取消",
-    "or": "もしくは",
-    "understood": "理解した",
-    "unspecified": "未指定",
     "confirm": "確認",
     "continue_text": "続行",
-    "quick_actions": "クイックアクション",
     "save": "保存",
     "save_changes": "変更を保存",
     "close_and_save": "保存して閉じる",
     "add": "追加",
     "edit": "編集",
-    "balance": "収支",
     "delete": "削除",
+    "see-more": "もっと見る",
+    "select-all": "すべて選択",
+    "deselect-all": "選択を解除",
+    "select": "選択",
+    "search": "検索",
+    "filter": "フィルター",
+    "reset": "リセット",
+    "submit": "提出",
+    "next": "次",
+    "previous": "前",
+    "back": "戻る",
+    "reload": "リロード",
+    "view": "見る",
+    "download": "ダウンロード",
+    "upload": "アップロード",
+    "retry": "再試行",
+    "copy": "コピー",
+    "paste": "貼付",
+    "undo": "取り消す",
+    "redo": "もう一度",
+    "open": "公開",
+    "close": "閉じる",
+    "apply": "適用",
+    "discard": "放棄",
+    "refresh": "再読込",
+    "details": "詳細",
+    "share": "共有"
+  },
+  "GENERAL": {
+    "or": "もしくは",
+    "understood": "理解した",
+    "unspecified": "未指定",
+    "quick_actions": "クイックアクション",
+    "balance": "収支",
     "account": "口座",
     "accounts": "口座",
     "categories": "カテゴリ",
@@ -21,10 +50,8 @@
     "today": "今日",
     "yesterday": "昨日",
     "filters": "フィルター",
-    "see-more": "もっと見る",
-    "select-all": "すべて選択",
-    "deselect-all": "選択解除",
     "empty-warn": "おっと!ここは空です",
+    "search-no-results": "条件と一致するものがありません",
     "insufficient-data": "データ不足",
     "show-more-fields": "もっとフィールドを表示",
     "show-less-fields": "フィールドを折りたたむ",
@@ -170,15 +197,24 @@
   "FINANCIAL-HEALTH": {
     "display": "財務の健全性",
     "review": {
-      "very_good(context=GenderContext)": { "male,female": "とても良い！" },
-      "good(context=GenderContext)": { "male,female": "良い" },
-      "normal(context=GenderContext)": { "male,female": "普通" },
-      "bad(context=GenderContext)": { "male,female": "悪い" },
-      "very_bad(context=GenderContext)": { "male,female": "とても悪い" },
+      "very_good(context=GenderContext)": {
+        "male,female": "とても良い！" 
+      },
+      "good(context=GenderContext)": {
+        "male,female": "良い" 
+      },
+      "normal(context=GenderContext)": {
+        "male,female": "普通" 
+      },
+      "bad(context=GenderContext)": {
+        "male,female": "悪い" 
+      },
+      "very_bad(context=GenderContext)": {
+        "male,female": "とても悪い" 
+      },
       "insufficient_data(context=GenderContext)": {
         "male,female": "情報不足"
       },
-
       "descr": {
         "insufficient_data": "財務の健全性を測るのに十分な情報がないようです。この期間の支出入を追加して、私達があなたのお手伝いをできるようにしてください!",
         "very_good": "おめでとう!あなたの財務の健全性はとても良好です。この状況を維持して、Monekinで学び続けてください!",
@@ -236,6 +272,8 @@
     "color": "色",
     "select-icon": "アイコンを選んでください",
     "select-color": "色を選んでください",
+    "custom-color": "カスタムカラー",
+    "current-color-selection": "現在の選択",
     "select-account-icon": "口座を定義",
     "select-category-icon": "カテゴリを定義",
     "SCOPES": {
@@ -287,11 +325,15 @@
       "recurrent-rule-finished": "定期的な支払は完了しました。もう支払の必要はありません!"
     },
     "LIST": {
+      "all": "全取引",
       "empty": "表示する取引がありません。取引を追加すれば幸運が訪れるかもしれません。",
       "searcher.placeholder": "カテゴリ、詳細で検索...",
       "searcher.no-results": "条件と一致する取引がありませんでした",
       "loading": "取引をロードしています...",
-      "selected.short": { "one": "{{n}} 選択されました", "other": "{{n}} 選択されました" },
+      "selected.short": { 
+        "one": "{{n}} 選択されました", 
+        "other": "{{n}} 選択されました" 
+      },
       "selected.long": {
         "one": " {{n}} 取引が選択されました",
         "other": "{{n}} 取引が選択されました"
@@ -303,6 +345,7 @@
       }
     },
     "FILTERS": {
+      "title": "取引のフィルター",
       "from_value": "金額から",
       "to_value": "金額まで",
       "from_value_def": "{{x}}から",
@@ -399,6 +442,10 @@
       "last-payment-info": "此動作是循環規則的最後一個，因此當確認此動作時，該規則將自動刪除",
       "delete-header": "刪除重複交易",
       "delete-message": "此操作不可逆轉，不會影響您已確認/付款的交易"
+    },
+    "STATUS": {
+      "delayed_by": "{{x}}日遅れている",
+      "coming_in": "{{x}} 日以内に"
     }
   },
   "ACCOUNT": {
@@ -561,7 +608,9 @@
       "name": "預算名稱",
       "value": "數量限制",
       "create": "添加預算",
+      "create-success": "Budget created successfully",
       "edit": "編輯預算",
+      "edit-success": "Budget edited successfully",
       "negative-warn": "預算不能有負數"
     },
     "DETAILS": {
@@ -574,15 +623,24 @@
     }
   },
   "BACKUP": {
+    "no_file_selected": "No file selected",
+    "no_directory_selected": "No directory selected",
     "EXPORT": {
       "title": "匯出您的資料",
       "title.short": "匯出",
+      "type-of-export": "Type of export",
+      "other-options": "Options",
       "all": "完整備份",
       "all.descr": "匯出您的所有資料（帳戶、交易、預算、設定...）。隨時重新匯入它們，這樣您就不會丟失任何內容。",
       "transactions": "交易備份",
       "transactions.descr": "以 CSV 格式匯出您的交易，以便您可以在其他程式或應用程式中更輕鬆地分析它們。",
+      "transactions-to-export": {
+        "one": "1 transaction to export",
+        "other": "{{ n }} transactions to export"
+      },
       "description": "以不同格式下載資料",
-      "dialog_title": "儲存/傳送文件",
+      "send_file": "Send file",
+      "see_folder": "See folder",
       "success": "檔案已在{{x}}中成功儲存/下載",
       "error": "下載檔案時發生錯誤。請透過 lozin.technologies@gmail.com 聯絡開發人員"
     },
@@ -640,7 +698,9 @@
     "lang.section": "語言和文本",
     "lang.title": "應用程式語言",
     "lang.descr": "應用程式中顯示文字的語言",
+    "lang.help": "If you want to collaborate with the translations of this app, you can consult <a href='https://github.com/enrique-lozano/Monekin/tree/main/lib/i18n'>our guide</a>",
     "locale": "地區",
+    "locale_auto": "System",
     "locale.descr": "設定用於日期、數字的格式...",
     "locale.warn": "更改區域時應用程式將更新",
     "first_day_of_week": "一週的第一天",
@@ -655,6 +715,20 @@
     "dynamic-colors.descr": "盡可能使用系統強調色",
     "accent-color": "強調色",
     "accent-color.descr": "選擇應用程式用來強調介面某些部分的顏色",
+    "font": "Font",
+    "font-platform": "Platform",
+    "SWIPE-ACTIONS": {
+      "title": "Swipe actions",
+      "choose-description": "Choose what action will be triggered when you swipe a transaction item in the list using this swipe direction",
+      "swipe-left": "Swipe left",
+      "swipe-right": "Swipe right",
+      "none": "No action",
+      "toggle-reconciled": "Toggle reconciled",
+      "toggle-pending": "Toggle pending",
+      "toggle-voided": "Toggle voided",
+      "toggle-unreconciled": "Toggle unreconciled",
+      "remove-status": "Remove status"
+    },
     "SECURITY": {
       "title": "安全",
       "private-mode-at-launch": "啟動時啟用的隱私模式",
