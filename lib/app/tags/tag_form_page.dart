@@ -5,6 +5,7 @@ import 'package:monekin/core/database/services/tags/tags_service.dart';
 import 'package:monekin/core/extensions/color.extensions.dart';
 import 'package:monekin/core/extensions/lists.extensions.dart';
 import 'package:monekin/core/models/tags/tag.dart';
+import 'package:monekin/core/presentation/helpers/snackbar.dart';
 import 'package:monekin/core/presentation/widgets/color_picker/color_picker.dart';
 import 'package:monekin/core/presentation/widgets/color_picker/color_picker_modal.dart';
 import 'package:monekin/core/presentation/widgets/confirm_dialog.dart';
@@ -13,7 +14,7 @@ import 'package:monekin/core/presentation/widgets/persistent_footer_button.dart'
 import 'package:monekin/core/utils/constants.dart';
 import 'package:monekin/core/utils/text_field_utils.dart';
 import 'package:monekin/core/utils/uuid.dart';
-import 'package:monekin/i18n/translations.g.dart';
+import 'package:monekin/i18n/generated/translations.g.dart';
 
 class TagFormPage extends StatefulWidget {
   const TagFormPage({super.key, this.tag});
@@ -39,15 +40,14 @@ class _TagFormPageState extends State<TagFormPage> {
     super.initState();
 
     _nameController.value = TextEditingValue(text: widget.tag?.name ?? '');
-    _descrController.value =
-        TextEditingValue(text: widget.tag?.description ?? '');
+    _descrController.value = TextEditingValue(
+      text: widget.tag?.description ?? '',
+    );
 
     _color = widget.tag?.color ?? defaultColorPickerOptions.randomItem();
   }
 
-  submitForm() async {
-    final messager = ScaffoldMessenger.of(context);
-
+  Future<void> submitForm() async {
     final tagToEdit = Tag(
       id: widget.tag?.id ?? generateUUID(),
       name: _nameController.text,
@@ -56,11 +56,14 @@ class _TagFormPageState extends State<TagFormPage> {
     );
 
     if (widget.tag != null) {
-      await TagService.instance.updateTag(tagToEdit).then((value) {
-        messager.showSnackBar(SnackBar(content: Text(t.tags.edit_success)));
-      }).catchError((error) {
-        messager.showSnackBar(SnackBar(content: Text(error.toString())));
-      });
+      await TagService.instance
+          .updateTag(tagToEdit)
+          .then((value) {
+            MonekinSnackbar.success(SnackbarParams(t.tags.edit_success));
+          })
+          .catchError((error) {
+            MonekinSnackbar.error(SnackbarParams.fromError(error));
+          });
     } else {
       final db = AppDB.instance;
 
@@ -69,20 +72,19 @@ class _TagFormPageState extends State<TagFormPage> {
         ..where((tbl) => tbl.name.isValue(_nameController.text));
 
       if (await query.watchSingleOrNull().first != null) {
-        messager.showSnackBar(SnackBar(
-          content: Text(t.tags.already_exists),
-        ));
-
+        MonekinSnackbar.error(SnackbarParams(t.tags.already_exists));
         return;
       }
 
-      await TagService.instance.insertTag(tagToEdit).then((value) {
-        Navigator.pop(context);
-
-        messager.showSnackBar(SnackBar(content: Text(t.tags.create_success)));
-      }).catchError((error) {
-        messager.showSnackBar(SnackBar(content: Text(error.toString())));
-      });
+      await TagService.instance
+          .insertTag(tagToEdit)
+          .then((value) {
+            if (mounted) Navigator.pop(context);
+            MonekinSnackbar.success(SnackbarParams(t.tags.create_success));
+          })
+          .catchError((error) {
+            MonekinSnackbar.error(SnackbarParams.fromError(error));
+          });
     }
   }
 
@@ -97,32 +99,32 @@ class _TagFormPageState extends State<TagFormPage> {
           if (widget.tag != null)
             IconButton(
               onPressed: () {
-                final scaffold = ScaffoldMessenger.of(context);
-
                 confirmDialog(
                   context,
                   dialogTitle: t.tags.delete_warning_header,
                   contentParagraphs: [Text(t.tags.delete_warning_message)],
-                  confirmationText: t.general.continue_text,
+                  confirmationText: t.ui_actions.continue_text,
                   showCancelButton: true,
                   icon: Icons.delete,
-                ).then(
-                  (isConfirmed) {
-                    if (isConfirmed != true) return;
+                ).then((isConfirmed) {
+                  if (isConfirmed != true) return;
 
-                    TagService.instance.deleteTag(widget.tag!.id).then((value) {
-                      Navigator.pop(context);
+                  TagService.instance
+                      .deleteTag(widget.tag!.id)
+                      .then((value) {
+                        Navigator.pop(context);
 
-                      scaffold.showSnackBar(
-                          SnackBar(content: Text(t.tags.delete_success)));
-                    }).catchError((err) {
-                      scaffold.showSnackBar(SnackBar(content: Text('$err')));
-                    });
-                  },
-                );
+                        MonekinSnackbar.success(
+                          SnackbarParams(t.tags.delete_success),
+                        );
+                      })
+                      .catchError((err) {
+                        MonekinSnackbar.error(SnackbarParams.fromError(err));
+                      });
+                });
               },
               icon: const Icon(Icons.delete),
-            )
+            ),
         ],
       ),
       persistentFooterButtons: [
@@ -136,9 +138,9 @@ class _TagFormPageState extends State<TagFormPage> {
               }
             },
             icon: const Icon(Icons.check),
-            label: Text(t.general.save_changes),
+            label: Text(t.ui_actions.save_changes),
           ),
-        )
+        ),
       ],
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -167,7 +169,7 @@ class _TagFormPageState extends State<TagFormPage> {
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           textInputAction: TextInputAction.next,
                         ),
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -183,14 +185,15 @@ class _TagFormPageState extends State<TagFormPage> {
                       ColorPickerModal(
                         colorOptions: defaultColorPickerOptions,
                         selectedColor: _color,
-                      ),
-                    ).then((value) {
-                      if (value == null) return;
+                        onColorSelected: (value) {
+                          Navigator.pop(context);
 
-                      setState(() {
-                        _color = value.toHex();
-                      });
-                    }),
+                          setState(() {
+                            _color = value.toHex();
+                          });
+                        },
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   TextFormField(

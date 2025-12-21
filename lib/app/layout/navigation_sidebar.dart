@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:monekin/app/home/widgets/home_drawer.dart';
-import 'package:monekin/app/home/widgets/new_transaction_fl_button.dart';
-import 'package:monekin/core/database/services/user-setting/user_setting_service.dart';
+import 'package:monekin/app/layout/navigation_drawer.dart';
+import 'package:monekin/app/settings/widgets/display_app_icon.dart';
 import 'package:monekin/core/presentation/responsive/breakpoint_container.dart';
 import 'package:monekin/core/presentation/responsive/breakpoints.dart';
-import 'package:monekin/core/presentation/widgets/user_avatar.dart';
 import 'package:monekin/core/routes/destinations.dart';
 import 'package:monekin/core/routes/route_utils.dart';
 import 'package:monekin/main.dart';
@@ -19,7 +17,7 @@ double getNavigationSidebarWidth(BuildContext context) {
   }
 
   double screenPercent = 0.3;
-  double maxWidthNavigation = 270;
+  double maxWidthNavigation = 240;
 
   return (MediaQuery.sizeOf(context).width * screenPercent > maxWidthNavigation
           ? maxWidthNavigation
@@ -45,57 +43,54 @@ class NavigationSidebarState extends State<NavigationSidebar> {
 
   @override
   Widget build(BuildContext context) {
-    final menuItems = getDestinations(context,
-        shortLabels: BreakPoint.of(context).isSmallerThan(BreakpointID.xl));
+    final menuItems = getDestinations(
+      context,
+      shortLabels: BreakPoint.of(context).isSmallerThan(BreakpointID.xl),
+    );
 
     selectedDestination ??= menuItems.elementAt(0);
 
-    final selectedNavItemIndex = menuItems
-        .indexWhere((element) => element.id == selectedDestination!.id);
+    final selectedNavItemIndex = menuItems.indexWhere(
+      (element) => element.id == selectedDestination!.id,
+    );
 
     onDestinationSelected(int e) {
       RouteUtils.popAllRoutesExceptFirst();
       tabsPageKey.currentState?.changePage(menuItems.elementAt(e));
     }
 
+    final navSidebarWidth = getNavigationSidebarWidth(context);
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 1500),
       curve: Curves.easeInOutCubicEmphasized,
-      width: getNavigationSidebarWidth(context),
+      width: navSidebarWidth,
       child: BreakpointContainer(
         mdChild: SafeArea(
           child: NavigationRail(
-              leading: const Column(
-                children: [
-                  SizedBox(height: 16),
-                  NewTransactionButton(),
-                  SizedBox(height: 16),
-                ],
-              ),
-              trailing: Expanded(
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16, top: 16),
-                    child: StreamBuilder(
-                        stream: UserSettingService.instance
-                            .getSettingFromDB(SettingKey.avatar),
-                        builder: (context, snapshot) {
-                          return UserAvatar(avatar: snapshot.data);
-                        }),
-                  ),
+            leading: const SizedBox(height: 8),
+            backgroundColor: Theme.of(context).cardColor,
+            trailing: Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16, top: 16),
+                  child: DisplayAppIcon(height: navSidebarWidth - 48),
                 ),
               ),
-              labelType: NavigationRailLabelType.all,
-              destinations: menuItems
-                  .map((e) => e.toNavigationRailDestinationWidget())
-                  .toList(),
-              onDestinationSelected: onDestinationSelected,
-              selectedIndex:
-                  selectedNavItemIndex < 0 ? null : selectedNavItemIndex),
+            ),
+            labelType: NavigationRailLabelType.all,
+            destinations: menuItems
+                .map((e) => e.toNavigationRailDestinationWidget())
+                .toList(),
+            onDestinationSelected: onDestinationSelected,
+            selectedIndex: selectedNavItemIndex < 0
+                ? null
+                : selectedNavItemIndex,
+          ),
         ),
         xlChild: SafeArea(
-          child: HomeDrawer(
+          child: SideNavigationDrawer(
             drawerActions: menuItems,
             onDestinationSelected: onDestinationSelected,
             selectedIndex: selectedNavItemIndex,

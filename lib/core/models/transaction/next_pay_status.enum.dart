@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monekin/core/presentation/app_colors.dart';
-import 'package:monekin/i18n/translations.g.dart';
+import 'package:monekin/i18n/generated/translations.g.dart';
 
 enum NextPayStatus {
   /// The payment date has not yet arrived, but it is very close
@@ -40,9 +40,9 @@ enum NextPayStatus {
     }
 
     if (this == delayed) {
-      return 'Atrasado por ${days.abs()}d';
+      return t.recurrent_transactions.status.delayed_by(x: days.abs());
     }
 
-    return 'In ${days.abs()} days';
+    return t.recurrent_transactions.status.coming_in(x: days.abs());
   }
 }

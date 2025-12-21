@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:monekin/i18n/translations.g.dart';
+import 'package:monekin/i18n/generated/translations.g.dart';
 
 /// The radius of the `CardWithHeader` widget, a very useful widget through the app
 const cardWithHeaderRadius = 12.0;
@@ -47,14 +47,16 @@ class CardWithHeader extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title,
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w600)),
+                    Text(
+                      title,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleMedium!.copyWith(fontSize: 18),
+                    ),
                     if (subtitle != null)
                       Text(
                         subtitle!,
-                        style: const TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.w300),
+                        style: Theme.of(context).textTheme.bodySmall!,
                       ),
                   ],
                 ),
@@ -64,12 +66,9 @@ class CardWithHeader extends StatelessWidget {
           Material(
             type: MaterialType.transparency,
             clipBehavior: Clip.antiAliasWithSaveLayer,
-            child: Padding(
-              padding: bodyPadding,
-              child: body,
-            ),
+            child: Padding(padding: bodyPadding, child: body),
           ),
-          if (footer != null) footer!
+          if (footer != null) footer!,
         ],
       ),
     );
@@ -89,11 +88,7 @@ class CardFooterWithSingleButton extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Divider(
-          thickness: 2,
-          indent: 16,
-          endIndent: 16,
-        ),
+        const Divider(thickness: 2, indent: 16, endIndent: 16),
         Container(
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.fromLTRB(2, 4, 2, 4),
@@ -101,9 +96,9 @@ class CardFooterWithSingleButton extends StatelessWidget {
             onPressed: onButtonClick,
             iconAlignment: IconAlignment.end,
             icon: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
-            label: Text(text ?? t.general.see_more),
+            label: Text(text ?? t.ui_actions.see_more),
           ),
-        )
+        ),
       ],
     );
   }

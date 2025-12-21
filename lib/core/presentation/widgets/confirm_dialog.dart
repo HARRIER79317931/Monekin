@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:monekin/i18n/translations.g.dart';
+import 'package:monekin/i18n/generated/translations.g.dart';
 
 /// Display a dialog with a title, a description and confirm/cancel buttons.
 ///
@@ -35,7 +35,7 @@ Future<bool?> confirmDialog(
         actions: [
           if (showCancelButton)
             TextButton(
-              child: Text(t.general.cancel),
+              child: Text(t.ui_actions.cancel),
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop(false);
               },

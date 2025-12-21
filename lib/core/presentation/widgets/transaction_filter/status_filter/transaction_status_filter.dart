@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monekin/core/models/transaction/transaction_status.enum.dart';
 import 'package:monekin/core/presentation/widgets/transaction_filter/status_filter/transaction_status_filter_chip.dart';
-import 'package:monekin/i18n/translations.g.dart';
+import 'package:monekin/i18n/generated/translations.g.dart';
 
 class TransactionStatusFilter extends StatelessWidget {
   const TransactionStatusFilter({
@@ -12,7 +12,7 @@ class TransactionStatusFilter extends StatelessWidget {
   });
 
   final void Function(TransactionStatus? statusSelected, bool value)?
-      onSelected;
+  onSelected;
 
   final List<TransactionStatus?> selectedStatuses;
   final bool allowMultipleSelection;
@@ -25,7 +25,8 @@ class TransactionStatusFilter extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-            '${t.transaction.status.display(n: allowMultipleSelection ? 10 : 1)}:'),
+          '${t.transaction.status.display(n: allowMultipleSelection ? 10 : 1)}:',
+        ),
         const SizedBox(height: 4),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -40,7 +41,7 @@ class TransactionStatusFilter extends StatelessWidget {
                       : null,
                 ),
                 const SizedBox(width: 6),
-              ]
+              ],
             ],
           ),
         ),

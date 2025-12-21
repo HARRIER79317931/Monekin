@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
+import 'package:monekin/app/categories/selectors/draggableScrollableKeyboardAware.mixin.dart';
 import 'package:monekin/core/database/services/tags/tags_service.dart';
 import 'package:monekin/core/extensions/string.extension.dart';
 import 'package:monekin/core/models/tags/tag.dart';
@@ -9,7 +10,7 @@ import 'package:monekin/core/presentation/widgets/bottomSheetFooter.dart';
 import 'package:monekin/core/presentation/widgets/count_indicator.dart';
 import 'package:monekin/core/presentation/widgets/modal_container.dart';
 import 'package:monekin/core/presentation/widgets/scrollable_with_bottom_gradient.dart';
-import 'package:monekin/i18n/translations.g.dart';
+import 'package:monekin/i18n/generated/translations.g.dart';
 
 Future<List<Tag?>?> showTagListModal(
   BuildContext context, {
@@ -43,14 +44,11 @@ class TagSelector extends StatefulWidget {
   State<TagSelector> createState() => _TagSelectorState();
 }
 
-class _TagSelectorState extends State<TagSelector> {
+class _TagSelectorState extends State<TagSelector>
+    with DraggableScrollableKeyboardAware {
   late List<Tag?> selectedTags;
 
   String searchValue = '';
-
-  final DraggableScrollableController controller =
-      DraggableScrollableController();
-
   @override
   void initState() {
     super.initState();
@@ -59,86 +57,63 @@ class _TagSelectorState extends State<TagSelector> {
   }
 
   @override
-  void dispose() {
-    controller.dispose();
-
-    super.dispose();
-  }
-
-  _moveSheetTo(double position) {
-    if (controller.isAttached && mounted) {
-      controller.jumpTo(position);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
 
-    final bottomInsets = MediaQuery.of(context).viewInsets.bottom;
-
-    if (bottomInsets > 0) {
-      _moveSheetTo(1);
-    } else {
-      _moveSheetTo(0.65);
-    }
-
-    return DraggableScrollableSheet(
-        controller: controller,
-        expand: false,
-        minChildSize: 0.64,
-        initialChildSize: 0.65,
-        snap: true,
-        snapSizes: const [0.65],
-        builder: (context, scrollController) {
-          return ModalContainer(
-            title: t.tags.select.title,
-            titleBuilder: selectedTags.isEmpty
-                ? null
-                : (title) {
-                    return Row(
-                      children: [
-                        Text(title),
-                        const SizedBox(width: 12),
-                        CountIndicator(selectedTags.length),
-                      ],
-                    );
-                  },
-            body: StreamBuilder(
-                stream: TagService.instance.getTags(
-                  filter: (p0) => p0.name.contains(searchValue),
-                ),
-                builder: (context, snapshot) {
-                  return Column(
+    return buildDraggableSheet(
+      minChildSize: 0.64,
+      defaultSize: 0.65,
+      builder: (context, scrollController) {
+        return ModalContainer(
+          title: t.tags.select.title,
+          titleBuilder: selectedTags.isEmpty
+              ? null
+              : (title) {
+                  return Row(
                     children: [
-                      TextField(
-                        decoration: InputDecoration(
-                          filled: false,
-                          isDense: false,
-                          hintText: t.currencies.search,
-                          labelText: t.general.tap_to_search,
-                          floatingLabelStyle: const TextStyle(height: -0.0005),
-                          prefixIcon: const Icon(Icons.search),
-                          border: const UnderlineInputBorder(),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            searchValue = value;
-                          });
-                        },
-                      ),
-                      buildSelectAllButton(snapshot),
-                      buildTagList(snapshot, scrollController),
+                      Text(title),
+                      const SizedBox(width: 12),
+                      CountIndicator(selectedTags.length),
                     ],
                   );
-                }),
-            footer: BottomSheetFooter(
-              onSaved: selectedTags.isNotEmpty || widget.allowEmptySubmit
-                  ? () => Navigator.of(context).pop(selectedTags)
-                  : null,
+                },
+          body: StreamBuilder(
+            stream: TagService.instance.getTags(
+              filter: (p0) => p0.name.contains(searchValue),
             ),
-          );
-        });
+            builder: (context, snapshot) {
+              return Column(
+                children: [
+                  TextField(
+                    decoration: InputDecoration(
+                      filled: false,
+                      isDense: false,
+                      hintText: t.currencies.search,
+                      labelText: t.general.tap_to_search,
+                      floatingLabelStyle: const TextStyle(height: -0.0005),
+                      prefixIcon: const Icon(Icons.search),
+                      border: const UnderlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      searchValue = value;
+
+                      rebuild();
+                    },
+                  ),
+                  buildSelectAllButton(snapshot),
+                  buildTagList(snapshot, scrollController),
+                ],
+              );
+            },
+          ),
+          footer: BottomSheetFooter(
+            onSaved: selectedTags.isNotEmpty || widget.allowEmptySubmit
+                ? () => Navigator.of(context).pop(selectedTags)
+                : null,
+          ),
+        );
+      },
+    );
   }
 
   Widget buildTagList(
@@ -149,16 +124,14 @@ class _TagSelectorState extends State<TagSelector> {
       return const LinearProgressIndicator();
     }
 
-    final allTags =
-        widget.includeNullTag ? [null, ...snapshot.data!] : snapshot.data!;
+    final allTags = widget.includeNullTag
+        ? [null, ...snapshot.data!]
+        : snapshot.data!;
 
     if (allTags.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(16),
-        child: Text(
-          t.account.no_accounts,
-          textAlign: TextAlign.center,
-        ),
+        child: Text(t.account.no_accounts, textAlign: TextAlign.center),
       );
     }
 
@@ -184,13 +157,14 @@ class _TagSelectorState extends State<TagSelector> {
                     if (newValue == null) return;
 
                     if (!newValue) {
-                      selectedTags
-                          .removeWhere((element) => element?.id == null);
+                      selectedTags.removeWhere(
+                        (element) => element?.id == null,
+                      );
                     } else {
                       selectedTags.add(null);
                     }
 
-                    setState(() {});
+                    rebuild();
                   },
                 );
               }
@@ -198,8 +172,10 @@ class _TagSelectorState extends State<TagSelector> {
               // TAG NOT NULL --> Rest of the tags:
 
               return CheckboxListTile.adaptive(
-                value: selectedTags.any((element) =>
-                    element != null && element.id == tag.id || element == tag),
+                value: selectedTags.any(
+                  (element) =>
+                      element != null && element.id == tag.id || element == tag,
+                ),
                 secondary: tag.displayIcon(),
                 title: Text(tag.name),
                 subtitle: !tag.description.isNullOrEmpty
@@ -209,20 +185,22 @@ class _TagSelectorState extends State<TagSelector> {
                   if (newValue == null) return;
 
                   if (!newValue) {
-                    selectedTags
-                        .removeWhere((element) => element?.id == tag.id);
+                    selectedTags.removeWhere(
+                      (element) => element?.id == tag.id,
+                    );
                   } else {
                     selectedTags.add(tag);
                   }
 
-                  setState(() {});
+                  rebuild();
                 },
               );
             },
             separatorBuilder: (context, index) => const Divider(),
           ),
           ScrollableWithBottomGradient.buildPositionedGradient(
-              Theme.of(context).colorSchemeExtended.modalBackground),
+            AppColors.of(context).modalBackground,
+          ),
         ],
       ),
     );
@@ -231,37 +209,43 @@ class _TagSelectorState extends State<TagSelector> {
   Widget buildSelectAllButton(AsyncSnapshot<List<Tag>> snapshot) {
     final filteredTags = [
       if (widget.includeNullTag) null,
-      if (snapshot.hasData) ...snapshot.data!
+      if (snapshot.hasData) ...snapshot.data!,
     ];
 
     final filteredSelectedTags = selectedTags
-        .where((selAcc) =>
-            selAcc == null ||
-            filteredTags.nonNulls.map((e) => e.id).contains(selAcc.id))
+        .where(
+          (selAcc) =>
+              selAcc == null ||
+              filteredTags.nonNulls.map((e) => e.id).contains(selAcc.id),
+        )
         .toList();
 
     return CheckboxListTile(
       value: filteredSelectedTags.isEmpty
           ? false
           : filteredSelectedTags.length == filteredTags.length
-              ? true
-              : null,
+          ? true
+          : null,
       tristate: true,
       title: Text(
-        t.general.select_all,
-        style: const TextStyle(fontWeight: FontWeight.w700),
+        t.ui_actions.select_all,
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       enabled: snapshot.hasData && snapshot.data!.isNotEmpty,
       onChanged: (value) {
         if (value == true) {
-          selectedTags.addAll(filteredTags.whereNot(
-              (e) => selectedTags.map((selAcc) => selAcc?.id).contains(e?.id)));
+          selectedTags.addAll(
+            filteredTags.whereNot(
+              (e) => selectedTags.map((selAcc) => selAcc?.id).contains(e?.id),
+            ),
+          );
         } else {
           selectedTags.removeWhere(
-              (selAcc) => filteredTags.map((e) => e?.id).contains(selAcc?.id));
+            (selAcc) => filteredTags.map((e) => e?.id).contains(selAcc?.id),
+          );
         }
 
-        setState(() {});
+        rebuild();
       },
     );
   }

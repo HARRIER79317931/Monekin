@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
+import 'package:monekin/app/categories/selectors/draggableScrollableKeyboardAware.mixin.dart';
 import 'package:monekin/core/database/services/category/category_service.dart';
 import 'package:monekin/core/extensions/string.extension.dart';
 import 'package:monekin/core/models/category/category.dart';
@@ -10,10 +11,12 @@ import 'package:monekin/core/presentation/widgets/bottomSheetFooter.dart';
 import 'package:monekin/core/presentation/widgets/count_indicator.dart';
 import 'package:monekin/core/presentation/widgets/modal_container.dart';
 import 'package:monekin/core/presentation/widgets/scrollable_with_bottom_gradient.dart';
-import 'package:monekin/i18n/translations.g.dart';
+import 'package:monekin/i18n/generated/translations.g.dart';
 
 Future<List<Category>?> showMultiCategoryListModal(
-    BuildContext context, CategoryMultiSelectorModal modal) {
+  BuildContext context,
+  CategoryMultiSelectorModal modal,
+) {
   return showModalBottomSheet<List<Category>>(
     context: context,
     isScrollControlled: true,
@@ -35,17 +38,14 @@ class CategoryMultiSelectorModal extends StatefulWidget {
       _CategoryMultiSelectorModalState();
 }
 
-class _CategoryMultiSelectorModalState
-    extends State<CategoryMultiSelectorModal> {
+class _CategoryMultiSelectorModalState extends State<CategoryMultiSelectorModal>
+    with DraggableScrollableKeyboardAware {
   late List<Category> selectedCategories;
 
   String searchValue = '';
 
   /// IDs of the category tiles that are expanded
   Set<String> expandedCategoriesTiles = {};
-
-  final DraggableScrollableController controller =
-      DraggableScrollableController();
 
   @override
   void initState() {
@@ -55,37 +55,12 @@ class _CategoryMultiSelectorModalState
   }
 
   @override
-  void dispose() {
-    controller.dispose();
-
-    super.dispose();
-  }
-
-  _moveSheetTo(double position) {
-    if (controller.isAttached && mounted) {
-      controller.jumpTo(position);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
 
-    final bottomInsets = MediaQuery.of(context).viewInsets.bottom;
-
-    if (bottomInsets > 0) {
-      _moveSheetTo(1);
-    } else {
-      _moveSheetTo(0.65);
-    }
-
-    return DraggableScrollableSheet(
-      controller: controller,
-      expand: false,
+    return buildDraggableSheet(
+      defaultSize: 0.65,
       minChildSize: 0.64,
-      initialChildSize: 0.65,
-      snap: true,
-      snapSizes: const [0.65],
       builder: (context, sc) {
         return ModalContainer(
           title: t.categories.select.title,
@@ -102,9 +77,9 @@ class _CategoryMultiSelectorModalState
                 },
           body: StreamBuilder(
             stream: CategoryService.instance.getCategories(
-                predicate: (c, pc) =>
-                    c.name.contains(searchValue) |
-                    pc.name.contains(searchValue)),
+              predicate: (c, pc) =>
+                  c.name.contains(searchValue) | pc.name.contains(searchValue),
+            ),
             builder: (context, snapshot) {
               return Column(
                 children: [
@@ -119,9 +94,9 @@ class _CategoryMultiSelectorModalState
                       border: const UnderlineInputBorder(),
                     ),
                     onChanged: (value) {
-                      setState(() {
-                        searchValue = value;
-                      });
+                      searchValue = value;
+
+                      rebuild();
                     },
                   ),
                   buildSelectAllButton(snapshot),
@@ -141,22 +116,22 @@ class _CategoryMultiSelectorModalState
   }
 
   Widget buildCategoryTree(
-      AsyncSnapshot<List<Category>> snapshot, ScrollController sc) {
+    AsyncSnapshot<List<Category>> snapshot,
+    ScrollController sc,
+  ) {
     if (!snapshot.hasData) {
       return const LinearProgressIndicator();
     }
 
-    final allParentCategories =
-        snapshot.data!.where((c) => c.parentCategoryID.isNullOrEmpty);
+    final allParentCategories = snapshot.data!.where(
+      (c) => c.parentCategoryID.isNullOrEmpty,
+    );
 
     if (allParentCategories.isEmpty) {
       //TODO: Improve this messages in all the app
       return Padding(
         padding: const EdgeInsets.all(16),
-        child: Text(
-          t.account.no_accounts,
-          textAlign: TextAlign.center,
-        ),
+        child: Text(t.account.no_accounts, textAlign: TextAlign.center),
       );
     }
 
@@ -168,48 +143,55 @@ class _CategoryMultiSelectorModalState
             itemCount: allParentCategories.length,
             itemBuilder: (context, index) {
               final category = allParentCategories.elementAt(index);
-              final subcategories = snapshot.data!
-                  .where((cat) => cat.parentCategoryID == category.id);
+              final subcategories = snapshot.data!.where(
+                (cat) => cat.parentCategoryID == category.id,
+              );
 
               final subcategoriesAndMainCategory = [category, ...subcategories];
 
               final selectedSubcategoriesInThisCat = selectedCategories.where(
-                  (sel) => subcategoriesAndMainCategory
-                      .map((e) => e.id)
-                      .contains(sel.id));
+                (sel) => subcategoriesAndMainCategory
+                    .map((e) => e.id)
+                    .contains(sel.id),
+              );
 
               return ExpansionTile(
                 onExpansionChanged: (value) {
                   if (value) {
                     expandedCategoriesTiles.add(category.id);
                   } else {
-                    expandedCategoriesTiles
-                        .removeWhere((e) => e == category.id);
+                    expandedCategoriesTiles.removeWhere(
+                      (e) => e == category.id,
+                    );
                   }
 
-                  setState(() {});
+                  rebuild();
                 },
-                leading:
-                    IconDisplayer.fromCategory(context, category: category),
+                leading: IconDisplayer.fromCategory(
+                  context,
+                  category: category,
+                ),
                 trailing: Checkbox.adaptive(
-                  value: selectedSubcategoriesInThisCat.length ==
+                  value:
+                      selectedSubcategoriesInThisCat.length ==
                           subcategories.length + 1
                       ? true
                       : selectedSubcategoriesInThisCat.isEmpty
-                          ? false
-                          : null,
+                      ? false
+                      : null,
                   tristate: true,
                   onChanged: (value) {
                     if (value == true) {
                       selectedCategories.addAll(subcategoriesAndMainCategory);
                     } else {
-                      selectedCategories.removeWhere((e) =>
-                          subcategoriesAndMainCategory
-                              .map((s) => s.id)
-                              .contains(e.id));
+                      selectedCategories.removeWhere(
+                        (e) => subcategoriesAndMainCategory
+                            .map((s) => s.id)
+                            .contains(e.id),
+                      );
                     }
 
-                    setState(() {});
+                    rebuild();
                   },
                 ),
                 title: Row(
@@ -227,12 +209,13 @@ class _CategoryMultiSelectorModalState
                           Icons.arrow_forward_ios_rounded,
                           size: 14,
                         ),
-                      )
-                    ]
+                      ),
+                    ],
                   ],
                 ),
                 subtitle: Text(
-                    '${subcategories.length} ${t.categories.subcategories}'),
+                  '${subcategories.length} ${t.categories.subcategories}',
+                ),
                 children: [
                   buildSubcategoryCheckboxTile(context, category: category),
                   ...subcategories.map(
@@ -240,13 +223,14 @@ class _CategoryMultiSelectorModalState
                       context,
                       category: subcategory,
                     ),
-                  )
+                  ),
                 ],
               );
             },
           ),
           ScrollableWithBottomGradient.buildPositionedGradient(
-              Theme.of(context).colorSchemeExtended.modalBackground),
+            AppColors.of(context).modalBackground,
+          ),
         ],
       ),
     );
@@ -266,10 +250,7 @@ class _CategoryMultiSelectorModalState
           softWrap: false,
           overflow: TextOverflow.ellipsis,
         ),
-        secondary: IconDisplayer.fromCategory(
-          context,
-          category: category,
-        ),
+        secondary: IconDisplayer.fromCategory(context, category: category),
         value: selectedCategories.map((e) => e.id).contains(category.id),
         onChanged: (value) {
           if (value == true) {
@@ -278,7 +259,7 @@ class _CategoryMultiSelectorModalState
             selectedCategories.removeWhere((e) => e.id == category.id);
           }
 
-          setState(() {});
+          rebuild();
         },
       ),
     );
@@ -288,34 +269,41 @@ class _CategoryMultiSelectorModalState
     final filteredSelectedCategories = snapshot.data == null
         ? <Category>[]
         : selectedCategories
-            .where(
-                (selAcc) => snapshot.data!.map((e) => e.id).contains(selAcc.id))
-            .toList();
+              .where(
+                (selAcc) => snapshot.data!.map((e) => e.id).contains(selAcc.id),
+              )
+              .toList();
 
     return CheckboxListTile(
-      value: snapshot.data == null ||
+      value:
+          snapshot.data == null ||
               snapshot.data!.isEmpty ||
               filteredSelectedCategories.isEmpty
           ? false
           : filteredSelectedCategories.length == snapshot.data!.length
-              ? true
-              : null,
+          ? true
+          : null,
       tristate: true,
       title: Text(
-        t.general.select_all,
-        style: const TextStyle(fontWeight: FontWeight.w700),
+        t.ui_actions.select_all,
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       enabled: snapshot.hasData && snapshot.data!.isNotEmpty,
       onChanged: (value) {
         if (value == true && snapshot.data != null) {
-          selectedCategories.addAll(snapshot.data!.whereNot((e) =>
-              selectedCategories.map((selAcc) => selAcc.id).contains(e.id)));
+          selectedCategories.addAll(
+            snapshot.data!.whereNot(
+              (e) =>
+                  selectedCategories.map((selAcc) => selAcc.id).contains(e.id),
+            ),
+          );
         } else {
           selectedCategories.removeWhere(
-              (selAcc) => snapshot.data!.map((e) => e.id).contains(selAcc.id));
+            (selAcc) => snapshot.data!.map((e) => e.id).contains(selAcc.id),
+          );
         }
 
-        setState(() {});
+        rebuild();
       },
     );
   }

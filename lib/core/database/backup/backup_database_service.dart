@@ -1,45 +1,53 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:monekin/core/database/app_db.dart';
 import 'package:monekin/core/database/services/app-data/app_data_service.dart';
 import 'package:monekin/core/models/transaction/transaction.dart';
-import 'package:monekin/core/utils/get_download_path.dart';
 import 'package:monekin/core/utils/logger.dart';
 import 'package:path/path.dart' as path;
 
 class BackupDatabaseService {
   AppDB db = AppDB.instance;
 
-  Future<void> downloadDatabaseFile(BuildContext context) async {
-    final messeger = ScaffoldMessenger.of(context);
-
-    List<int> dbFileInBytes = await File(await db.databasePath).readAsBytes();
-
-    String downloadPath = await getDownloadPath();
-    downloadPath = path.join(
-      downloadPath,
-      "monekin-${DateFormat('yyyyMMdd-Hms').format(DateTime.now())}.db",
-    );
+  File createAndReturnFile({
+    required String exportPath,
+    required String fileName,
+  }) {
+    String downloadPath = path.join(exportPath, fileName);
 
     File downloadFile = File(downloadPath);
 
-    await downloadFile.writeAsBytes(dbFileInBytes);
+    if (!downloadFile.existsSync()) {
+      downloadFile.createSync(recursive: true);
+    }
 
-    messeger.showSnackBar(SnackBar(
-      content: Text('Base de datos descargada con exito en $downloadPath'),
-    ));
+    return downloadFile;
   }
 
-  Future<String> exportSpreadsheet(
-    BuildContext context,
+  Future<File> exportDatabaseFile(String exportPath) async {
+    List<int> dbFileInBytes = await getDbFileInBytes();
+
+    final file = createAndReturnFile(
+      exportPath: exportPath,
+      fileName:
+          "monekin-${DateFormat('yyyyMMdd-Hms').format(DateTime.now())}.db",
+    );
+
+    return file.writeAsBytes(dbFileInBytes, mode: FileMode.write);
+  }
+
+  Future<Uint8List> getDbFileInBytes() async =>
+      File(await db.databasePath).readAsBytes();
+
+  String creatCsvFromTransactions(
     List<MoneyTransaction> data, {
     String format = 'csv',
     String separator = ',',
-  }) async {
+  }) {
     var csvData = '';
 
     var keys = [
@@ -80,7 +88,7 @@ class BackupDatabaseService {
         if (transaction.isTransfer) 'TRANSFER',
         (transaction.category?.parentCategory != null
             ? transaction.category?.name
-            : '')
+            : ''),
       ];
 
       csvData += toAdd.join(separator);
@@ -94,15 +102,22 @@ class BackupDatabaseService {
       }
     }
 
-    String downloadPath = await getDownloadPath();
-    downloadPath =
-        '${downloadPath}Transactions-${DateFormat('yyyyMMdd-Hms').format(DateTime.now())}.csv';
+    return csvData;
+  }
 
-    File downloadFile = File(downloadPath);
+  Future<File> exportSpreadsheet(
+    String exportPath,
+    List<MoneyTransaction> data,
+  ) async {
+    final csvData = creatCsvFromTransactions(data);
 
-    await downloadFile.writeAsString(csvData);
+    final file = createAndReturnFile(
+      exportPath: exportPath,
+      fileName:
+          "Transactions-${DateFormat('yyyyMMdd-Hms').format(DateTime.now())}.csv",
+    );
 
-    return downloadPath;
+    return file.writeAsString(csvData, mode: FileMode.writeOnly);
   }
 
   Future<bool> importDatabase() async {
@@ -127,13 +142,16 @@ class BackupDatabaseService {
       final currentDBContent = await File(dbPath).readAsBytes();
 
       // Load the new database
-      await File(dbPath)
-          .writeAsBytes(await selectedFile.readAsBytes(), mode: FileMode.write);
+      await File(
+        dbPath,
+      ).writeAsBytes(await selectedFile.readAsBytes(), mode: FileMode.write);
 
       try {
-        final dbVersion = int.parse((await AppDataService.instance
-            .getAppDataItem(AppDataKey.dbVersion)
-            .first)!);
+        final dbVersion = int.parse(
+          (await AppDataService.instance
+              .getAppDataItem(AppDataKey.dbVersion)
+              .first)!,
+        );
 
         if (dbVersion < db.schemaVersion) {
           await db.migrateDB(dbVersion, db.schemaVersion);

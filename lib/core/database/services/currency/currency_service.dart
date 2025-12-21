@@ -7,7 +7,7 @@ import 'package:monekin/core/database/app_db.dart';
 import 'package:monekin/core/database/services/user-setting/user_setting_service.dart';
 import 'package:monekin/core/models/currency/currency.dart';
 import 'package:monekin/core/utils/logger.dart';
-import 'package:monekin/i18n/translations.g.dart';
+import 'package:monekin/i18n/generated/translations.g.dart';
 
 class CurrencyService {
   final AppDB db;
@@ -20,8 +20,9 @@ class CurrencyService {
   }
 
   Future<int> deleteCurrency(String currencyId) {
-    return (db.delete(db.categories)..where((tbl) => tbl.id.equals(currencyId)))
-        .go();
+    return (db.delete(
+      db.categories,
+    )..where((tbl) => tbl.id.equals(currencyId))).go();
   }
 
   Stream<List<Currency>?> getCurrencies() {
@@ -54,20 +55,23 @@ class CurrencyService {
     return settingService
         .getSettingFromDB(SettingKey.preferredCurrency)
         .asyncMap((currencyCode) async {
-      if (currencyCode == null) {
-        currencyCode = await getDeviceDefaultCurrencyCode();
+          if (currencyCode == null) {
+            currencyCode = await getDeviceDefaultCurrencyCode();
 
-        await settingService.setItem(
-            SettingKey.preferredCurrency, currencyCode);
-      }
+            await settingService.setItem(
+              SettingKey.preferredCurrency,
+              currencyCode,
+            );
+          }
 
-      return (await getCurrencyByCode(currencyCode).first)!;
-    });
+          return (await getCurrencyByCode(currencyCode).first)!;
+        });
   }
 
   Future<dynamic> getInitialCurrencies() async {
-    String defaultCurrencies =
-        await rootBundle.loadString('assets/sql/initial_currencies.json');
+    String defaultCurrencies = await rootBundle.loadString(
+      'assets/sql/initial_currencies.json',
+    );
 
     return jsonDecode(defaultCurrencies);
   }

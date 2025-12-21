@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
+import 'package:monekin/app/categories/selectors/draggableScrollableKeyboardAware.mixin.dart';
 import 'package:monekin/core/database/app_db.dart';
 import 'package:monekin/core/database/services/account/account_service.dart';
 import 'package:monekin/core/models/account/account.dart';
@@ -9,10 +10,12 @@ import 'package:monekin/core/presentation/widgets/bottomSheetFooter.dart';
 import 'package:monekin/core/presentation/widgets/count_indicator.dart';
 import 'package:monekin/core/presentation/widgets/modal_container.dart';
 import 'package:monekin/core/presentation/widgets/scrollable_with_bottom_gradient.dart';
-import 'package:monekin/i18n/translations.g.dart';
+import 'package:monekin/i18n/generated/translations.g.dart';
 
 Future<List<Account>?> showAccountSelectorBottomSheet(
-    BuildContext context, AccountSelectorModal accountSelector) {
+  BuildContext context,
+  AccountSelectorModal accountSelector,
+) {
   return showModalBottomSheet<List<Account>>(
     context: context,
     showDragHandle: true,
@@ -42,13 +45,11 @@ class AccountSelectorModal extends StatefulWidget {
   State<AccountSelectorModal> createState() => _AccountSelectorModalState();
 }
 
-class _AccountSelectorModalState extends State<AccountSelectorModal> {
+class _AccountSelectorModalState extends State<AccountSelectorModal>
+    with DraggableScrollableKeyboardAware {
   late List<Account> selectedAccounts;
 
   String searchValue = '';
-
-  final DraggableScrollableController controller =
-      DraggableScrollableController();
 
   @override
   void initState() {
@@ -58,37 +59,12 @@ class _AccountSelectorModalState extends State<AccountSelectorModal> {
   }
 
   @override
-  void dispose() {
-    controller.dispose();
-
-    super.dispose();
-  }
-
-  _moveSheetTo(double position) {
-    if (controller.isAttached && mounted) {
-      controller.jumpTo(position);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
 
-    final bottomInsets = MediaQuery.of(context).viewInsets.bottom;
-
-    if (bottomInsets > 0) {
-      _moveSheetTo(1);
-    } else {
-      _moveSheetTo(0.65);
-    }
-
-    return DraggableScrollableSheet(
-      controller: controller,
-      expand: false,
+    return buildDraggableSheet(
       minChildSize: 0.64,
-      initialChildSize: 0.65,
-      snap: true,
-      snapSizes: const [0.65],
+      defaultSize: 0.65,
       builder: (context, scrollController) {
         return ModalContainer(
           title: widget.allowMultiSelection
@@ -106,39 +82,39 @@ class _AccountSelectorModalState extends State<AccountSelectorModal> {
                   );
                 },
           body: StreamBuilder(
-              stream: AccountService.instance.getAccounts(
-                predicate: (acc, curr) => AppDB.instance.buildExpr([
-                  acc.name.contains(searchValue),
-                  if (widget.filterSavingAccounts)
-                    acc.type.equalsValue(AccountType.saving).not(),
-                  if (!widget.includeArchivedAccounts) acc.closingDate.isNull()
-                ]),
-              ),
-              builder: (context, snapshot) {
-                return Column(
-                  children: [
-                    TextField(
-                      decoration: InputDecoration(
-                        filled: false,
-                        isDense: false,
-                        hintText: t.currencies.search,
-                        labelText: t.general.tap_to_search,
-                        floatingLabelStyle: const TextStyle(height: -0.0005),
-                        prefixIcon: const Icon(Icons.search),
-                        border: const UnderlineInputBorder(),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          searchValue = value;
-                        });
-                      },
+            stream: AccountService.instance.getAccounts(
+              predicate: (acc, curr) => AppDB.instance.buildExpr([
+                acc.name.contains(searchValue),
+                if (widget.filterSavingAccounts)
+                  acc.type.equalsValue(AccountType.saving).not(),
+                if (!widget.includeArchivedAccounts) acc.closingDate.isNull(),
+              ]),
+            ),
+            builder: (context, snapshot) {
+              return Column(
+                children: [
+                  TextField(
+                    decoration: InputDecoration(
+                      filled: false,
+                      isDense: false,
+                      hintText: t.currencies.search,
+                      labelText: t.general.tap_to_search,
+                      floatingLabelStyle: const TextStyle(height: -0.0005),
+                      prefixIcon: const Icon(Icons.search),
+                      border: const UnderlineInputBorder(),
                     ),
-                    if (widget.allowMultiSelection)
-                      buildSelectAllButton(snapshot),
-                    buildAccountList(snapshot, scrollController),
-                  ],
-                );
-              }),
+                    onChanged: (value) {
+                      searchValue = value;
+                      rebuild();
+                    },
+                  ),
+                  if (widget.allowMultiSelection)
+                    buildSelectAllButton(snapshot),
+                  buildAccountList(snapshot, scrollController),
+                ],
+              );
+            },
+          ),
           footer: !widget.allowMultiSelection
               ? null
               : BottomSheetFooter(
@@ -155,34 +131,40 @@ class _AccountSelectorModalState extends State<AccountSelectorModal> {
     final filteredSelectedAccounts = snapshot.data == null
         ? <Account>[]
         : selectedAccounts
-            .where(
-                (selAcc) => snapshot.data!.map((e) => e.id).contains(selAcc.id))
-            .toList();
+              .where(
+                (selAcc) => snapshot.data!.map((e) => e.id).contains(selAcc.id),
+              )
+              .toList();
 
     return CheckboxListTile(
-      value: snapshot.data == null ||
+      value:
+          snapshot.data == null ||
               snapshot.data!.isEmpty ||
               filteredSelectedAccounts.isEmpty
           ? false
           : filteredSelectedAccounts.length == snapshot.data!.length
-              ? true
-              : null,
+          ? true
+          : null,
       tristate: true,
       title: Text(
-        t.general.select_all,
-        style: const TextStyle(fontWeight: FontWeight.w700),
+        t.ui_actions.select_all,
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       enabled: snapshot.hasData && snapshot.data!.isNotEmpty,
       onChanged: (value) {
         if (value == true && snapshot.data != null) {
-          selectedAccounts.addAll(snapshot.data!.whereNot((e) =>
-              selectedAccounts.map((selAcc) => selAcc.id).contains(e.id)));
+          selectedAccounts.addAll(
+            snapshot.data!.whereNot(
+              (e) => selectedAccounts.map((selAcc) => selAcc.id).contains(e.id),
+            ),
+          );
         } else {
           selectedAccounts.removeWhere(
-              (selAcc) => snapshot.data!.map((e) => e.id).contains(selAcc.id));
+            (selAcc) => snapshot.data!.map((e) => e.id).contains(selAcc.id),
+          );
         }
 
-        setState(() {});
+        rebuild();
       },
     );
   }
@@ -200,63 +182,64 @@ class _AccountSelectorModalState extends State<AccountSelectorModal> {
     if (allAccounts.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(16),
-        child: Text(
-          t.account.no_accounts,
-          textAlign: TextAlign.center,
-        ),
+        child: Text(t.account.no_accounts, textAlign: TextAlign.center),
       );
     }
 
     return Expanded(
-      child: Stack(children: [
-        ListView.separated(
-          controller: scrollController,
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          itemCount: allAccounts.length,
-          padding: const EdgeInsets.only(bottom: 16, top: 4),
-          separatorBuilder: (context, i) {
-            return const Divider(height: 0);
-          },
-          itemBuilder: (context, index) {
-            final account = allAccounts[index];
+      child: Stack(
+        children: [
+          ListView.separated(
+            controller: scrollController,
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            itemCount: allAccounts.length,
+            padding: const EdgeInsets.only(bottom: 16, top: 4),
+            separatorBuilder: (context, i) {
+              return const Divider(height: 0);
+            },
+            itemBuilder: (context, index) {
+              final account = allAccounts[index];
 
-            if (!widget.allowMultiSelection) {
-              return RadioListTile(
-                value: account.id,
-                title: Text(account.name),
-                secondary: account.displayIcon(context),
-                groupValue: selectedAccounts.firstOrNull?.id,
-                onChanged: (value) {
-                  setState(() {
-                    selectedAccounts = [account];
+              if (!widget.allowMultiSelection) {
+                return RadioListTile(
+                  value: account.id,
+                  title: Text(account.name),
+                  secondary: account.displayIcon(context),
+                  groupValue: selectedAccounts.firstOrNull?.id,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedAccounts = [account];
 
-                    Navigator.of(context).pop(selectedAccounts);
-                  });
-                },
-              );
-            } else {
-              return CheckboxListTile(
-                value: selectedAccounts.map((e) => e.id).contains(account.id),
-                title: Text(account.name),
-                secondary: account.displayIcon(context),
-                onChanged: (value) {
-                  if (value == true) {
-                    selectedAccounts.add(account);
-                  } else {
-                    selectedAccounts
-                        .removeWhere((element) => element.id == account.id);
-                  }
+                      Navigator.of(context).pop(selectedAccounts);
+                    });
+                  },
+                );
+              } else {
+                return CheckboxListTile(
+                  value: selectedAccounts.map((e) => e.id).contains(account.id),
+                  title: Text(account.name),
+                  secondary: account.displayIcon(context),
+                  onChanged: (value) {
+                    if (value == true) {
+                      selectedAccounts.add(account);
+                    } else {
+                      selectedAccounts.removeWhere(
+                        (element) => element.id == account.id,
+                      );
+                    }
 
-                  setState(() {});
-                },
-              );
-            }
-          },
-        ),
-        if (widget.allowMultiSelection)
-          ScrollableWithBottomGradient.buildPositionedGradient(
-              Theme.of(context).colorSchemeExtended.modalBackground),
-      ]),
+                    rebuild();
+                  },
+                );
+              }
+            },
+          ),
+          if (widget.allowMultiSelection)
+            ScrollableWithBottomGradient.buildPositionedGradient(
+              AppColors.of(context).modalBackground,
+            ),
+        ],
+      ),
     );
   }
 }

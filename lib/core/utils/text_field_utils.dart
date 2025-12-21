@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:monekin/i18n/translations.g.dart';
+import 'package:monekin/i18n/generated/translations.g.dart';
 
 /// A text input formatter that allows up to two decimal places,
 /// replacing or disabling any invalid symbols
@@ -12,7 +12,8 @@ List<FilteringTextInputFormatter> decimalDigitFormatter(int decimalPlaces) {
   return [
     FilteringTextInputFormatter.deny(',', replacementString: '.'),
     FilteringTextInputFormatter.allow(
-        RegExp(r'(^\d*\.?\d{0,' + decimalPlaces.toString() + r'})')),
+      RegExp(r'(^\d*\.?\d{0,' + decimalPlaces.toString() + r'})'),
+    ),
   ];
 }
 
@@ -24,8 +25,11 @@ enum ValidatorType {
   bool get isNumber => this == double || this == int;
 }
 
-String? fieldValidator(String? value,
-    {bool isRequired = false, ValidatorType validator = ValidatorType.text}) {
+String? fieldValidator(
+  String? value, {
+  bool isRequired = false,
+  ValidatorType validator = ValidatorType.text,
+}) {
   if (!isRequired && (value == null || value.isEmpty)) {
     // If the field is not required and is empty, we don't return any error
     return null;

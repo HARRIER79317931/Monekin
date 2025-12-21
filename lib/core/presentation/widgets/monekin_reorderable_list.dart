@@ -9,36 +9,56 @@ class MonekinReorderableList extends StatefulWidget {
     required this.totalItemCount,
     this.isOrderEnabled = true,
     this.padding,
+    this.spaceBetween = 0,
+    this.scrollController,
   });
 
-  final Widget Function(BuildContext context, int index) itemBuilder;
+  final Widget Function(BuildContext context, int index, bool isOrdering)
+  itemBuilder;
   final void Function(int from, int to) onReorder;
 
   final int totalItemCount;
   final bool isOrderEnabled;
 
   final EdgeInsets? padding;
+  final double spaceBetween;
+
+  final ScrollController? scrollController;
 
   @override
   State<MonekinReorderableList> createState() => _MonekinReorderableListState();
 }
 
 class _MonekinReorderableListState extends State<MonekinReorderableList> {
-  int? isOrderingItem;
+  int? currentOrderingIndex;
 
   @override
   Widget build(BuildContext context) {
     return ReorderableListView.builder(
       shrinkWrap: true,
+      scrollController: widget.scrollController,
       physics: const BouncingScrollPhysics(),
       padding: widget.padding,
+      proxyDecorator: (child, index, animation) =>
+          Material(type: MaterialType.transparency, child: child),
       itemBuilder: (context, index) => Opacity(
         key: Key(index.toString()),
-        opacity: isOrderingItem == null || isOrderingItem == index ? 1 : 0.4,
-        child: ReorderableDelayedDragStartListener(
-          index: index,
-          enabled: widget.isOrderEnabled,
-          child: widget.itemBuilder(context, index),
+        opacity: currentOrderingIndex == null || currentOrderingIndex == index
+            ? 1
+            : 0.4,
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: index < widget.totalItemCount - 1 ? widget.spaceBetween : 0,
+          ),
+          child: ReorderableDelayedDragStartListener(
+            index: index,
+            enabled: widget.isOrderEnabled,
+            child: widget.itemBuilder(
+              context,
+              index,
+              currentOrderingIndex == index,
+            ),
+          ),
         ),
       ),
       buildDefaultDragHandles: false,
@@ -48,12 +68,12 @@ class _MonekinReorderableListState extends State<MonekinReorderableList> {
         HapticFeedback.lightImpact();
 
         setState(() {
-          isOrderingItem = index;
+          currentOrderingIndex = index;
         });
       },
       onReorderEnd: (index) {
         setState(() {
-          isOrderingItem = null;
+          currentOrderingIndex = null;
         });
       },
     );

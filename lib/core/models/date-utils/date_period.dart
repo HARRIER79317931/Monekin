@@ -21,13 +21,18 @@ class DatePeriod {
   });
 
   const DatePeriod.withPeriods(Periodicity periodicity)
-      : this(periodType: PeriodType.cycle, periodicity: periodicity);
+    : this(periodType: PeriodType.cycle, periodicity: periodicity);
 
   const DatePeriod.lastDays(int days)
-      : this(periodType: PeriodType.lastDays, lastDays: days);
+    : this(periodType: PeriodType.lastDays, lastDays: days);
 
   const DatePeriod.allTime() : this(periodType: PeriodType.allTime);
 
   const DatePeriod.customRange(DateTime? start, DateTime? end)
-      : this(periodType: PeriodType.dateRange, customDateRange: (start, end));
+    : this(periodType: PeriodType.dateRange, customDateRange: (start, end));
+
+  @override
+  String toString() {
+    return 'DatePeriod(periodType: $periodType)';
+  }
 }
