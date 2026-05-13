@@ -5,6 +5,7 @@ import 'package:monekin/core/presentation/app_colors.dart';
 import 'package:monekin/core/presentation/widgets/bottomSheetFooter.dart';
 import 'package:monekin/core/presentation/widgets/modal_container.dart';
 import 'package:monekin/core/presentation/widgets/scrollable_with_bottom_gradient.dart';
+import 'package:monekin/core/routes/route_utils.dart';
 import 'package:monekin/core/services/supported_icon/supported_icon_service.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
 
@@ -92,30 +93,32 @@ class _IconSelectorModalState extends State<IconSelectorModal> {
               color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          body: ScrollableWithBottomGradient(
-            gradientColor: AppColors.of(context).modalBackground,
-            controller: scrollController,
-            child: Builder(
-              builder: (context) {
-                final scopes = iconsByScope.keys.toList();
+          body: Stack(
+            children: [
+              Builder(
+                builder: (context) {
+                  final scopes = iconsByScope.keys.toList();
 
-                return ListView.builder(
-                  itemCount: scopes.length,
-                  shrinkWrap: true,
-                  physics: const BouncingScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return _buildIconGroup(scopes.elementAt(index));
-                  },
-                );
-              },
-            ),
+                  return ListView.builder(
+                    itemCount: scopes.length,
+                    controller: scrollController,
+                    itemBuilder: (context, index) {
+                      return _buildIconGroup(scopes.elementAt(index));
+                    },
+                  );
+                },
+              ),
+              ScrollableWithBottomGradient.buildPositionedGradient(
+                AppColors.of(context).modalBackground,
+              ),
+            ],
           ),
           footer: BottomSheetFooter(
             submitIcon: Icons.check,
             submitText: t.ui_actions.select,
             onSaved: () {
               widget.onIconSelected!(_selectedIcon!);
-              Navigator.pop(context);
+              RouteUtils.popRoute();
             },
           ),
         );

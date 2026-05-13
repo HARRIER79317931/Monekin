@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:monekin/core/extensions/color.extensions.dart';
 import 'package:monekin/core/models/supported-icon/icon_displayer.dart';
 import 'package:monekin/core/models/supported-icon/supported_icon.dart';
+import 'package:monekin/core/presentation/styles/borders.dart';
 import 'package:monekin/core/presentation/theme.dart';
 import 'package:monekin/core/presentation/widgets/color_picker/color_picker.dart';
 import 'package:monekin/core/presentation/widgets/color_picker/color_picker_modal.dart';
 import 'package:monekin/core/presentation/widgets/icon_selector_modal.dart';
 import 'package:monekin/core/presentation/widgets/tappable.dart';
+import 'package:monekin/core/routes/route_utils.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
 
 class IconAndColorSelector extends StatelessWidget {
@@ -29,13 +31,15 @@ class IconAndColorSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Translations.of(context);
 
-    final bgColor = Theme.of(context).inputDecorationTheme.fillColor!;
+    final bgColor =
+        Theme.of(context).inputDecorationTheme.fillColor ??
+        Theme.of(context).colorScheme.surfaceContainerHighest;
 
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.all(inputBorderRadius),
       ),
       child: Row(
         children: [
@@ -63,13 +67,19 @@ class IconAndColorSelector extends StatelessWidget {
                   child: ListTile(
                     mouseCursor: SystemMouseCursors.click,
                     title: Text(t.icon_selector.icon),
+                    contentPadding: const EdgeInsets.only(
+                      left: 6,
+                      top: 2,
+                      bottom: 2,
+                      right: 16,
+                    ),
                     trailing: const Icon(
                       Icons.arrow_forward_ios_rounded,
                       size: 12,
                     ),
                   ),
                 ),
-                Divider(color: bgColor.darken()),
+                Divider(height: 0),
                 Tappable(
                   onTap: () => showColorPickerModal(
                     context,
@@ -88,7 +98,7 @@ class IconAndColorSelector extends StatelessWidget {
                             outlineWidth: 2,
                           ),
                       onColorSelected: (selColor) {
-                        Navigator.pop(context);
+                        RouteUtils.popRoute();
                         onDataChange((color: selColor, icon: data.icon));
                       },
                     ),
@@ -96,6 +106,12 @@ class IconAndColorSelector extends StatelessWidget {
                   bgColor: bgColor,
                   child: ListTile(
                     mouseCursor: SystemMouseCursors.click,
+                    contentPadding: const EdgeInsets.only(
+                      left: 6,
+                      top: 2,
+                      bottom: 2,
+                      right: 16,
+                    ),
                     title: Text(t.icon_selector.color),
                     trailing: Icon(Icons.circle, color: data.color),
                   ),

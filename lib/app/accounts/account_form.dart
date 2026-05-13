@@ -1,11 +1,13 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:monekin/app/accounts/account_type_selector.dart';
+import 'package:monekin/app/accounts/widgets/balance_currency_form_field.dart';
 import 'package:monekin/app/categories/form/icon_and_color_selector.dart';
+import 'package:monekin/app/layout/page_framework.dart';
 import 'package:monekin/core/database/app_db.dart';
 import 'package:monekin/core/database/services/account/account_service.dart';
+import 'package:monekin/core/database/services/account/investment_service.dart';
 import 'package:monekin/core/database/services/currency/currency_service.dart';
 import 'package:monekin/core/database/services/exchange-rate/exchange_rate_service.dart';
 import 'package:monekin/core/database/services/transaction/transaction_service.dart';
@@ -16,15 +18,17 @@ import 'package:monekin/core/models/currency/currency.dart';
 import 'package:monekin/core/models/supported-icon/icon_displayer.dart';
 import 'package:monekin/core/models/supported-icon/supported_icon.dart';
 import 'package:monekin/core/presentation/helpers/snackbar.dart';
+import 'package:monekin/core/presentation/styles/borders.dart';
 import 'package:monekin/core/presentation/theme.dart';
 import 'package:monekin/core/presentation/widgets/color_picker/color_picker.dart';
-import 'package:monekin/core/presentation/widgets/currency_selector_modal.dart';
-import 'package:monekin/core/presentation/widgets/expansion_panel/single_expansion_panel.dart';
 import 'package:monekin/core/presentation/widgets/form_fields/date_form_field.dart';
-import 'package:monekin/core/presentation/widgets/form_fields/read_only_form_field.dart';
+import 'package:monekin/core/presentation/widgets/form_fields/list_tile_field.dart';
+import 'package:monekin/core/presentation/widgets/icon_selector_modal.dart';
 import 'package:monekin/core/presentation/widgets/inline_info_card.dart';
 import 'package:monekin/core/presentation/widgets/persistent_footer_button.dart';
-import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filters.dart';
+import 'package:monekin/core/presentation/widgets/show_more_content_button.dart';
+import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filter_set.dart';
+import 'package:monekin/core/routes/route_utils.dart';
 import 'package:monekin/core/services/supported_icon/supported_icon_service.dart';
 import 'package:monekin/core/utils/text_field_utils.dart';
 import 'package:monekin/core/utils/uuid.dart';
@@ -49,7 +53,9 @@ class _AccountFormPageState extends State<AccountFormPage> {
   final TextEditingController _ibanController = TextEditingController();
   final TextEditingController _swiftController = TextEditingController();
   final TextEditingController _textController = TextEditingController();
-  final TextEditingController _balanceController = TextEditingController();
+  final TextEditingController _balanceController = TextEditingController(
+    text: '0',
+  );
 
   AccountType _type = AccountType.normal;
   SupportedIcon _icon = SupportedIconService.instance.defaultSupportedIcon;
@@ -57,24 +63,22 @@ class _AccountFormPageState extends State<AccountFormPage> {
   Currency? _currency;
   Currency? _userPrCurrency;
 
-  Account? _accountToEdit;
+  late final Account? _accountToEdit;
 
   DateTime _openingDate = DateTime.now();
   DateTime? _closeDate;
 
   Future<void> submitForm() async {
+    final t = Translations.of(context);
     final accountService = AccountService.instance;
 
-    double newBalance = double.parse(_balanceController.text);
-
-    navigateBack() => Navigator.pop(context);
-
+    double iniValue;
     if (_accountToEdit != null) {
       // Check if there are transactions before the opening date of the account:
       if ((await TransactionService.instance
               .getTransactions(
-                filters: TransactionFilters(
-                  accountsIDs: [_accountToEdit!.id],
+                filters: TransactionFilterSet(
+                  accountsIDs: [_accountToEdit.id],
                   maxDate: _openingDate,
                 ),
                 limit: 2,
@@ -88,17 +92,28 @@ class _AccountFormPageState extends State<AccountFormPage> {
         return;
       }
 
-      newBalance =
-          _accountToEdit!.iniValue +
-          newBalance -
-          await accountService.getAccountMoney(account: _accountToEdit!).first;
+      // Check if there are valuations before the creation date of the asset:
+      if ((await InvestmentService.instance
+              .getValuationsForAccount(_accountToEdit.id)
+              .first)
+          .where((v) => v.date.isBefore(_openingDate))
+          .isNotEmpty) {
+        MonekinSnackbar.warning(
+          SnackbarParams(t.account.form.valuation_before_creation_date),
+        );
+        return;
+      }
+
+      iniValue = _accountToEdit.iniValue;
+    } else {
+      iniValue = double.parse(_balanceController.text);
     }
 
     Account accountToSubmit = Account(
       id: _accountToEdit?.id ?? generateUUID(),
       name: _nameController.text,
       displayOrder: _accountToEdit?.displayOrder ?? 10,
-      iniValue: newBalance,
+      iniValue: iniValue,
       date: _openingDate,
       closingDate: _closeDate,
       type: _type,
@@ -111,17 +126,19 @@ class _AccountFormPageState extends State<AccountFormPage> {
     );
 
     // Check for accounts with same names before continue:
-    if (_accountToEdit == null ||
-        _accountToEdit!.name != accountToSubmit.name) {
+    if (_accountToEdit == null || _accountToEdit.name != accountToSubmit.name) {
       final db = AppDB.instance;
       final query = db.select(db.accounts)
         ..addColumns([db.accounts.id.count()])
         ..where((tbl) => tbl.name.isValue(_nameController.text));
 
       if (await query.watchSingleOrNull().first != null) {
-        if (context.mounted) {
-          MonekinSnackbar.error(SnackbarParams(t.account.form.already_exists));
-        }
+        MonekinSnackbar.error(
+          SnackbarParams.fromError(
+            t.account.form.already_exists,
+            duration: const Duration(seconds: 6),
+          ),
+        );
 
         return;
       }
@@ -130,11 +147,11 @@ class _AccountFormPageState extends State<AccountFormPage> {
     if (_accountToEdit != null) {
       await accountService
           .updateAccount(accountToSubmit)
-          .then((value) => {navigateBack()});
+          .then((value) => {RouteUtils.popRoute()});
     } else {
       await accountService
           .insertAccount(accountToSubmit)
-          .then((value) => {navigateBack()});
+          .then((value) => {RouteUtils.popRoute()});
     }
   }
 
@@ -142,12 +159,15 @@ class _AccountFormPageState extends State<AccountFormPage> {
   void initState() {
     super.initState();
 
-    if (widget.account != null) {
-      _accountToEdit = widget.account;
+    _accountToEdit = widget.account;
+
+    if (_accountToEdit != null) {
       _fillForm();
     }
 
-    CurrencyService.instance.getUserPreferredCurrency().first.then((value) {
+    CurrencyService.instance.ensureAndGetPreferredCurrency().first.then((
+      value,
+    ) {
       setState(() {
         if (widget.account == null) {
           _currency = value;
@@ -158,32 +178,30 @@ class _AccountFormPageState extends State<AccountFormPage> {
   }
 
   void _fillForm() {
-    final accountService = AccountService.instance;
-
     if (_accountToEdit == null) return;
 
-    _nameController.text = _accountToEdit!.name;
-    _ibanController.text = _accountToEdit!.iban ?? '';
-    _swiftController.text = _accountToEdit!.swift ?? '';
-    _textController.text = _accountToEdit!.description ?? '';
+    final accountService = AccountService.instance;
 
-    _openingDate = _accountToEdit!.date;
-    _closeDate = _accountToEdit!.closingDate;
+    _nameController.text = _accountToEdit.name;
+    _ibanController.text = _accountToEdit.iban ?? '';
+    _swiftController.text = _accountToEdit.swift ?? '';
+    _textController.text = _accountToEdit.description ?? '';
 
-    _type = _accountToEdit!.type;
+    _openingDate = _accountToEdit.date;
+    _closeDate = _accountToEdit.closingDate;
 
-    accountService.getAccountMoney(account: _accountToEdit!).first.then((
-      value,
-    ) {
-      _balanceController.text = value.toString();
+    _type = _accountToEdit.type;
 
-      _color = _accountToEdit!.getComputedColor(context);
+    accountService.getAccountMoney(account: _accountToEdit).first.then((value) {
+      setState(() {
+        _color = _accountToEdit.getComputedColor(context);
+      });
     });
 
-    _icon = _accountToEdit!.icon;
+    _icon = _accountToEdit.icon;
 
     CurrencyService.instance
-        .getCurrencyByCode(_accountToEdit!.currency.code)
+        .getCurrencyByCode(_accountToEdit.currency.code)
         .first
         .then((value) {
           setState(() {
@@ -208,32 +226,26 @@ class _AccountFormPageState extends State<AccountFormPage> {
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
-
-    return Scaffold(
-      persistentFooterButtons: [
-        PersistentFooterButton(
-          child: FilledButton.icon(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                _formKey.currentState!.save();
-
-                submitForm();
-              }
-            },
-            icon: const Icon(Icons.save),
-            label: Text(
-              _accountToEdit != null
-                  ? t.account.form.edit
-                  : t.account.form.create,
-            ),
-          ),
-        ),
-      ],
-      appBar: AppBar(
-        title: Text(
-          widget.account != null ? t.account.form.edit : t.account.form.create,
+    final pageTitle = widget.account != null
+        ? t.account.form.edit
+        : t.account.form.create;
+    final footerButtons = [
+      PersistentFooterButton(
+        child: FilledButton.icon(
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              submitForm();
+            }
+          },
+          icon: const Icon(Icons.save),
+          label: Text(pageTitle),
         ),
       ),
+    ];
+
+    return PageFramework(
+      title: pageTitle,
+      persistentFooterButtons: footerButtons,
       body: Builder(
         builder: (context) {
           if (widget.account != null && _accountToEdit == null) {
@@ -246,230 +258,287 @@ class _AccountFormPageState extends State<AccountFormPage> {
             padding: const EdgeInsets.all(16),
             child: Form(
               key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  IconAndColorSelector(
-                    iconSelectorModalSubtitle:
-                        t.icon_selector.select_account_icon,
-                    iconDisplayer: IconDisplayer(
-                      supportedIcon: _icon,
-                      size: 36,
-                      isOutline: true,
-                      outlineWidth: 1.5,
-                      mainColor: _color.lighten(
-                        isDark ? IconDisplayer.darkLightenFactor : 0,
-                      ),
-                      secondaryColor: _color.lighten(
-                        isDark ? 0 : IconDisplayer.darkLightenFactor,
-                      ),
-                      displayMode: IconDisplayMode.polygon,
-                    ),
-                    onDataChange: ((data) {
-                      setState(() {
-                        _icon = data.icon;
-                        _color = data.color;
-                      });
-                    }),
-                    data: (color: _color, icon: _icon),
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: '${t.account.form.name} *',
-                      hintText: 'Ex.: My account',
-                    ),
-                    validator: (value) =>
-                        fieldValidator(value, isRequired: true),
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _balanceController,
-                    decoration: InputDecoration(
-                      labelText: widget.account != null
-                          ? '${t.account.form.current_balance} *'
-                          : '${t.account.form.initial_balance} *',
-                      hintText: 'Ex.: 200',
-                      suffixText: _currency?.symbol,
-                    ),
-                    keyboardType: TextInputType.number,
-                    enabled:
-                        !(widget.account != null && widget.account!.isClosed),
-                    inputFormatters: twoDecimalDigitFormatter,
-                    validator: (value) => fieldValidator(
-                      value,
-                      validator: ValidatorType.double,
-                      isRequired: true,
-                    ),
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 16),
-                  ReadOnlyTextFormField(
-                    displayValue: _currency != null
-                        ? _currency!.name
-                        : t.general.unspecified,
-                    onTap: () {
-                      if (_currency == null) return;
+              child: Builder(
+                builder: (context) {
+                  final List<Widget> formChildren = [];
 
-                      showCurrencySelectorModal(
-                        context,
-                        CurrencySelectorModal(
-                          preselectedCurrency: _currency!,
-                          onCurrencySelected: (newCurrency) {
-                            setState(() {
-                              _currency = newCurrency;
-                            });
-                          },
-                        ),
-                      );
-                    },
-                    decoration: InputDecoration(
-                      labelText: t.currencies.currency,
-                      suffixIcon: const Icon(Icons.arrow_drop_down),
-                      prefixIcon: _currency != null
-                          ? Container(
-                              margin: const EdgeInsets.all(10),
-                              clipBehavior: Clip.hardEdge,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              child: SvgPicture.asset(
-                                _currency!.currencyIconPath,
-                                height: 25,
-                                width: 25,
-                              ),
-                            )
-                          : null,
+                  void add(Widget w) {
+                    formChildren.add(w);
+                    formChildren.add(const SizedBox(height: 12));
+                  }
+
+                  // Name
+                  add(
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        labelText: '${t.account.form.name} *',
+                        hintText: 'Ex.: My account',
+                      ),
+                      validator: (value) =>
+                          fieldValidator(value, isRequired: true),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      textInputAction: TextInputAction.next,
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  if (_currency != null)
-                    StreamBuilder(
-                      stream: ExchangeRateService.instance
-                          .getLastExchangeRateOf(currencyCode: _currency!.code),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData ||
-                            _currency?.code == _userPrCurrency?.code) {
-                          return Container();
-                        } else {
-                          return InlineInfoCard(
-                            text: t.account.form.currency_not_found_warn,
-                            mode: InlineInfoCardMode.warn,
+                  );
+
+                  // Icon & color selector
+                  add(
+                    IconAndColorSelector(
+                      iconSelectorModalSubtitle:
+                          t.icon_selector.select_account_icon,
+                      iconDisplayer: IconDisplayer(
+                        supportedIcon: _icon,
+                        size: 36,
+                        isOutline: true,
+                        outlineWidth: 1.5,
+                        onTap: () {
+                          showIconSelectorModal(
+                            context,
+                            IconSelectorModal(
+                              preselectedIconID: _icon.id,
+                              subtitle: t.icon_selector.select_account_icon,
+                              onIconSelected: (selectedIcon) {
+                                setState(() {
+                                  _icon = selectedIcon;
+                                });
+                              },
+                            ),
                           );
+                        },
+                        mainColor: _color.lighten(
+                          isDark ? IconDisplayer.darkLightenFactor : 0,
+                        ),
+                        secondaryColor: _color.lighten(
+                          isDark ? 0 : IconDisplayer.darkLightenFactor,
+                        ),
+                        displayMode: IconDisplayMode.polygon,
+                      ),
+                      onDataChange: ((data) {
+                        setState(() {
+                          _icon = data.icon;
+                          _color = data.color;
+                        });
+                      }),
+                      data: (color: _color, icon: _icon),
+                    ),
+                  );
+
+                  // Amount / Currency fields (conditionally add)
+                  if (widget.account == null) {
+                    add(
+                      AmountAndCurrencyFormField(
+                        amountController: _balanceController,
+                        currency: _currency,
+                        amountLabel: t.account.form.initial_balance,
+                        enabled: true,
+                        onCurrencySelected: (newCurrency) {
+                          setState(() {
+                            _currency = newCurrency;
+                          });
+                        },
+                      ),
+                    );
+                  } else if (_currency != null) {
+                    add(
+                      CurrencyFormField(
+                        currency: _currency,
+                        onCurrencySelected: (newCurrency) {
+                          setState(() {
+                            _currency = newCurrency;
+                          });
+                        },
+                      ),
+                    );
+                  }
+
+                  // Exchange rate info: only include spacing when showing content
+                  if (_currency != null) {
+                    formChildren.add(
+                      StreamBuilder(
+                        stream: ExchangeRateService.instance
+                            .getLastExchangeRateOf(
+                              currencyCode: _currency!.code,
+                            ),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData ||
+                              _currency?.code == _userPrCurrency?.code) {
+                            return const SizedBox.shrink();
+                          } else {
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                InlineInfoCard(
+                                  text: t.account.form.currency_not_found_warn,
+                                  mode: InlineInfoCardMode.warn,
+                                ),
+                                const SizedBox(height: 12),
+                              ],
+                            );
+                          }
+                        },
+                      ),
+                    );
+                  }
+
+                  // Account type selector stream: include spacing only when visible
+                  formChildren.add(
+                    StreamBuilder(
+                      stream: _accountToEdit == null
+                          ? Stream.value(true)
+                          : TransactionService.instance
+                                .countTransactions(
+                                  filters: TransactionFilterSet(
+                                    transactionTypes: [
+                                      TransactionType.expense,
+                                      TransactionType.income,
+                                    ],
+                                    accountsIDs: [_accountToEdit.id],
+                                  ),
+                                )
+                                .map((count) => count == 0),
+                      builder: (context, snapshot) {
+                        final hasTransactions =
+                            !snapshot.hasData || snapshot.data! == false;
+                        final isInvestmentEdit =
+                            _accountToEdit?.type == AccountType.investment;
+
+                        if (hasTransactions || isInvestmentEdit) {
+                          return const SizedBox.shrink();
                         }
+
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTileField(
+                              leading: Icon(
+                                _type.icon,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              title: t.account.types.title,
+                              subtitle: _type.title(context),
+                              trailing: const Icon(Icons.chevron_right),
+                              onTap: () async {
+                                final selected = await showAccountTypeSelector(
+                                  context,
+                                  selectedType: _type,
+                                );
+                                if (selected != null) {
+                                  setState(() => _type = selected);
+                                }
+                              },
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                        );
                       },
                     ),
-                  StreamBuilder(
-                    stream: _accountToEdit == null
-                        ? Stream.value(true)
-                        : TransactionService.instance
-                              .countTransactions(
-                                filters: TransactionFilters(
-                                  transactionTypes: [
-                                    TransactionType.E,
-                                    TransactionType.I,
-                                  ],
-                                  accountsIDs: [_accountToEdit!.id],
-                                ),
-                              )
-                              .map((count) => count == 0),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData || snapshot.data! == false) {
-                        return Container();
-                      }
+                  );
 
-                      return Column(
+                  // Show more fields
+                  // Build the inner column as before (it manages its own spacing)
+                  formChildren.add(
+                    ShowMoreContentButton(
+                      headerPadding: const EdgeInsets.only(top: 12),
+                      child: Column(
+                        spacing: 12,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          const SizedBox(height: 12),
-                          AccountTypeSelector(
-                            selectedType: _type,
-                            onSelected: (newType) {
-                              setState(() {
-                                _type = newType;
-                              });
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  SingleExpansionPanel(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 12),
-                        DateTimeFormField(
-                          decoration: InputDecoration(
-                            suffixIcon: const Icon(Icons.event),
-                            labelText: '${t.account.date} *',
-                          ),
-                          initialDate: _openingDate,
-                          dateFormat: DateFormat.yMMMd().add_jm(),
-                          lastDate: _closeDate ?? DateTime.now(),
-                          validator: (e) =>
-                              e == null ? t.general.validations.required : null,
-                          onDateSelected: (DateTime value) {
-                            setState(() {
-                              _openingDate = value;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 22),
-                        if (_accountToEdit != null &&
-                            _accountToEdit!.isClosed) ...[
                           DateTimeFormField(
                             decoration: InputDecoration(
                               suffixIcon: const Icon(Icons.event),
-                              labelText: t.account.close_date,
+                              labelText: '${t.account.date} *',
                             ),
-                            initialDate: _closeDate,
-                            firstDate: _openingDate,
-                            lastDate: DateTime.now(),
+                            initialDate: _openingDate,
                             dateFormat: DateFormat.yMMMd().add_jm(),
+                            lastDate: _closeDate ?? DateTime.now(),
+                            validator: (e) => e == null
+                                ? t.general.validations.required
+                                : null,
                             onDateSelected: (DateTime value) {
                               setState(() {
-                                _closeDate = value;
+                                _openingDate = value;
                               });
                             },
                           ),
+                          if (_accountToEdit != null && _accountToEdit.isClosed)
+                            DateTimeFormField(
+                              decoration: InputDecoration(
+                                suffixIcon: const Icon(Icons.event),
+                                labelText: t.account.close_date,
+                              ),
+                              initialDate: _closeDate,
+                              firstDate: _openingDate,
+                              lastDate: DateTime.now(),
+                              dateFormat: DateFormat.yMMMd().add_jm(),
+                              onDateSelected: (DateTime value) {
+                                setState(() {
+                                  _closeDate = value;
+                                });
+                              },
+                            ),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextFormField(
+                                controller: _ibanController,
+                                decoration: InputDecoration(
+                                  labelText: t.account.form.iban,
+                                  border: appInputBorder.copyWith(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: inputBorderRadius,
+                                      topRight: inputBorderRadius,
+                                    ),
+                                  ),
+                                ),
+                                textInputAction: TextInputAction.next,
+                              ),
+                              const Divider(),
+                              TextFormField(
+                                controller: _swiftController,
+                                decoration: InputDecoration(
+                                  labelText: t.account.form.swift,
+                                  border: appInputBorder.copyWith(
+                                    borderRadius: BorderRadius.only(
+                                      bottomLeft: inputBorderRadius,
+                                      bottomRight: inputBorderRadius,
+                                    ),
+                                  ),
+                                ),
+                                textInputAction: TextInputAction.next,
+                              ),
+                            ],
+                          ),
+
+                          TextFormField(
+                            minLines: 2,
+                            maxLines: 10,
+                            controller: _textController,
+                            decoration: InputDecoration(
+                              labelText: t.account.form.notes,
+                              hintText: t.account.form.notes_placeholder,
+                              alignLabelWithHint: true,
+                            ),
+                            textInputAction: TextInputAction.next,
+                          ),
+
                           const SizedBox(height: 22),
                         ],
-                        TextFormField(
-                          controller: _ibanController,
-                          decoration: InputDecoration(
-                            labelText: t.account.form.iban,
-                          ),
-                          textInputAction: TextInputAction.next,
-                        ),
-                        const SizedBox(height: 22),
-                        TextFormField(
-                          controller: _swiftController,
-                          decoration: InputDecoration(
-                            labelText: t.account.form.swift,
-                          ),
-                          textInputAction: TextInputAction.next,
-                        ),
-                        const SizedBox(height: 22),
-                        TextFormField(
-                          minLines: 2,
-                          maxLines: 10,
-                          controller: _textController,
-                          decoration: InputDecoration(
-                            labelText: t.account.form.notes,
-                            hintText: t.account.form.notes_placeholder,
-                            alignLabelWithHint: true,
-                          ),
-                          textInputAction: TextInputAction.next,
-                        ),
-                        const SizedBox(height: 22),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                  );
+
+                  // Remove trailing spacing if present
+                  if (formChildren.isNotEmpty &&
+                      formChildren.last is SizedBox) {
+                    formChildren.removeLast();
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: formChildren,
+                  );
+                },
               ),
             ),
           );

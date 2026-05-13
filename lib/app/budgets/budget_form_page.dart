@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:monekin/app/accounts/account_selector.dart';
 import 'package:monekin/app/categories/selectors/category_multi_selector.dart';
+import 'package:monekin/app/layout/page_framework.dart';
+import 'package:monekin/core/database/app_db.dart';
 import 'package:monekin/core/database/services/account/account_service.dart';
 import 'package:monekin/core/database/services/budget/budget_service.dart';
 import 'package:monekin/core/database/services/category/category_service.dart';
@@ -13,6 +15,7 @@ import 'package:monekin/core/models/date-utils/periodicity.dart';
 import 'package:monekin/core/presentation/helpers/snackbar.dart';
 import 'package:monekin/core/presentation/widgets/form_fields/date_field.dart';
 import 'package:monekin/core/presentation/widgets/form_fields/date_form_field.dart';
+import 'package:monekin/core/routes/route_utils.dart';
 import 'package:monekin/core/utils/text_field_utils.dart';
 import 'package:monekin/core/utils/uuid.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
@@ -60,7 +63,7 @@ class _BudgetFormPageState extends State<BudgetFormPage> {
     }
 
     onSuccess() {
-      Navigator.pop(context);
+      RouteUtils.popRoute();
 
       MonekinSnackbar.success(
         SnackbarParams(
@@ -80,8 +83,11 @@ class _BudgetFormPageState extends State<BudgetFormPage> {
       intervalPeriod: intervalPeriod,
       startDate: intervalPeriod == null ? startDate : null,
       endDate: intervalPeriod == null ? endDate : null,
-      categories: categories?.map((e) => e.id).toList(),
-      accounts: accounts?.map((e) => e.id).toList(),
+      trFilters: TransactionFilterSetInDB(
+        id: generateUUID(),
+        categoriesIds: categories?.map((e) => e.id).toList(),
+        accountsIDs: accounts?.map((e) => e.id).toList(),
+      ),
     );
 
     if (isEditMode) {
@@ -123,18 +129,22 @@ class _BudgetFormPageState extends State<BudgetFormPage> {
       endDate = budget.endDate;
     }
 
-    categories = budget.categories == null
+    categories = budget.trFilters.categoriesIds == null
         ? null
         : await CategoryService.instance
               .getCategories(
-                predicate: (p0, p1) => p0.id.isIn(budget.categories!),
+                predicate: (p0, p1) =>
+                    p0.id.isIn(budget.trFilters.categoriesIds!),
               )
               .first;
 
-    accounts = budget.accounts == null
+    accounts = budget.trFilters.accountsIDs == null
         ? null
         : await AccountService.instance
-              .getAccounts(predicate: (p0, p1) => p0.id.isIn(budget.accounts!))
+              .getAccounts(
+                predicate: (p0, p1) =>
+                    p0.id.isIn(budget.trFilters.accountsIDs!),
+              )
               .first;
 
     intervalPeriod = budget.intervalPeriod;
@@ -146,10 +156,8 @@ class _BudgetFormPageState extends State<BudgetFormPage> {
   Widget build(BuildContext context) {
     final t = Translations.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditMode ? t.budgets.form.edit : t.budgets.form.create),
-      ),
+    return PageFramework(
+      title: isEditMode ? t.budgets.form.edit : t.budgets.form.title,
       persistentFooterButtons: [
         PersistentFooterButton(
           child: FilledButton.icon(
@@ -176,6 +184,7 @@ class _BudgetFormPageState extends State<BudgetFormPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 12,
             children: [
               TextFormField(
                 controller: nameController,
@@ -185,14 +194,14 @@ class _BudgetFormPageState extends State<BudgetFormPage> {
                   labelText: '${t.budgets.form.name} *',
                 ),
               ),
-              const SizedBox(height: 8),
               TextFormField(
                 controller: valueController,
                 decoration: InputDecoration(
                   labelText: '${t.budgets.form.value} *',
                   hintText: 'Ex.: 200',
                   suffix: StreamBuilder(
-                    stream: CurrencyService.instance.getUserPreferredCurrency(),
+                    stream: CurrencyService.instance
+                        .ensureAndGetPreferredCurrency(),
                     builder: (context, snapshot) {
                       return Text(snapshot.data?.symbol ?? '');
                     },
@@ -222,7 +231,6 @@ class _BudgetFormPageState extends State<BudgetFormPage> {
                   setState(() {});
                 },
               ),
-              const SizedBox(height: 16),
               DropdownButtonFormField(
                 value: intervalPeriod,
                 decoration: InputDecoration(
@@ -249,8 +257,7 @@ class _BudgetFormPageState extends State<BudgetFormPage> {
                   });
                 },
               ),
-              if (intervalPeriod == null) ...[
-                const SizedBox(height: 16),
+              if (intervalPeriod == null)
                 Row(
                   children: [
                     Expanded(
@@ -294,8 +301,14 @@ class _BudgetFormPageState extends State<BudgetFormPage> {
                     ),
                   ],
                 ),
-              ],
-              const SizedBox(height: 16),
+
+              const Divider(thickness: 2, height: 16),
+
+              Text(
+                t.general.filters,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+
               StreamBuilder(
                 stream: AccountService.instance.getAccounts(),
                 builder: (context, snapshot) {
@@ -338,7 +351,6 @@ class _BudgetFormPageState extends State<BudgetFormPage> {
                   );
                 },
               ),
-              const SizedBox(height: 16),
               StreamBuilder(
                 stream: CategoryService.instance.getCategories(),
                 builder: (context, snapshot) {

@@ -34,7 +34,6 @@
     "apply": "Apply",
     "discard": "Discard",
     "refresh": "Refresh",
-    "details": "Details",
     "share": "Share"
   },
   "GENERAL": {
@@ -42,6 +41,7 @@
     "understood": "Understood",
     "unspecified": "Unspecified",
     "quick_actions": "Quick actions",
+    "details": "Details",
     "balance": "Balance",
     "account": "Account",
     "accounts": "Accounts",
@@ -50,12 +50,17 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "filters": "Filters",
-    "empty-warn": "Ops! This is very empty",
+    "empty-warn": "Oops! This is very empty",
     "search-no-results": "No items match your search criteria",
     "insufficient-data": "Insufficient data",
     "show-more-fields": "Show more fields",
     "show-less-fields": "Show less fields",
     "tap-to-search": "Tap to search",
+    "delete_success": "Item deleted successfully",
+    "LEAVE-WITHOUT-SAVING": {
+      "title": "Leave without saving?",
+      "message": "You have unsaved changes, are you sure you want to leave without saving them?"
+    },
     "CLIPBOARD": {
       "success": "{{x}} copied to the clipboard",
       "error": "Error copying"
@@ -197,15 +202,24 @@
   "FINANCIAL-HEALTH": {
     "display": "Financial health",
     "review": {
-      "very_good(context=GenderContext)": { "male,female": "Very good!" },
-      "good(context=GenderContext)": { "male,female": "Good" },
-      "normal(context=GenderContext)": { "male,female": "Average" },
-      "bad(context=GenderContext)": { "male,female": "Fair" },
-      "very_bad(context=GenderContext)": { "male,female": "Very Bad" },
+      "very_good(context=GenderContext)": {
+        "male,female": "Very good!"
+      },
+      "good(context=GenderContext)": {
+        "male,female": "Good"
+      },
+      "normal(context=GenderContext)": {
+        "male,female": "Average"
+      },
+      "bad(context=GenderContext)": {
+        "male,female": "Fair"
+      },
+      "very_bad(context=GenderContext)": {
+        "male,female": "Very Bad"
+      },
       "insufficient_data(context=GenderContext)": {
         "male,female": "Insufficient data"
       },
-
       "descr": {
         "insufficient_data": "It looks like we don't have enough expenses to calculate your financial health. Add some expenses/incomes in this period to allow us to help you!",
         "very_good": "Congratulations! Your financial health is tremendous. We hope you continue your good streak and continue learning with Monekin",
@@ -247,6 +261,10 @@
     "balance-by-currency-subtitle": "How much money do I have in foreign currency?",
     "balance-evolution": "Balance trend",
     "balance-evolution-subtitle": "Do I have more money than before?",
+    "net-worth": "Net worth",
+    "net-worth-subtitle": "The difference between what you own and what you owe.",
+    "net-worth-composition": "Net worth composition",
+    "net-worth-composition-subtitle": "Distribution between accounts, investments and debts.",
     "compared-to-previous-period": "Compared to the previous period",
     "cash-flow": "Cash flow",
     "cash-flow-subtitle": "Am I spending less than I earn?",
@@ -302,6 +320,7 @@
     "delete.multiple.warning-message": "This action is irreversible and will remove {{ x }} transactions. The current balance of your accounts and all your statistics will be recalculated",
     "delete.multiple.success": "{{x}} transactions deleted correctly",
     "details": "Movement details",
+    "select": "Select a transaction",
     "NEXT-PAYMENTS": {
       "accept": "Accept",
       "skip": "Skip",
@@ -321,7 +340,10 @@
       "searcher.placeholder": "Search by category, description...",
       "searcher.no-results": "No transactions found matching the search criteria",
       "loading": "Loading more transactions...",
-      "selected.short": { "one": "{{n}} selected", "other": "{{n}} selected" },
+      "selected.short": {
+        "one": "{{n}} selected",
+        "other": "{{n}} selected"
+      },
       "selected.long": {
         "one": "{{n}} transaction selected",
         "other": "{{n}} transactions selected"
@@ -329,7 +351,8 @@
       "BULK_EDIT": {
         "dates": "Edit dates",
         "categories": "Edit categories",
-        "status": "Edit statuses"
+        "status": "Edit statuses",
+        "tags": "Edit tags"
       }
     },
     "FILTERS": {
@@ -339,7 +362,22 @@
       "from_value_def": "From {{ x }}",
       "to_value_def": "Up to {{ x }}",
       "from_date_def": "From the {{ date }}",
-      "to_date_def": "Up to the {{ date }}"
+      "to_date_def": "Up to the {{ date }}",
+      "reset": "Reset filters",
+      "saved": {
+        "title": "Saved filters",
+        "new_title": "New Filter",
+        "edit_title": "Edit Filter",
+        "name_label": "Filter Name",
+        "name_hint": "My custom filter",
+        "save_dialog_title": "Save Filter",
+        "save_tooltip": "Save current filter",
+        "load_tooltip": "Load saved filter",
+        "empty_title": "No saved filters found",
+        "empty_description": "Save filters here to quickly access them later.",
+        "save_success": "Filter saved successfully",
+        "delete_success": "Filter deleted successfully"
+      }
     },
     "FORM": {
       "VALIDATORS": {
@@ -447,6 +485,7 @@
     "n_transactions": "Number of transactions",
     "add_money": "Add money",
     "withdraw_money": "Withdraw money",
+    "correct_balance": "Correct balance",
     "no-accounts": "No accounts found to display here. Add an account by clicking the '+' button at the bottom",
     "TYPES": {
       "title": "Account type",
@@ -454,7 +493,9 @@
       "normal": "Normal account",
       "normal.descr": "Useful to record your day-to-day finances. It is the most common account, it allows you to add expenses, income...",
       "saving": "Savings account",
-      "saving.descr": "You will only be able to add and withdraw money from it from other accounts. Perfect to start saving money"
+      "saving.descr": "You will only be able to add and withdraw money from it from other accounts. Perfect to start saving money",
+      "investment": "Investment account",
+      "investment.descr": "A broker, crypto exchange or portfolio account. Track your invested capital and update its value manually via valuations"
     },
     "FORM": {
       "name": "Account name",
@@ -469,7 +510,32 @@
       "already-exists": "There is already another one with the same name, please write another",
       "tr-before-opening-date": "There are transactions in this account with a date before the opening date",
       "iban": "IBAN",
-      "swift": "SWIFT"
+      "swift": "SWIFT",
+      "include-in-net-worth": "Include in net worth",
+      "include-in-net-worth.descr": "Add this account to the total net worth calculation",
+      "correct_balance_description": "Adjusting the balance modifies the account's initial value. This correction will not be reflected in your statistics.",
+      "valuation_before_creation_date": "There are valuations in this account with a date before the creation date"
+    },
+    "INVESTMENT": {
+      "details-header": "Investment",
+      "correct_balance_title": "Correct invested capital",
+      "correct_balance_description": "This account uses manual valuations for portfolio value. This action only updates the invested capital (initial value) and will not change recorded valuations or investment statistics.",
+      "invested-capital": "Invested capital",
+      "portfolio-value": "Portfolio value",
+      "profit": "Profit",
+      "last-valuation": "Last valuation",
+      "no-valuations": "No valuations recorded yet",
+      "update-value": "Update value",
+      "update-value.descr": "Record the current portfolio value",
+      "update-value.success": "Valuation recorded successfully",
+      "history": "Valuation history",
+      "history-empty": "No valuations recorded yet for this account",
+      "add-valuation": "Add valuation",
+      "edit-valuation": "Edit valuation",
+      "edit-valuation.success": "Valuation edited successfully",
+      "delete-valuation.success": "Valuation deleted successfully",
+      "delete-all-valuations": "Delete all valuations",
+      "delete-all-valuations.success": "All valuations deleted successfully"
     },
     "DELETE": {
       "warning-header": "Delete account?",
@@ -494,23 +560,50 @@
   "CURRENCIES": {
     "currency-converter": "Currency converter",
     "currency": "Currency",
+    "currency-settings": "Currency settings",
     "currency-manager": "Currency manager",
     "currency-manager.descr": "Configure your currency and its exchange rates with others",
     "preferred-currency": "Preferred/base currency",
+    "tap-to-change-preferred-currency": "Tap to change",
     "change-preferred-currency-title": "Change preferred currency",
     "change-preferred-currency-msg": "All stats and budgets will be displayed in this currency from now on. Accounts and transactions will keep the currency they had. All saved exchange rates will be deleted if you execute this action. Do you wish to continue?",
-    "FORM": {
+    "EXCHANGE-RATE-FORM": {
       "equal-to-preferred-warn": "The currency cannot be equal to the user currency",
+      "override-existing-warn": "An exchange rate for this currency in this date already exists. If you continue, the previous one will be overwritten",
       "specify-a-currency": "Please specify a currency",
       "add": "Add exchange rate",
       "add-success": "Exchange rate added successfully",
       "edit": "Edit exchange rate",
-      "edit-success": "Exchange rate edited successfully"
+      "edit-success": "Exchange rate edited successfully",
+      "remove-all": "Delete all exchange rates",
+      "remove-all-warning": "This action is irreversible and will delete all exchange rates for this currency"
+    },
+    "TYPES": {
+      "display": "Currency type",
+      "fiat": "FIAT",
+      "crypto": "Cryptocurrency",
+      "other": "Other"
+    },
+    "CURRENCY-FORM": {
+      "name": "Display Name",
+      "code": "Currency Code",
+      "symbol": "Symbol",
+      "decimal-digits": "Decimal Digits",
+      "create": "Create currency",
+      "create-success": "Currency created successfully",
+      "edit": "Edit currency",
+      "edit-success": "Currency edited successfully",
+      "delete": "Delete currency",
+      "delete-success": "Currency deleted successfully",
+      "already-exists": "A currency with this code already exists. You may want to edit it"
     },
     "delete-all-success": "Deleted exchange rates successfully",
     "historical": "Historical rates",
+    "historical-empty": "No historical exchange rates found for this currency",
     "exchange-rate": "Exchange rate",
     "exchange-rates": "Exchange rates",
+    "min-exchange-rate": "Minimum exchange rate",
+    "max-exchange-rate": "Maximum exchange rate",
     "empty": "Add exchange rates here so that if you have accounts in currencies other than your base currency our charts are more accurate",
     "select-a-currency": "Select a currency",
     "search": "Search by name or by currency code"
@@ -529,6 +622,7 @@
       "all": "All the tags"
     },
     "empty-list": "You haven't created any tags yet. Tags and categories are a great way to categorize your movements",
+    "no-tags": "You haven't created any tags yet. Go to the settings to create a tag.",
     "without-tags": "Without tags",
     "add": "Add tag",
     "create": "Create label",
@@ -576,14 +670,10 @@
   },
   "BUDGETS": {
     "title": "Budgets",
+    "status": "Budget status",
     "repeated": "Recurring",
     "one-time": "Once",
-    "annual": "Annuals",
-    "week": "Weekly",
-    "month": "Monthly",
     "actives": "Actives",
-    "pending": "Pending start",
-    "finish": "Finished",
     "from-budgeted": "left of ",
     "days-left": "days left",
     "days-to-start": "days to start",
@@ -605,10 +695,222 @@
       "title": "Budget Details",
       "statistics": "Statistics",
       "budget-value": "Budgeted",
-      "expend-diary-left": "You can spend {{ dailyAmount }}/day for {{ remainingDays }} remaining days",
       "expend-evolution": "Expenditure evolution",
       "no-transactions": "It seems that you have not made any expenses related to this budget"
+    },
+    "TARGET_TIMELINE_STATUSES": {
+      "active": "Active budget",
+      "past": "Finished budget",
+      "future": "Future budget"
+    },
+    "PROGRESS": {
+      "LABELS": {
+        "active-on-track": "On track",
+        "active-overspending": "Overspending",
+        "active-indeterminate": "Active",
+        "success": "Achieved",
+        "fail": "Budget exceeded"
+      },
+      "DESCRIPTION": {
+        "active-on-track": "You can spend {{ dailyAmount }} per day for the remaining {{ remainingDays }} days",
+        "active-overspending": "To get back on track, you should limit your spending to {{ dailyAmount }} per day for the remaining {{ remainingDays }} days",
+        "active-indeterminate": "You have {{ amount }} left to spend.",
+        "active-exceeded": "You have already exceeded your budget limit by {{ amount }}. If you don't find any incomes for this budget, you should stop spending for the rest of its period",
+        "success": "Great job! This budget has already finish successfully. Keep creating budgets to manage your expenses",
+        "fail": "You exceeded the budget by {{ amount }}. Try to be more careful next time!"
+      }
     }
+  },
+  "GOALS": {
+    "title": "Goals",
+    "status": "Goal status",
+    "type": {
+      "display": "Goal Type",
+      "income": {
+        "title": "Savings Goal",
+        "descr": "Ideal for saving money. You succeed when the balance goes above your target."
+      },
+      "expense": {
+        "title": "Spending Goal",
+        "descr": "Track how much you spend and aim to reach a target amount. Works good for donations, charity, leisure spending..."
+      }
+    },
+    "empty_title": "No goals found",
+    "empty_description": "Create a new goal to start tracking your savings!",
+    "delete": "Delete goal",
+    "delete_warning": "This action is irreversible. Categories and transactions referring to this goal will not be deleted",
+    "FORM": {
+      "new_title": "New Goal",
+      "edit_title": "Edit Goal",
+      "target_amount": "Target Amount",
+      "initial_amount": "Initial Amount",
+      "name": "Name",
+      "name_hint": "My Saving Goal",
+      "create_success": "Goal created successfully",
+      "edit_success": "Goal edited successfully",
+      "negative_warn": "The goal amount cannot be negative"
+    },
+    "DETAILS": {
+      "title": "Goal Details",
+      "statistics": "Statistics",
+      "goal_value": "Goal Target",
+      "evolution": "Evolution",
+      "no_transactions": "It seems that you have not made any transactions related to this goal"
+    },
+    "TARGET_TIMELINE_STATUSES": {
+      "active": "Active goal",
+      "past": "Finished goal",
+      "future": "Future goal"
+    },
+    "PROGRESS": {
+      "LABELS": {
+        "active-on-track": "On track",
+        "active-behind-schedule": "Behind schedule",
+        "active-indeterminate": "Active",
+        "success": "Goal reached",
+        "fail": "Goal failed"
+      },
+      "DESCRIPTION": {
+        "active-on-track": "You are on track to seek your goal! You have to save {{ dailyAmount }} per day for the remaining {{ remainingDays }} days",
+        "active-behind-schedule": "You are behind schedule. You have to save {{ dailyAmount }} per day to reach your goal in {{ remainingDays }} days",
+        "active-indeterminate": "You need {{ amount }} more to reach your goal.",
+        "success": "Congratulations! You reached your goal.",
+        "fail": "You missed your goal by {{ amount }}."
+      }
+    }
+  },
+  "DEBTS": {
+    "display": {
+      "one": "Debt",
+      "other": "Debts"
+    },
+    "FORM": {
+      "name": "Debt name",
+      "initial_amount": "Initial amount",
+      "total_amount": "Total amount",
+      "step_initial_value": "Initial value",
+      "step_details": "Details",
+      "from_transaction": {
+        "title": "From a transaction",
+        "tap_to_select": "Tap to select a transaction"
+      },
+      "from_amount": {
+        "title": "From an initial amount",
+        "description": "This amount will not be taken into account for statistics as an expense/income. It will be used to calculate balances and net worth"
+      }
+    },
+    "DIRECTION": {
+      "lent": "Lent",
+      "borrowed": "Borrowed"
+    },
+    "STATUS": {
+      "active": "Active",
+      "close": "Closed"
+    },
+    "DETAILS": {
+      "collected_amount": "Collected amount",
+      "remaining": "Remaining",
+      "no_deadline": "No deadline",
+      "in_days": "In {{x}} days",
+      "due_today": "Due today",
+      "days_ago": "{{x}} days ago",
+      "overdue_by": "Overdue by {{x}} days",
+      "per_day": "/ day",
+      "no_transactions": "No transactions found for this debt"
+    },
+    "EMPTY": {
+      "no_debts_active": "No active debts found. Start by creating a new debt by clicking the button below",
+      "no_debts_closed": "No closed debts found. A debt is closed when you have collected all the money from it or you have paid all the money you owed."
+    },
+    "ACTIONS": {
+      "edit": {
+        "title": "Edit debt",
+        "success": "Debt edited successfully"
+      },
+      "delete": {
+        "warning_header": "Delete this debt?",
+        "warning_text": "This action cannot be undone. Linked transactions will not be deleted but will no longer be associated with this debt."
+      },
+      "add_register": {
+        "title": "Add movement",
+        "success": "Movement added successfully",
+        "fab_label": "Add register",
+        "modal_title": "Add register to this debt",
+        "modal_subtitle": "Choose one of the following options to link a transaction to this debt"
+      },
+      "link_transaction": {
+        "title": "Link existing transaction",
+        "description": "Choose an existing record to link it to this debt",
+        "success": "Transaction linked to debt",
+        "creating": "You are creating a transaction linked to the debt <b>{{ name }}</b>"
+      },
+      "unlink_transaction": {
+        "title": "Unlink from debt",
+        "warning_text": "This transaction will no longer be associated with this debt.",
+        "success": "Transaction unlinked from debt"
+      },
+      "new_transaction": {
+        "title": "Add new transaction",
+        "description": "Manually add or reduce the debt by creating a new transaction linked to this debt"
+      },
+      "create": {
+        "title": "Create debt",
+        "success": "Debt created successfully"
+      }
+    }
+  },
+  "ASSETS": {
+    "title": "Assets",
+    "empty_description": "You haven't created any assets yet. Assets like real estate, vehicles, or collectibles can be tracked with their valuations",
+    "create": "Add asset",
+    "create_success": "Asset created successfully",
+    "edit_success": "Asset edited successfully",
+    "delete": "Delete asset",
+    "delete_success": "Asset deleted successfully",
+    "delete_confirmation": "This action cannot be undone. All valuations for this asset will also be deleted.",
+    "profit": "Profit",
+    "profit_percent": "Return %",
+    "total_value": "Assets total value",
+    "FORM": {
+      "name": "Asset name",
+      "name_required": "Please enter an asset name",
+      "description": "Description",
+      "initial_value": "Initial value",
+      "initial_value_required": "Please enter an initial value",
+      "initial_value_invalid": "Please enter a valid number",
+      "currency": "Currency",
+      "select_currency": "Please select a currency",
+      "creation_date": "Acquisition date",
+      "edit": "Edit asset",
+      "create": "Create asset",
+      "already_exists": "An asset with this name already exists. You may want to edit it",
+      "valuation_before_creation_date": "There are valuations in this asset with a date before the acquisition date"
+    },
+    "VALUATION": {
+      "history": "Valuation history",
+      "no_valuations": "No valuations recorded yet. Start by adding the first valuation",
+      "add_valuation": "Add valuation",
+      "edit_valuation": "Edit valuation",
+      "value": "Value",
+      "value_required": "Please enter a value",
+      "value_invalid": "Please enter a valid number",
+      "update_value_success": "Valuation added successfully",
+      "edit_valuation_success": "Valuation updated successfully",
+      "delete_valuation_success": "Valuation deleted successfully",
+      "delete_all_valuations": "Delete all valuations",
+      "delete_all_valuations_success": "All valuations deleted successfully"
+    },
+    "SORT": {
+      "name_asc": "Name (A-Z)",
+      "name_desc": "Name (Z-A)",
+      "value_asc": "Value (lowest first)",
+      "value_desc": "Value (highest first)"
+    }
+  },
+  "TARGET_TIMELINE_STATUSES": {
+    "active": "Active",
+    "past": "Finished",
+    "future": "Future"
   },
   "BACKUP": {
     "no_file_selected": "No file selected",
@@ -658,7 +960,7 @@
         ],
         "steps-descr": [
           "Select a .csv file from your device. Make sure it has a first row that describes the name of each column",
-          "Select the column where the value of each transaction is specified. Use negative values for expenses and positive values for income. Use a point as a decimal separator",
+          "Select the column where the value of each transaction is specified. Use negative values for expenses and positive values for income.",
           "Select the column where the account to which each transaction belongs is specified. You can also select a default account in case we cannot find the account you want. If a default account is not specified, we will create one with the same name ",
           "Specify the column where the transaction category name is located. You must specify a default category so that we assign this category to transactions, in case the category cannot be found",
           "Select the column where the date of each transaction is specified. If not specified, transactions will be created with the current date",
@@ -678,52 +980,104 @@
     }
   },
   "SETTINGS": {
-    "title_long": "Settings and appearance",
+    "title_long": "Settings & Customization",
     "title_short": "Settings",
-    "description": "App theme, texts and other general settings",
+    "description": "Theme, Language, Data and more",
     "edit_profile": "Edit profile",
-    "lang.section": "Language and texts",
-    "lang.title": "App language",
-    "lang.descr": "Language in which the texts will be displayed in the app",
-    "lang.help": "If you want to collaborate with the translations of this app, you can consult <a href='https://github.com/enrique-lozano/Monekin/tree/main/lib/i18n'>our guide</a>",
-    "locale": "Region",
-    "locale_auto": "System",
-    "locale.descr": "Set the format to use for dates, numbers...",
-    "locale.warn": "When changing region the app will update",
-    "first_day_of_week": "First day of week",
-    "theme_and_colors": "Theme and colors",
-    "theme": "Theme",
-    "theme.auto": "System",
-    "theme.light": "Light",
-    "theme.dark": "Dark",
-    "amoled-mode": "AMOLED mode",
-    "amoled-mode.descr": "Use a pure black wallpaper when possible. This will slightly help the battery of devices with AMOLED screens",
-    "dynamic-colors": "Dynamic colors",
-    "dynamic-colors.descr": "Use your system accent color whenever possible",
-    "accent-color": "Accent color",
-    "accent-color.descr": "Choose the color the app will use to emphasize certain parts of the interface",
-    "font": "Font",
-    "font-platform": "Platform",
-    "SWIPE-ACTIONS": {
-      "title": "Swipe actions",
-      "choose-description": "Choose what action will be triggered when you swipe a transaction item in the list using this swipe direction",
-      "swipe-left": "Swipe left",
-      "swipe-right": "Swipe right",
-      "none": "No action",
-      "toggle-reconciled": "Toggle reconciled",
-      "toggle-pending": "Toggle pending",
-      "toggle-voided": "Toggle voided",
-      "toggle-unreconciled": "Toggle unreconciled",
-      "remove-status": "Remove status"
+    "GENERAL": {
+      "menu_title": "General Settings",
+      "menu_descr": "Language, privacy, and more",
+      "show_all_decimals": "Show all decimal places",
+      "show_all_decimals_descr": "Whether to show all decimals places even if there are trailing zeros",
+      "LANGUAGE": {
+        "section": "Language and texts",
+        "title": "App language",
+        "descr": "Language in which the texts will be displayed in the app",
+        "help": "If you want to collaborate with the translations of this app, you can consult <a href='https://github.com/enrique-lozano/Monekin/tree/main/lib/i18n'>our guide</a>"
+      },
+      "LOCALE": {
+        "title": "Region",
+        "auto": "System",
+        "descr": "Set the format to use for dates, numbers...",
+        "warn": "When changing region the app will update",
+        "first_day_of_week": "First day of week"
+      }
+    },
+    "APP_STRUCTURES": {
+      "title": "App structures",
+      "tags": "Define tags to achieve better organization of your transactions",
+      "categories": "Categories and subcategories organization",
+      "accounts": "Manage and edit your accounts",
+      "filters": "Configure global filters that you can use for transactions and statistics"
     },
     "SECURITY": {
-      "title": "Seguridad",
-      "private-mode-at-launch": "Private mode at launch",
-      "private-mode-at-launch.descr": "Launch the app in private mode by default",
-      "private-mode": "Private mode",
-      "private-mode.descr": "Hide all monetary values",
-      "private-mode.activated": "Private mode activated",
-      "private-mode.deactivated": "Private mode disabled"
+      "title": "Security",
+      "private_mode_at_launch": "Private mode at launch",
+      "private_mode_at_launch_descr": "Launch the app in private mode by default",
+      "private_mode": "Private mode",
+      "private_mode_descr": "Hide all monetary values",
+      "private_mode_activated": "Private mode activated",
+      "private_mode_deactivated": "Private mode disabled"
+    },
+    "TRANSACTIONS": {
+      "menu_title": "Transactions",
+      "menu_descr": "Configure the behavior and appearance of all transaction-related features",
+      "title": "Transactions Settings",
+      "STYLE": {
+        "title": "Transaction style",
+        "subtitle": "Configure how transactions look in the different lists of the app",
+        "show_tags": "Show Tags",
+        "show_time": "Show Time"
+      },
+      "SWIPE_ACTIONS": {
+        "title": "Swipe actions",
+        "choose_description": "Choose what action will be triggered when you swipe a transaction item in the list using this swipe direction",
+        "swipe_left": "Swipe left",
+        "swipe_right": "Swipe right",
+        "none": "No action",
+        "toggle_reconciled": "Toggle reconciled",
+        "toggle_pending": "Toggle pending",
+        "toggle_voided": "Toggle voided",
+        "toggle_unreconciled": "Toggle unreconciled",
+        "remove_status": "Remove status"
+      },
+      "DEFAULT_VALUES": {
+        "title": "Default Form Values",
+        "page_title": "New Transaction: Default Form Values",
+        "reuse_last_transaction": "Reuse Last Transaction Values",
+        "reuse_last_transaction_descr": "Automatically fill the form with some values from the last created transaction",
+        "fields_to_reuse": "Fields to reuse",
+        "reuse_last_values_modal_descr": "Select the fields that should be pre-filled with the values from the last created transaction.",
+        "default_values_separator": "Default Values",
+        "default_category": "Default Category",
+        "default_status": "Default Status",
+        "default_tags": "Default Tags",
+        "no_tags_selected": "No tags selected"
+      },
+      "DEFAULT_TYPE": {
+        "title": "Default Type",
+        "modal_title": "Select Default Type"
+      }
+    },
+    "APPEARANCE": {
+      "menu_title": "Theme & Style",
+      "menu_descr": "Color schemes, fonts and other global visual settings",
+      "theme_and_colors": "Theme and colors",
+      "THEME": {
+        "title": "Theme",
+        "auto": "System",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "amoled_mode": "AMOLED mode",
+      "amoled_mode_descr": "Use a pure black wallpaper when possible. This will slightly help the battery of devices with AMOLED screens",
+      "dynamic_colors": "Dynamic colors",
+      "dynamic_colors_descr": "Use your system accent color whenever possible",
+      "accent_color": "Accent color",
+      "accent_color_descr": "Choose the color the app will use to emphasize certain parts of the interface",
+      "text": "Text",
+      "font": "Font",
+      "font_platform": "Platform"
     }
   },
   "MORE": {
@@ -740,7 +1094,7 @@
     },
     "ABOUT_US": {
       "display": "App information",
-      "description": "Check out the terms and other relevant information about Monekin. Get in touch with the community by reporting bugs, leaving suggestions...",
+      "description": "Find Monekin’s terms, important info, and connect by reporting bugs or sharing ideas",
       "LEGAL": {
         "display": "Legal information",
         "privacy": "Privacy policy",

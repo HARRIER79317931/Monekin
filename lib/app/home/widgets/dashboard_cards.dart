@@ -8,7 +8,7 @@ import 'package:monekin/core/models/date-utils/date_period_state.dart';
 import 'package:monekin/core/presentation/responsive/breakpoints.dart';
 import 'package:monekin/core/presentation/responsive/responsive_row_column.dart';
 import 'package:monekin/core/presentation/widgets/card_with_header.dart';
-import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filters.dart';
+import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filter_set.dart';
 import 'package:monekin/core/routes/route_utils.dart';
 import 'package:monekin/core/services/finance_health_service.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
@@ -33,12 +33,12 @@ class DashboardCards extends StatelessWidget {
           rowFit: FlexFit.tight,
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            spacing: 16,
             children: [
               CardWithHeader(
                 title: t.financial_health.display,
                 footer: CardFooterWithSingleButton(
                   onButtonClick: () => RouteUtils.pushRoute(
-                    context,
                     StatsPage(
                       dateRangeService: dateRangeService,
                       initialIndex: 0,
@@ -48,7 +48,7 @@ class DashboardCards extends StatelessWidget {
                 bodyPadding: const EdgeInsets.all(16),
                 body: StreamBuilder(
                   stream: FinanceHealthService().getHealthyValue(
-                    filters: TransactionFilters(
+                    filters: TransactionFilterSet(
                       minDate: dateRangeService.startDate,
                       maxDate: dateRangeService.endDate,
                     ),
@@ -66,13 +66,11 @@ class DashboardCards extends StatelessWidget {
                   },
                 ),
               ),
-              const SizedBox(height: 16),
               CardWithHeader(
                 title: t.stats.by_categories,
                 body: PieChartByCategories(datePeriodState: dateRangeService),
                 footer: CardFooterWithSingleButton(
                   onButtonClick: () => RouteUtils.pushRoute(
-                    context,
                     StatsPage(
                       dateRangeService: dateRangeService,
                       initialIndex: 1,
@@ -95,7 +93,6 @@ class DashboardCards extends StatelessWidget {
                 footer: CardFooterWithSingleButton(
                   onButtonClick: () {
                     RouteUtils.pushRoute(
-                      context,
                       StatsPage(
                         dateRangeService: dateRangeService,
                         initialIndex: 2,
@@ -114,7 +111,7 @@ class DashboardCards extends StatelessWidget {
                 ),
                 body: BalanceBarChart(
                   dateRange: dateRangeService,
-                  filters: TransactionFilters(
+                  filters: TransactionFilterSet(
                     minDate: dateRangeService.startDate,
                     maxDate: dateRangeService.endDate,
                   ),
@@ -122,7 +119,6 @@ class DashboardCards extends StatelessWidget {
                 footer: CardFooterWithSingleButton(
                   onButtonClick: () {
                     RouteUtils.pushRoute(
-                      context,
                       StatsPage(
                         dateRangeService: dateRangeService,
                         initialIndex: 3,

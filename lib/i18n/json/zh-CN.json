@@ -34,7 +34,6 @@
     "apply": "应用",
     "discard": "放弃",
     "refresh": "刷新",
-    "details": "详情",
     "share": "分享"
   },
   "GENERAL": {
@@ -42,6 +41,7 @@
     "understood": "明白",
     "unspecified": "未指定",
     "quick_actions": "快捷行动",
+    "details": "细节",
     "balance": "余额",
     "account": "账户",
     "accounts": "账户",
@@ -56,6 +56,11 @@
     "show-more-fields": "显示更多",
     "show-less-fields": "显示更少",
     "tap-to-search": "点击以搜索",
+    "delete_success": "项目删除成功",
+    "LEAVE-WITHOUT-SAVING": {
+      "title": "不保存就离开？",
+      "message": "您有未保存的更改，确定要离开而不保存它们吗？"
+    },
     "CLIPBOARD": {
       "success": "已复制 {{x}}",
       "error": "复制出错"
@@ -256,6 +261,10 @@
     "balance-by-currency-subtitle": "我有多少的外币？",
     "balance-evolution": "余额趋势",
     "balance-evolution-subtitle": "我是否比之前更有钱了？",
+    "net-worth": "Net worth",
+    "net-worth-subtitle": "The difference between what you own and what you owe.",
+    "net-worth-composition": "Net worth composition",
+    "net-worth-composition-subtitle": "Distribution between accounts, investments and debts.",
     "compared-to-previous-period": "与上一段时间相比",
     "cash-flow": "现金流",
     "cash-flow-subtitle": "我的支出是否少于我的收入？",
@@ -311,6 +320,7 @@
     "delete.multiple.warning-message": "此操作无法撤回，并且将删除{{x}}笔交易。将重新计算您账户的当前余额及其它所有统计数据",
     "delete.multiple.success": "{{x}}笔交易删除成功",
     "details": "操作详情",
+    "select": "选择交易",
     "NEXT-PAYMENTS": {
       "accept": "接受",
       "skip": "跳过",
@@ -341,7 +351,8 @@
       "BULK_EDIT": {
         "dates": "批量编辑日期",
         "categories": "批量编辑类别",
-        "status": "批量编辑状态"
+        "status": "批量编辑状态",
+        "tags": "编辑标签"
       }
     },
     "FILTERS": {
@@ -351,7 +362,22 @@
       "from_value_def": "从 {{ x }}",
       "to_value_def": "到 {{ x }}",
       "from_date_def": "从 {{ date }}",
-      "to_date_def": "到 {{ date }}"
+      "to_date_def": "到 {{ date }}",
+      "reset": "重置过滤器",
+      "saved": {
+        "title": "已保存的过滤器",
+        "new_title": "新建过滤器",
+        "edit_title": "编辑过滤器",
+        "name_label": "过滤器名称",
+        "name_hint": "我的自定义过滤器",
+        "save_dialog_title": "保存过滤器",
+        "save_tooltip": "保存当前过滤器",
+        "load_tooltip": "加载已保存的过滤器",
+        "empty_title": "未找到已保存的过滤器",
+        "empty_description": "在此保存过滤器以便稍后快速访问。",
+        "save_success": "筛选器保存成功",
+        "delete_success": "筛选器删除成功"
+      }
     },
     "FORM": {
       "VALIDATORS": {
@@ -459,6 +485,7 @@
     "n_transactions": "交易数量",
     "add_money": "增加金额",
     "withdraw_money": "减少金额",
+    "correct_balance": "修正余额",
     "no-accounts": "未发现应当显示的交易。请点击底部的 '+' 按钮新增一个交易",
     "TYPES": {
       "title": "账户类型",
@@ -466,7 +493,9 @@
       "normal": "普通账户",
       "normal.descr": "用于记录日常财务。这是最普通的账户，您可以添加支出、收入……",
       "saving": "储蓄账户",
-      "saving.descr": "您只能从此账户中向其它账户中转入/转出（而无法用于消费开支）。非常适合用于存钱"
+      "saving.descr": "您只能从此账户中向其它账户中转入/转出（而无法用于消费开支）。非常适合用于存钱",
+      "investment": "投资账户",
+      "investment.descr": "券商、加密货币交易所或投资组合账户。跟踪您的投资资本，并通过估值手动更新其价值"
     },
     "FORM": {
       "name": "账户名称",
@@ -481,7 +510,32 @@
       "already-exists": "此账户名已存在，请起一个新的账户名",
       "tr-before-opening-date": "此账户中有早于开户日期的交易",
       "iban": "国际银行账户号码（IBAN）",
-      "swift": "银行识别码（SWIFT）"
+      "swift": "银行识别码（SWIFT）",
+      "include-in-net-worth": "计入净资产",
+      "include-in-net-worth.descr": "将此账户纳入总净资产计算",
+      "correct_balance_description": "调整余额会修改账户的初始值。此修正不会反映在统计数据中。",
+      "valuation_before_creation_date": "此帐户中存在日期早于创建日期的评估"
+    },
+    "INVESTMENT": {
+      "details-header": "投资",
+      "correct_balance_title": "更正已投资本金",
+      "correct_balance_description": "此账户使用手动估值来跟踪投资组合价值。此操作仅更新已投资本金（初始值），不会更改已记录的估值或投资统计信息。",
+      "invested-capital": "已投资本金",
+      "portfolio-value": "投资组合价值",
+      "profit": "收益",
+      "last-valuation": "最近估值",
+      "no-valuations": "暂无估值记录",
+      "update-value": "更新价值",
+      "update-value.descr": "记录当前投资组合价值",
+      "update-value.success": "估值记录成功",
+      "history": "估值历史",
+      "history-empty": "此账户暂无估值记录",
+      "add-valuation": "添加估值",
+      "edit-valuation": "编辑估值",
+      "edit-valuation.success": "估值编辑成功",
+      "delete-valuation.success": "估值删除成功",
+      "delete-all-valuations": "删除所有估值",
+      "delete-all-valuations.success": "所有估值已成功删除"
     },
     "DELETE": {
       "warning-header": "删除账户？",
@@ -506,23 +560,50 @@
   "CURRENCIES": {
     "currency-converter": "货币换算",
     "currency": "货币",
+    "currency-settings": "货币设置",
     "currency-manager": "货币管理",
     "currency-manager.descr": "设置您的货币及其与其他货币的汇率",
     "preferred-currency": "默认货币",
+    "tap-to-change-preferred-currency": "点击即可更改",
     "change-preferred-currency-title": "更改默认货币",
     "change-preferred-currency-msg": "从现在起，所有统计数据和预算都将以此货币显示。账户和交易将保留其原有货币单位。如果您执行此操作，所有保存的汇率都将被删除。您想继续吗？",
-    "FORM": {
+    "EXCHANGE-RATE-FORM": {
       "equal-to-preferred-warn": "货币不能与用户货币相同",
+      "override-existing-warn": "该货币在该日期的汇率已存在。如果继续，前一个将会被覆盖",
       "specify-a-currency": "请指定货币",
       "add": "添加汇率",
       "add-success": "汇率添加成功",
       "edit": "编辑汇率",
-      "edit-success": "汇率编辑成功"
+      "edit-success": "汇率编辑成功",
+      "remove-all": "删除所有汇率",
+      "remove-all-warning": "此操作不可逆转，并将删除该货币的所有汇率"
+    },
+    "TYPES": {
+      "display": "货币类型",
+      "fiat": "菲亚特",
+      "crypto": "加密货币",
+      "other": "其他"
+    },
+    "CURRENCY-FORM": {
+      "name": "显示名称",
+      "code": "货币代码",
+      "symbol": "象征",
+      "decimal-digits": "小数位",
+      "create": "创建货币",
+      "create-success": "货币创建成功",
+      "edit": "编辑货币",
+      "edit-success": "货币编辑成功",
+      "delete": "删除货币",
+      "delete-success": "币种删除成功",
+      "already-exists": "具有此代码的货币已存在。您可能想要编辑它"
     },
     "delete-all-success": "删除汇率成功",
     "historical": "历史汇率",
+    "historical-empty": "没有找到该货币的历史汇率",
     "exchange-rate": "汇率",
     "exchange-rates": "汇率",
+    "min-exchange-rate": "最低汇率",
+    "max-exchange-rate": "最高汇率",
     "empty": "如果您有账户使用默认货币以外的货币，请在此处添加汇率，以获得更准确的图表",
     "select-a-currency": "选择货币",
     "search": "按名称或货币代码搜索"
@@ -541,6 +622,7 @@
       "all": "所有标签"
     },
     "empty-list": "您还没有创建任何标签。标签和类别是对您的动作进行分类的好方法",
+    "no-tags": "您还没有创建任何标签。请前往设置创建标签。",
     "without-tags": "没有标签",
     "add": "添加标签",
     "create": "创建标签",
@@ -588,14 +670,10 @@
   },
   "BUDGETS": {
     "title": "预算",
+    "status": "预算状况",
     "repeated": "重复的",
     "one-time": "单次的",
-    "annual": "年度",
-    "week": "每周",
-    "month": "每月",
     "actives": "活跃",
-    "pending": "待办",
-    "finish": "完成",
     "from-budgeted": "预算为",
     "days-left": "天还剩",
     "days-to-start": "天开始",
@@ -617,10 +695,222 @@
       "title": "预算详情",
       "statistics": "统计数据",
       "budget-value": "预算",
-      "expend-diary-left": "在未来 {{remainingDays}} 天中，您每天可以花费 {{dailyAmount}}",
       "expend-evolution": "支出变化",
       "no-transactions": "看来您还没有与此预算相关的任何支出"
+    },
+    "TARGET_TIMELINE_STATUSES": {
+      "active": "当前预算",
+      "past": "已完成预算",
+      "future": "未来预算"
+    },
+    "PROGRESS": {
+      "LABELS": {
+        "active-on-track": "正常",
+        "active-overspending": "超支",
+        "active-indeterminate": "积极的",
+        "success": "已达成",
+        "fail": "超出预算"
+      },
+      "DESCRIPTION": {
+        "active-on-track": "在剩余的 {{ remainingDays }} 天里，您每天可以花费 {{ dailyAmount }}",
+        "active-overspending": "为了回到正轨，您应该在剩余的 {{ remainingDays }} 天里将每天的支出限制在 {{ dailyAmount }}",
+        "active-indeterminate": "您还剩 {{ amount }} 可以消费。",
+        "active-exceeded": "您已经超出了预算限额 {{ amount }}。如果您找不到此预算的任何收入，您应该在其剩余期间停止支出",
+        "success": "干得好！该预算已成功完成。继续创建预算以管理您的支出",
+        "fail": "您超出了预算 {{ amount }}。下次请更加小心！"
+      }
     }
+  },
+  "GOALS": {
+    "title": "目标",
+    "status": "目标状态",
+    "type": {
+      "display": "目标类型",
+      "income": {
+        "title": "储蓄目标",
+        "descr": "非常适合储蓄。当余额超过目标时，即为成功。"
+      },
+      "expense": {
+        "title": "支出目标",
+        "descr": "跟踪您的支出并以此达到目标金额。适用于捐款、慈善..."
+      }
+    },
+    "empty_title": "未找到目标",
+    "empty_description": "创建一个新目标以开始追踪您的储蓄！",
+    "delete": "删除目标",
+    "delete_warning": "此操作不可逆。涉及此目标的类别和交易将不会被删除",
+    "FORM": {
+      "new_title": "新目标",
+      "edit_title": "编辑目标",
+      "target_amount": "目标金额",
+      "initial_amount": "初始金额",
+      "name": "名称",
+      "name_hint": "我的储蓄目标",
+      "create_success": "目标创建成功",
+      "edit_success": "目标编辑成功",
+      "negative_warn": "目标金额不能为负数"
+    },
+    "DETAILS": {
+      "title": "目标详情",
+      "statistics": "统计",
+      "goal_value": "目标值",
+      "evolution": "趋势",
+      "no_transactions": "看来您还没有进行任何与此目标相关的交易"
+    },
+    "TARGET_TIMELINE_STATUSES": {
+      "active": "进行中的目标",
+      "past": "已结束的目标",
+      "future": "未来的目标"
+    },
+    "PROGRESS": {
+      "LABELS": {
+        "active-on-track": "步入正轨",
+        "active-behind-schedule": "落后于计划",
+        "active-indeterminate": "积极的",
+        "success": "目标达成",
+        "fail": "目标失败"
+      },
+      "DESCRIPTION": {
+        "active-on-track": "您正在寻找目标的轨道上！您必须在剩余的 {{ remainingDays }} 天内每天节省 {{ dailyAmount }}",
+        "active-behind-schedule": "你落后于计划了。您必须每天节省 {{ dailyAmount }} 才能在 {{ remainingDays }} 天后达到您的目标",
+        "active-indeterminate": "您还需要 {{ amount }} 才能实现目标。",
+        "success": "恭喜！你达到了你的目标。",
+        "fail": "您与目标相差了 {{ amount }}。"
+      }
+    }
+  },
+  "DEBTS": {
+    "display": {
+      "one": "债务",
+      "other": "债务"
+    },
+    "FORM": {
+      "name": "债务名称",
+      "initial_amount": "初始金额",
+      "total_amount": "总金额",
+      "step_initial_value": "初始值",
+      "step_details": "细节",
+      "from_transaction": {
+        "title": "来自一笔交易",
+        "tap_to_select": "点击选择交易"
+      },
+      "from_amount": {
+        "title": "从初始金额开始",
+        "description": "该金额不会作为支出/收入纳入统计。它将用于计算余额和净值"
+      }
+    },
+    "DIRECTION": {
+      "lent": "借出",
+      "borrowed": "借来的"
+    },
+    "STATUS": {
+      "active": "积极的",
+      "close": "关闭"
+    },
+    "DETAILS": {
+      "collected_amount": "收取金额",
+      "remaining": "其余的",
+      "no_deadline": "无截止日期",
+      "in_days": "{{x}} 天后",
+      "due_today": "今天到期",
+      "days_ago": "{{x}}天前",
+      "overdue_by": "逾期 {{x}} 天",
+      "per_day": "/ 天",
+      "no_transactions": "未找到该债务的交易"
+    },
+    "EMPTY": {
+      "no_debts_active": "未发现活跃债务。首先点击下面的按钮创建新债务",
+      "no_debts_closed": "未发现已结清的债务。当您收回所有债务或支付所有所欠债务时，债务就结束了。"
+    },
+    "ACTIONS": {
+      "edit": {
+        "title": "编辑债务",
+        "success": "债务编辑成功"
+      },
+      "delete": {
+        "warning_header": "删除这笔债务吗？",
+        "warning_text": "此操作无法撤消。关联交易不会被删除，但将不再与该债务关联。"
+      },
+      "add_register": {
+        "title": "添加动作",
+        "success": "运动添加成功",
+        "fab_label": "添加寄存器",
+        "modal_title": "添加登记到该债务",
+        "modal_subtitle": "选择以下选项之一将交易与该债务关联起来"
+      },
+      "link_transaction": {
+        "title": "链接现有交易",
+        "description": "选择现有记录将其链接到该债务",
+        "success": "与债务挂钩的交易",
+        "creating": "您正在创建与债务 <b>{{ name }}</b> 关联的交易"
+      },
+      "unlink_transaction": {
+        "title": "取消与债务的关联",
+        "warning_text": "此交易将不再与此债务相关联。",
+        "success": "交易已取消与债务的关联"
+      },
+      "new_transaction": {
+        "title": "添加新交易",
+        "description": "通过创建与该债务相关的新交易来手动添加或减少债务"
+      },
+      "create": {
+        "title": "创造债务",
+        "success": "债务创建成功"
+      }
+    }
+  },
+  "ASSETS": {
+    "title": "资产",
+    "empty_description": "您还没有创建任何资产。可以跟踪房地产、车辆或收藏品等资产的估值",
+    "create": "添加资产",
+    "create_success": "资产创建成功",
+    "edit_success": "资产编辑成功",
+    "delete": "删除资产",
+    "delete_success": "资产删除成功",
+    "delete_confirmation": "此操作无法撤消。该资产的所有估值也将被删除。",
+    "profit": "利润",
+    "profit_percent": "返回 ％",
+    "total_value": "资产总值",
+    "FORM": {
+      "name": "资产名称",
+      "name_required": "请输入资产名称",
+      "description": "描述",
+      "initial_value": "初始值",
+      "initial_value_required": "请输入初始值",
+      "initial_value_invalid": "请输入有效号码",
+      "currency": "货币",
+      "select_currency": "请选择货币",
+      "creation_date": "创建日期",
+      "edit": "编辑资产",
+      "create": "创建资产",
+      "already_exists": "具有此名称的资产已存在。您可能想要编辑它",
+      "valuation_before_creation_date": "该资产的估值日期早于收购日期"
+    },
+    "VALUATION": {
+      "history": "估值历史",
+      "no_valuations": "尚未记录估值。首先添加第一个估值",
+      "add_valuation": "添加估价",
+      "edit_valuation": "编辑估值",
+      "value": "价值",
+      "value_required": "请输入一个值",
+      "value_invalid": "请输入有效号码",
+      "update_value_success": "估价添加成功",
+      "edit_valuation_success": "估值更新成功",
+      "delete_valuation_success": "评估删除成功",
+      "delete_all_valuations": "删除所有估价",
+      "delete_all_valuations_success": "所有估价已成功删除"
+    },
+    "SORT": {
+      "name_asc": "姓名（A-Z）",
+      "name_desc": "姓名（Z-A）",
+      "value_asc": "值（最低的在前）",
+      "value_desc": "值（最高的在前）"
+    }
+  },
+  "TARGET_TIMELINE_STATUSES": {
+    "active": "进行中",
+    "past": "已完成",
+    "future": "未开始"
   },
   "BACKUP": {
     "no_file_selected": "未选择文件",
@@ -671,7 +961,7 @@
         ],
         "steps-descr": [
           "从您的设备中选择一个 .csv 文件。确保它的第一行描述了每列的名称。",
-          "选择每笔交易数额的列。负值表示支出，正值表示收入。.表示小数点分隔符。",
+          "选择每笔交易数额的列。负值表示支出，正值表示收入。",
           "选择每笔交易所属账户的列。您也可以选择默认账户，以防我们找不到您想要的账户。如果未指定默认账户，我们将建立一个同名账户。",
           "选择交易类别名称所在的列。您必须指定一个默认类别，以便我们在找不到此类别时，将默认类别分配给交易。",
           "选择每笔交易日期的列。如果未指定，所有交易将使用当前日期。",
@@ -692,52 +982,104 @@
     }
   },
   "SETTINGS": {
-    "title_long": "设置和外观",
+    "title_long": "设置与自定义",
     "title_short": "设置",
-    "description": "应用主题、语言和其它常规设置",
+    "description": "主题、语言、数据等",
     "edit_profile": "编辑个人资料",
-    "lang.section": "语言和文字",
-    "lang.title": "语言/Language",
-    "lang.descr": "应用中显示文字的语言",
-    "lang.help": "如果您想合作翻译此应用，您可参考<a href='https://github.com/enrique-lozano/Monekin/tree/main/lib/i18n'>我们的指南</a>",
-    "locale": "地区",
-    "locale_auto": "系统",
-    "locale.descr": "设置用于日期、数字的格式……",
-    "locale.warn": "更改区域时应用将更新",
-    "first_day_of_week": "一周的第一天",
-    "theme_and_colors": "主题和颜色",
-    "theme": "主题",
-    "theme.auto": "系统",
-    "theme.light": "明亮主题",
-    "theme.dark": "黑暗主题",
-    "amoled-mode": "AMOLED 模式",
-    "amoled-mode.descr": "尽可能使用纯黑色壁纸。在 AMOLED 屏幕的设备上能略微省电",
-    "dynamic-colors": "动态色彩",
-    "dynamic-colors.descr": "尽可能使用系统强调色",
-    "accent-color": "强调色",
-    "accent-color.descr": "选择应用中用来强调介面某些部分的颜色",
-    "font": "字体",
-    "font-platform": "平台",
-    "SWIPE-ACTIONS": {
-      "title": "滑动操作",
-      "choose-description": "选择当您使用此滑动方向滑动列表中的交易项目时将触发什么操作",
-      "swipe-left": "向左滑动",
-      "swipe-right": "向右滑动",
-      "none": "无动作",
-      "toggle-reconciled": "切换已调节",
-      "toggle-pending": "切换待处理",
-      "toggle-voided": "切换作废",
-      "toggle-unreconciled": "切换不可调和",
-      "remove-status": "删除状态"
+    "GENERAL": {
+      "menu_title": "常规设置",
+      "menu_descr": "语言、隐私等",
+      "show_all_decimals": "显示所有小数位",
+      "show_all_decimals_descr": "即便是末尾为零，也显示所有小数位",
+      "LANGUAGE": {
+        "section": "语言和文字",
+        "title": "语言/Language",
+        "descr": "应用中显示文字的语言",
+        "help": "如果您想合作翻译此应用，您可参考<a href='https://github.com/enrique-lozano/Monekin/tree/main/lib/i18n'>我们的指南</a>"
+      },
+      "LOCALE": {
+        "title": "地区",
+        "auto": "系统",
+        "descr": "设置用于日期、数字的格式……",
+        "warn": "更改区域时应用将更新",
+        "first_day_of_week": "一周的第一天"
+      }
+    },
+    "APP_STRUCTURES": {
+      "title": "应用程序结构",
+      "tags": "定义标签以更好地组织您的交易",
+      "categories": "类别和子类别组织",
+      "accounts": "管理和编辑您的帐户",
+      "filters": "配置可用于事务和统计的全局过滤器"
     },
     "SECURITY": {
       "title": "安全",
-      "private-mode-at-launch": "启动隐私模式",
-      "private-mode-at-launch.descr": "默认以隐私模式启动此应用",
-      "private-mode": "隐私模式",
-      "private-mode.descr": "隐藏所有金额",
-      "private-mode.activated": "隐私模式已启用",
-      "private-mode.deactivated": "隐私模式已禁用"
+      "private_mode_at_launch": "启动隐私模式",
+      "private_mode_at_launch_descr": "默认以隐私模式启动此应用",
+      "private_mode": "隐私模式",
+      "private_mode_descr": "隐藏所有金额",
+      "private_mode_activated": "隐私模式已启用",
+      "private_mode_deactivated": "隐私模式已禁用"
+    },
+    "TRANSACTIONS": {
+      "menu_title": "交易",
+      "menu_descr": "配置交易的行为",
+      "title": "交易设置",
+      "STYLE": {
+        "title": "交易样式",
+        "subtitle": "配置交易在应用列表中的显示方式",
+        "show_tags": "显示标签",
+        "show_time": "显示时间"
+      },
+      "SWIPE_ACTIONS": {
+        "title": "滑动操作",
+        "choose_description": "选择当您使用此滑动方向滑动列表中的交易项目时将触发什么操作",
+        "swipe_left": "向左滑动",
+        "swipe_right": "向右滑动",
+        "none": "无动作",
+        "toggle_reconciled": "切换已调节",
+        "toggle_pending": "切换待处理",
+        "toggle_voided": "切换作废",
+        "toggle_unreconciled": "切换不可调和",
+        "remove_status": "删除状态"
+      },
+      "DEFAULT_VALUES": {
+        "title": "Default Form Values",
+        "page_title": "New Transaction: Default Form Values",
+        "reuse_last_transaction": "Reuse Last Transaction Values",
+        "reuse_last_transaction_descr": "Automatically fill the form with some values from the last created transaction",
+        "fields_to_reuse": "Fields to reuse",
+        "reuse_last_values_modal_descr": "Select the fields that should be pre-filled with the values from the last created transaction.",
+        "default_values_separator": "Default Values",
+        "default_category": "Default Category",
+        "default_status": "Default Status",
+        "default_tags": "Default Tags",
+        "no_tags_selected": "No tags selected"
+      },
+      "DEFAULT_TYPE": {
+        "title": "Default Type",
+        "modal_title": "Select Default Type"
+      }
+    },
+    "APPEARANCE": {
+      "menu_title": "主题与风格",
+      "menu_descr": "主题选择、颜色以及与应用程序外观相关的其他内容",
+      "theme_and_colors": "主题和颜色",
+      "THEME": {
+        "title": "主题",
+        "auto": "系统",
+        "light": "明亮主题",
+        "dark": "黑暗主题"
+      },
+      "amoled_mode": "AMOLED 模式",
+      "amoled_mode_descr": "尽可能使用纯黑色壁纸。在 AMOLED 屏幕的设备上能略微省电",
+      "dynamic_colors": "动态色彩",
+      "dynamic_colors_descr": "尽可能使用系统强调色",
+      "accent_color": "强调色",
+      "accent_color_descr": "选择应用中用来强调介面某些部分的颜色",
+      "text": "文本",
+      "font": "字体",
+      "font_platform": "平台"
     }
   },
   "MORE": {
@@ -754,7 +1096,7 @@
     },
     "ABOUT_US": {
       "display": "应用信息",
-      "description": "查看有关 Monekin 的条款和其它相关信息。与社区取得联系以报告错误、留下建议……",
+      "description": "查找 Monekin 的条款、重要信息，并通过报告错误或分享想法与我们联系",
       "LEGAL": {
         "display": "法律信息",
         "privacy": "隐私权政策",

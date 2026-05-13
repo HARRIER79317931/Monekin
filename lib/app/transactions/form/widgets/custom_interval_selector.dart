@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:monekin/app/layout/page_framework.dart';
 import 'package:monekin/core/models/date-utils/periodicity.dart';
 import 'package:monekin/core/models/transaction/recurrency_data.dart';
 import 'package:monekin/core/models/transaction/rule_recurrent_limit.dart';
 import 'package:monekin/core/presentation/widgets/form_fields/date_field.dart';
 import 'package:monekin/core/presentation/widgets/form_fields/date_form_field.dart';
 import 'package:monekin/core/presentation/widgets/persistent_footer_button.dart';
+import 'package:monekin/core/routes/route_utils.dart';
 import 'package:monekin/core/utils/text_field_utils.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
 
@@ -74,11 +76,8 @@ class _IntervalSelectorPageState extends State<IntervalSelectorPage> {
   Widget build(BuildContext context) {
     final t = Translations.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(t.general.time.periodicity.display),
-        elevation: 0,
-      ),
+    return PageFramework(
+      title: Translations.of(context).general.time.periodicity.display,
       persistentFooterButtons: [
         PersistentFooterButton(
           child: FilledButton.icon(
@@ -86,8 +85,7 @@ class _IntervalSelectorPageState extends State<IntervalSelectorPage> {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
 
-                Navigator.pop(
-                  context,
+                RouteUtils.popRoute(
                   ruleUntilMode == RuleUntilMode.infinity
                       ? RecurrencyData.infinite(
                           intervalPeriod: intervalPeriod,
@@ -121,10 +119,13 @@ class _IntervalSelectorPageState extends State<IntervalSelectorPage> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 2, 0, 12),
-              child: Text(t.general.time.ranges.it_repeat),
+              child: Text(
+                t.general.time.ranges.it_repeat,
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 16),
               child: Form(
                 key: _formKey,
                 child: Row(
@@ -194,10 +195,13 @@ class _IntervalSelectorPageState extends State<IntervalSelectorPage> {
                 ),
               ),
             ),
-            const Divider(height: 24),
+            const Divider(height: 24, thickness: 3),
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 12, 0, 12),
-              child: Text(t.general.time.ranges.it_ends),
+              child: Text(
+                t.general.time.ranges.it_ends,
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
             buildRadioButton(
               RuleUntilMode.infinity,

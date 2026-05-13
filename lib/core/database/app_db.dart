@@ -8,11 +8,20 @@ import 'package:monekin/core/database/services/category/category_service.dart';
 import 'package:monekin/core/database/services/currency/currency_service.dart';
 import 'package:monekin/core/database/services/user-setting/user_setting_service.dart';
 import 'package:monekin/core/database/sql/initial/seed.dart';
+import 'package:monekin/core/database/utils/converters/custom_enum_converter.dart';
+import 'package:monekin/core/database/utils/converters/date_converters.dart';
+import 'package:monekin/core/database/utils/converters/list_converters.dart';
 import 'package:monekin/core/models/account/account.dart';
+import 'package:monekin/core/models/asset/asset.dart';
 import 'package:monekin/core/models/budget/budget.dart';
 import 'package:monekin/core/models/category/category.dart';
 import 'package:monekin/core/models/date-utils/periodicity.dart';
+import 'package:monekin/core/models/debt/debt.dart';
+import 'package:monekin/core/models/debt/debt_direction.enum.dart';
 import 'package:monekin/core/models/exchange-rate/exchange_rate.dart';
+import 'package:monekin/core/models/filters/saved_filter.dart';
+import 'package:monekin/core/models/goal/goal.dart';
+import 'package:monekin/core/models/goal/goal_type.enum.dart';
 import 'package:monekin/core/models/transaction/transaction.dart';
 import 'package:monekin/core/models/transaction/transaction_status.enum.dart';
 import 'package:monekin/core/models/transaction/transaction_type.enum.dart';
@@ -76,7 +85,7 @@ class AppDB extends _$AppDB {
   }
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration {
@@ -136,21 +145,6 @@ class AppDB extends _$AppDB {
         return Future(() => null);
       },
     );
-  }
-
-  /// Return a WHERE clause expression that is the equivalent to the conjunction of some expressions. If no expressions are passed, the WHERE clause will have no effect.
-  Expression<bool> buildExpr(List<Expression<bool>> expressions) {
-    if (expressions.isEmpty) return const CustomExpression('(TRUE)');
-
-    Expression<bool> toReturn = expressions.first;
-
-    for (var i = 1; i < expressions.length; i++) {
-      final exprToPush = expressions[i];
-
-      toReturn = toReturn & exprToPush;
-    }
-
-    return toReturn;
   }
 }
 

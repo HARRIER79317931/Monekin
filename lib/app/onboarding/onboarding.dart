@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:monekin/app/layout/tabs.dart';
+import 'package:monekin/app/layout/page_switcher.dart';
 import 'package:monekin/app/onboarding/classes/OnboardingItem.dart';
 import 'package:monekin/core/database/services/app-data/app_data_service.dart';
 import 'package:monekin/core/database/services/currency/currency_service.dart';
@@ -13,10 +13,10 @@ import 'package:monekin/core/presentation/styles/big_button_style.dart';
 import 'package:monekin/core/presentation/theme.dart';
 import 'package:monekin/core/presentation/widgets/currency_selector_modal.dart';
 import 'package:monekin/core/presentation/widgets/persistent_footer_button.dart';
-import 'package:monekin/core/presentation/widgets/skeleton.dart';
 import 'package:monekin/core/routes/route_utils.dart';
+import 'package:monekin/core/utils/unique_app_widgets_keys.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
-import 'package:monekin/main.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -35,8 +35,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
         .setItem(AppDataKey.introSeen, '1', updateGlobalState: true)
         .then((value) {
           RouteUtils.pushRoute(
-            context,
-            TabsPage(key: tabsPageKey),
+            PageSwitcher(key: tabsPageKey),
             withReplacement: true,
           );
         });
@@ -91,7 +90,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     ];
 
     final isInLastPage = currentPage >= items.length - 1;
-    double screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: SafeArea(
@@ -287,46 +286,51 @@ class _OnboardingPageState extends State<OnboardingPage> {
     final t = Translations.of(context);
 
     return StreamBuilder(
-      stream: CurrencyService.instance.getUserPreferredCurrency(),
+      stream: CurrencyService.instance.ensureAndGetPreferredCurrency(),
       builder: (context, snapshot) {
         final userCurrency = snapshot.data;
 
-        return ListTile(
-          tileColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.04),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          trailing: Icon(
-            Icons.arrow_forward_ios_rounded,
-            size: 14,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
-          ),
-          leading: Container(
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(100)),
-            child: userCurrency != null
-                ? userCurrency.displayFlagIcon(size: 42)
-                : const Skeleton(height: 42, width: 42),
-          ),
-          title: Text(t.intro.select_your_currency),
-          subtitle: userCurrency != null
-              ? Text(userCurrency.name)
-              : const Skeleton(height: 12, width: 50),
-          onTap: () {
-            if (userCurrency == null) return;
-
-            showCurrencySelectorModal(
+        return Skeletonizer(
+          enabled: userCurrency == null,
+          child: ListTile(
+            tileColor: Theme.of(
               context,
-              CurrencySelectorModal(
-                preselectedCurrency: userCurrency,
-                onCurrencySelected: (newCurrency) {
-                  UserSettingService.instance
-                      .setItem(SettingKey.preferredCurrency, newCurrency.code)
-                      .then((value) => setState(() => {}));
-                },
+            ).colorScheme.onSurface.withOpacity(0.04),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            trailing: Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 14,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
+            ),
+            leading: Container(
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
               ),
-            );
-          },
+              child: userCurrency != null
+                  ? userCurrency.displayFlagIcon(size: 42)
+                  : Bone.square(size: 42),
+            ),
+            title: Text(t.intro.select_your_currency),
+            subtitle: Text(userCurrency?.name ?? BoneMock.name),
+            onTap: () {
+              if (userCurrency == null) return;
+
+              showCurrencySelectorModal(
+                context,
+                CurrencySelectorModal(
+                  preselectedCurrency: userCurrency,
+                  onCurrencySelected: (newCurrency) {
+                    UserSettingService.instance
+                        .setItem(SettingKey.preferredCurrency, newCurrency.code)
+                        .then((value) => setState(() => {}));
+                  },
+                ),
+              );
+            },
+          ),
         );
       },
     );
