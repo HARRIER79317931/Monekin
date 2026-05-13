@@ -3,10 +3,10 @@
 /// Source: lib/i18n/json
 /// To regenerate, run: `dart run slang`
 ///
-/// Locales: 9
-/// Strings: 5417 (601 per locale)
+/// Locales: 10
+/// Strings: 6018 (601 per locale)
 ///
-/// Built on 2025-11-03 at 23:12 UTC
+/// Built on 2025-12-22 at 04:08 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint, unused_import
@@ -21,6 +21,7 @@ import 'translations_de.g.dart' deferred as l_de;
 import 'translations_es.g.dart' deferred as l_es;
 import 'translations_hu.g.dart' deferred as l_hu;
 import 'translations_it.g.dart' deferred as l_it;
+import 'translations_ja.g.dart' deferred as l_ja;
 import 'translations_tr.g.dart' deferred as l_tr;
 import 'translations_uk.g.dart' deferred as l_uk;
 import 'translations_zh_CN.g.dart' deferred as l_zh_CN;
@@ -39,6 +40,7 @@ enum AppLocale with BaseAppLocale<AppLocale, Translations> {
 	es(languageCode: 'es'),
 	hu(languageCode: 'hu'),
 	it(languageCode: 'it'),
+	ja(languageCode: 'ja'),
 	tr(languageCode: 'tr'),
 	uk(languageCode: 'uk'),
 	zhCn(languageCode: 'zh', countryCode: 'CN'),
@@ -91,6 +93,13 @@ enum AppLocale with BaseAppLocale<AppLocale, Translations> {
 			case AppLocale.it:
 				await l_it.loadLibrary();
 				return l_it.TranslationsIt(
+					overrides: overrides,
+					cardinalResolver: cardinalResolver,
+					ordinalResolver: ordinalResolver,
+				);
+			case AppLocale.ja:
+				await l_ja.loadLibrary();
+				return l_ja.TranslationsJa(
 					overrides: overrides,
 					cardinalResolver: cardinalResolver,
 					ordinalResolver: ordinalResolver,
@@ -159,6 +168,12 @@ enum AppLocale with BaseAppLocale<AppLocale, Translations> {
 				);
 			case AppLocale.it:
 				return l_it.TranslationsIt(
+					overrides: overrides,
+					cardinalResolver: cardinalResolver,
+					ordinalResolver: ordinalResolver,
+				);
+			case AppLocale.ja:
+				return l_ja.TranslationsJa(
 					overrides: overrides,
 					cardinalResolver: cardinalResolver,
 					ordinalResolver: ordinalResolver,

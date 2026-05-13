@@ -58,10 +58,5 @@ const appSupportedLocales = [
     locale: AppLocale.zhCn,
     label: '简体中文',
     writingSystem: WritingSystem.chinese,
-  ),
-    SupportedLocale(
-    locale: AppLocale.jp,
-    label: '日本語',
-    writingSystem: WritingSystem.japanese,
-  ),
+  )
 ];
