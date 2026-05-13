@@ -5,7 +5,7 @@ import 'package:monekin/core/database/app_db.dart';
 import 'package:monekin/core/database/services/currency/currency_service.dart';
 import 'package:monekin/core/database/services/user-setting/private_mode_service.dart';
 import 'package:monekin/core/database/services/user-setting/user_setting_service.dart';
-import 'package:monekin/core/presentation/widgets/skeleton.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import 'ui_number_formatter.dart';
 
@@ -87,10 +87,16 @@ class CurrencyDisplayer extends StatelessWidget {
     }
 
     return StreamBuilder(
-      stream: CurrencyService.instance.getUserPreferredCurrency(),
+      stream: CurrencyService.instance.ensureAndGetPreferredCurrency(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Skeleton(width: 50, height: valueFontSize);
+          return Skeletonizer.zone(
+            child: Bone(
+              height: valueFontSize,
+              width: 40 + valueFontSize,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          );
         }
 
         final displayer = _amountDisplayer(context, currency: snapshot.data!);

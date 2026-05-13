@@ -1,10 +1,11 @@
 import 'dart:math';
 
 import 'package:async/async.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:monekin/core/database/services/account/account_service.dart';
 import 'package:monekin/core/database/services/transaction/transaction_service.dart';
-import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filters.dart';
+import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filter_set.dart';
 import 'package:monekin/core/utils/date_time_picker.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
 import 'package:rxdart/rxdart.dart';
@@ -69,8 +70,11 @@ class FinanceHealthData {
       return null;
     }
 
-    return savingPercentageScore.weightedValue! +
+    final score =
+        savingPercentageScore.weightedValue! +
         monthsWithoutIncomeScore.weightedValue!;
+
+    return clampDouble(score, 0, 100);
   }
 
   String healthyScoreString({int decimalPlaces = 0}) {
@@ -113,7 +117,12 @@ class FinanceHealthData {
   static Color getHealthyValueColor(double? healthyValue) =>
       healthyValue == null
       ? Colors.grey
-      : HSLColor.fromAHSL(1, healthyValue, 1, 0.35).toColor();
+      : HSLColor.fromAHSL(
+          1,
+          clampDouble(healthyValue, 0, 100),
+          1,
+          0.35,
+        ).toColor();
 
   Color getHealthyScoreColor() => getHealthyValueColor(healthyScore);
 
@@ -194,14 +203,11 @@ class FinanceHealthData {
 class FinanceHealthService {
   /// Returns the number of months that the user can live without income, taking into account their spending rate in the last 12 months.
   Stream<double?> getMonthsWithoutIncome({
-    required TransactionFilters filters,
+    required TransactionFilterSet filters,
   }) {
     final minDate = filters.minDate ?? kDefaultFirstSelectableDate;
     final maxDate = filters.maxDate ?? DateTime.now();
 
-    print(
-      'Calculating months without income from $minDate to $maxDate with filters: $filters',
-    );
     return Rx.combineLatest3(
       TransactionService.instance.countTransactions(filters: filters),
       AccountService.instance.getAccountsMoney(
@@ -211,7 +217,9 @@ class FinanceHealthService {
       ),
       TransactionService.instance
           .getTransactionsValueBalance(
-            filters: filters.copyWith(transactionTypes: [TransactionType.E]),
+            filters: filters.copyWith(
+              transactionTypes: [TransactionType.expense],
+            ),
           )
           .map((e) => e.abs()),
       (numberOfTransactions, accountsMoney, expense) {
@@ -222,19 +230,19 @@ class FinanceHealthService {
         final dateDiff = maxDate.difference(minDate).inDays;
         final monthlyExpense = expense / dateDiff * 30;
 
-        return accountsMoney / monthlyExpense;
+        return max(accountsMoney / monthlyExpense, 0);
       },
     );
   }
 
   /// Returns a number (from 0 to 100) with the user's savings percentage for a given period (if specified)
-  Stream<double> getSavingPercentage({required TransactionFilters filters}) {
+  Stream<double> getSavingPercentage({required TransactionFilterSet filters}) {
     return StreamZip([
       TransactionService.instance.getTransactionsValueBalance(
-        filters: filters.copyWith(transactionTypes: [TransactionType.I]),
+        filters: filters.copyWith(transactionTypes: [TransactionType.income]),
       ),
       TransactionService.instance.getTransactionsValueBalance(
-        filters: filters.copyWith(transactionTypes: [TransactionType.E]),
+        filters: filters.copyWith(transactionTypes: [TransactionType.expense]),
       ),
     ]).map((res) {
       final income = res[0];
@@ -257,7 +265,7 @@ class FinanceHealthService {
 
   /// Return a decimal number between 0 and 100 with the healthy value
   Stream<FinanceHealthData> getHealthyValue({
-    required TransactionFilters filters,
+    required TransactionFilterSet filters,
   }) {
     return Rx.combineLatest2(
       getMonthsWithoutIncome(filters: filters),

@@ -2,53 +2,63 @@
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:monekin/app/home/widgets/new_transaction_fl_button.dart';
-import 'package:monekin/app/layout/tabs.dart';
+import 'package:monekin/app/layout/page_context.dart';
+import 'package:monekin/app/layout/page_framework.dart';
 import 'package:monekin/app/transactions/widgets/bulk_edit_transaction_modal.dart';
 import 'package:monekin/app/transactions/widgets/transaction_list.dart';
+import 'package:monekin/app/transactions/widgets/transaction_list_tile.dart';
 import 'package:monekin/core/database/services/transaction/transaction_service.dart';
+import 'package:monekin/core/extensions/padding.extension.dart';
 import 'package:monekin/core/models/transaction/transaction.dart';
+import 'package:monekin/core/presentation/animations/animated_expanded.dart';
 import 'package:monekin/core/presentation/helpers/snackbar.dart';
-import 'package:monekin/core/presentation/responsive/breakpoints.dart';
 import 'package:monekin/core/presentation/widgets/confirm_dialog.dart';
 import 'package:monekin/core/presentation/widgets/filter_row_indicator.dart';
 import 'package:monekin/core/presentation/widgets/monekin_popup_menu_button.dart';
 import 'package:monekin/core/presentation/widgets/no_results.dart';
 import 'package:monekin/core/presentation/widgets/number_ui_formatters/currency_displayer.dart';
-import 'package:monekin/core/presentation/widgets/skeleton.dart';
-import 'package:monekin/core/presentation/widgets/transaction_filter/filter_sheet_modal.dart';
-import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filters.dart';
+import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filter_sheet_modal.dart';
+import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filter_set.dart';
 import 'package:monekin/core/utils/list_tile_action_item.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class TransactionsPage extends StatefulWidget {
   const TransactionsPage({super.key, this.filters});
 
-  final TransactionFilters? filters;
+  final TransactionFilterSet? filters;
 
   @override
-  State<TransactionsPage> createState() => _TransactionsPageState();
+  State<TransactionsPage> createState() => TransactionsPageState();
 }
 
-class _TransactionsPageState extends State<TransactionsPage> {
-  late TransactionFilters filters;
+class TransactionsPageState extends State<TransactionsPage> {
+  late TransactionFilterSet filters;
 
   bool searchActive = false;
+
   FocusNode searchFocusNode = FocusNode();
   final searchController = TextEditingController();
-
-  bool isFloatingButtonExtended = true;
+  final ScrollController listScrollController = ScrollController();
 
   List<MoneyTransaction> selectedTransactions = [];
+
+  void resetScroll() {
+    if (listScrollController.hasClients) {
+      listScrollController.jumpTo(0);
+    }
+  }
 
   @override
   void initState() {
     super.initState();
 
-    filters = widget.filters ?? const TransactionFilters();
+    filters = widget.filters ?? const TransactionFilterSet();
+
+    print("INITIAL FILTERS: $filters");
 
     searchFocusNode.addListener(() {
       if (!searchFocusNode.hasFocus && searchController.text.isEmpty) {
@@ -66,12 +76,14 @@ class _TransactionsPageState extends State<TransactionsPage> {
     super.dispose();
   }
 
+  bool get canPop => !searchActive && selectedTransactions.isEmpty;
+
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
 
     return PopScope(
-      canPop: !searchActive && selectedTransactions.isEmpty,
+      canPop: canPop,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
 
@@ -91,20 +103,21 @@ class _TransactionsPageState extends State<TransactionsPage> {
 
           return;
         }
-
-        Navigator.pop(context);
       },
-      child: Scaffold(
-        appBar: selectedTransactions.isNotEmpty
+      child: PageFramework(
+        title: t.transaction.display(n: 10),
+        appBarBuilder: (_, _, _) => selectedTransactions.isNotEmpty
             ? selectedTransactionsAppbar()
             : transactionsPageDefaultAppBar(t, context),
-        floatingActionButton: NewTransactionButton(
-          isExtended: isFloatingButtonExtended,
-        ),
+        floatingActionButton: ifIsInTabs(context)
+            ? null
+            : NewTransactionButton(scrollController: listScrollController),
         body: Column(
           children: [
-            if (filters.hasFilter) ...[
-              FilterRowIndicator(
+            AnimatedExpanded(
+              expand: filters.hasFilter,
+              duration: const Duration(milliseconds: 250),
+              child: FilterRowIndicator(
                 filters: filters.copyWith(searchValue: searchController.text),
                 onChange: (newFilters) {
                   setState(() {
@@ -112,7 +125,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                   });
                 },
               ),
-            ],
+            ),
             StreamBuilder(
               stream: Rx.combineLatest2(
                 TransactionService.instance.countTransactions(
@@ -124,52 +137,60 @@ class _TransactionsPageState extends State<TransactionsPage> {
                 (a, b) => (count: a, value: b),
               ),
               builder: (context, snapshot) {
-                final res = snapshot.data;
+                final trCountAndBalance = snapshot.data;
 
                 const smallerTextStyle = TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w300,
                 );
 
-                return Card(
-                  elevation: 2,
-                  //color: Theme.of(context).colorScheme.primary,
-                  margin: const EdgeInsets.all(8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 14,
+                return Skeletonizer(
+                  enabled: trCountAndBalance == null,
+                  child: Card(
+                    elevation: 2,
+                    //color: Theme.of(context).colorScheme.primary,
+                    margin: const EdgeInsets.all(8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    child: DefaultTextStyle(
-                      style: Theme.of(context).textTheme.titleMedium!,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          if (res != null) ...[
-                            Text.rich(
-                              TextSpan(
-                                text: selectedTransactions.isNotEmpty
-                                    ? ('${selectedTransactions.length.toStringAsFixed(0)}')
-                                    : '',
-                                children: [
-                                  TextSpan(
-                                    text:
-                                        '${selectedTransactions.isNotEmpty ? ' / ' : ''}${res.count} ',
-                                    style: selectedTransactions.isNotEmpty
-                                        ? smallerTextStyle
-                                        : null,
-                                  ),
-                                  TextSpan(
-                                    text: t.transaction
-                                        .display(n: res.count)
-                                        .toLowerCase(),
-                                  ),
-                                ],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 14,
+                      ),
+                      child: DefaultTextStyle(
+                        style: Theme.of(context).textTheme.titleMedium!,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            if (trCountAndBalance == null)
+                              Text("XX Transactions"),
+                            if (trCountAndBalance != null)
+                              Text.rich(
+                                TextSpan(
+                                  text: selectedTransactions.isNotEmpty
+                                      ? ('${selectedTransactions.length.toStringAsFixed(0)}')
+                                      : '',
+                                  children: [
+                                    TextSpan(
+                                      text:
+                                          '${selectedTransactions.isNotEmpty ? ' / ' : ''}${trCountAndBalance.count} ',
+                                      style: selectedTransactions.isNotEmpty
+                                          ? smallerTextStyle
+                                          : null,
+                                    ),
+
+                                    if (selectedTransactions.isNotEmpty)
+                                      const TextSpan(text: " "),
+
+                                    TextSpan(
+                                      text: t.transaction
+                                          .display(n: trCountAndBalance.count)
+                                          .toLowerCase(),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -183,10 +204,11 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                         .sum,
                                     showDecimals: false,
                                   ),
-                                  const Text("/ ", style: smallerTextStyle),
+                                  const Text(" / ", style: smallerTextStyle),
                                 ],
                                 CurrencyDisplayer(
-                                  amountToConvert: res.value,
+                                  amountToConvert:
+                                      trCountAndBalance?.value ?? 0,
                                   showDecimals: selectedTransactions.isEmpty,
                                   integerStyle: selectedTransactions.isEmpty
                                       ? const TextStyle(inherit: true)
@@ -195,11 +217,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                               ],
                             ),
                           ],
-                          if (res == null) ...[
-                            const Skeleton(width: 38, height: 18),
-                            const Skeleton(width: 28, height: 18),
-                          ],
-                        ],
+                        ),
                       ),
                     ),
                   ),
@@ -208,33 +226,27 @@ class _TransactionsPageState extends State<TransactionsPage> {
             ),
             Expanded(
               child: TransactionListComponent(
-                heroTagBuilder: (tr) => 'transactions-page__tr-icon-${tr.id}',
+                scrollController: listScrollController,
+                isScrollable: true,
+                listPadding: const EdgeInsets.only(
+                  bottom: 64,
+                ).withSafeBottom(context),
+                tileBuilder: (tr) => TransactionListTile(
+                  transaction: tr,
+                  heroTag: 'transactions-page__tr-icon-${tr.id}',
+                  onLongPress: selectedTransactions.isNotEmpty
+                      ? null
+                      : () => toggleTransaction(tr),
+                  onTap: selectedTransactions.isEmpty
+                      ? null
+                      : () => toggleTransaction(tr),
+                  isSelected: selectedTransactions.any(
+                    (element) => element.id == tr.id,
+                  ),
+                  showDateTime: false,
+                  applySwipeActions: true,
+                ),
                 filters: filters.copyWith(searchValue: searchController.text),
-                prevPage: const TabsPage(),
-                selectedTransactions: selectedTransactions,
-                onLongPress: (tr) {
-                  if (selectedTransactions.isNotEmpty) {
-                    return;
-                  }
-
-                  setState(() {
-                    selectedTransactions = [tr];
-                  });
-                },
-                onScrollChange: (controller) {
-                  bool shouldExtendButton =
-                      BreakPoint.of(context).isLargerThan(BreakpointID.md) ||
-                      controller.offset <= 10 ||
-                      controller.position.userScrollDirection !=
-                          ScrollDirection.reverse;
-
-                  if (isFloatingButtonExtended != shouldExtendButton) {
-                    setState(() {
-                      isFloatingButtonExtended = shouldExtendButton;
-                    });
-                  }
-                },
-                onTap: selectedTransactions.isEmpty ? null : toggleTransaction,
                 onEmptyList: NoResults(
                   title: filters.hasFilter ? null : t.general.empty_warn,
                   description: filters.hasFilter
@@ -252,8 +264,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
 
   void closeSearch() {
     setState(() {
-      searchActive = false;
       searchController.text = "";
+      searchFocusNode.unfocus();
     });
   }
 
@@ -262,29 +274,35 @@ class _TransactionsPageState extends State<TransactionsPage> {
       leading: searchActive
           ? IconButton(onPressed: closeSearch, icon: const Icon(Icons.close))
           : null,
-      title: searchActive
-          ? TextField(
-              controller: searchController,
-              focusNode: searchFocusNode,
-              decoration: InputDecoration(
-                hintText: t.transaction.list.searcher_placeholder,
-                border: const UnderlineInputBorder(),
-              ),
-              onChanged: (text) {
-                setState(() {});
-              },
-            )
-          : Text(t.transaction.display(n: 10)),
+      title: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 175),
+        child: searchActive
+            ? TextField(
+                controller: searchController,
+                focusNode: searchFocusNode,
+                decoration: InputDecoration(
+                  hintText: t.transaction.list.searcher_placeholder,
+                  border: const UnderlineInputBorder(),
+                  filled: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 8,
+                  ),
+                ),
+                onChanged: (text) {
+                  setState(() {});
+                },
+              )
+            : Text(t.transaction.display(n: 10)),
+      ),
       actions: [
         if (!searchActive)
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              setState(() {
-                searchActive = true;
-              });
-
+              searchActive = true;
               searchFocusNode.requestFocus();
+              setState(() {});
             },
           ),
         IconButton(
@@ -333,8 +351,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                     return BulkEditTransactionModal(
                       transactionsToEdit: selectedTransactions,
                       onSuccess: () {
-                        selectedTransactions = [];
-                        setState(() {});
+                        cleanSelectedTransactions();
                       },
                     );
                   },
@@ -383,9 +400,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                           ),
                         );
 
-                        setState(() {
-                          selectedTransactions = [];
-                        });
+                        cleanSelectedTransactions();
                       })
                       .catchError((err) {
                         MonekinSnackbar.error(SnackbarParams.fromError(err));

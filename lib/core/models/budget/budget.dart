@@ -1,34 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:monekin/core/database/app_db.dart';
-import 'package:monekin/core/database/services/transaction/transaction_service.dart';
+import 'package:monekin/core/database/app_db.dart'
+    show BudgetInDB, TransactionFilterSetInDB;
 import 'package:monekin/core/models/date-utils/date_period.dart';
 import 'package:monekin/core/models/date-utils/date_period_state.dart';
+import 'package:monekin/core/models/mixins/financial_target_direction.enum.dart';
+import 'package:monekin/core/models/mixins/financial_target_mixin.dart';
 import 'package:monekin/core/models/transaction/transaction_status.enum.dart';
-import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filters.dart';
+import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filter_set.dart';
 import 'package:monekin/core/utils/date_utils.dart';
+import 'package:monekin/i18n/generated/translations.g.dart';
 
 import '../transaction/transaction_type.enum.dart';
+import 'target_timeline_status.enum.dart';
 
-class Budget extends BudgetInDB {
-  List<String>? categories;
-  List<String>? accounts;
+class Budget extends BudgetInDB
+    with FinancialTargetMixin
+    implements FinancialTarget {
+  final TransactionFilterSetInDB _dbTrFilters;
+
+  @override
+  bool get isTargetLimit => true;
+
+  @override
+  double get targetAmount => limitAmount;
+
+  @override
+  FinancialTargetDirection get targetDirection =>
+      FinancialTargetDirection.toExpense;
 
   Budget({
     required super.id,
     required super.name,
     required super.limitAmount,
-    required List<String>? categories,
-    required List<String>? accounts,
+    required TransactionFilterSetInDB trFilters,
     super.intervalPeriod,
     super.startDate,
     super.endDate,
-  }) {
-    this.categories = categories != null && categories.isEmpty
-        ? null
-        : categories;
-
-    this.accounts = accounts != null && accounts.isEmpty ? null : accounts;
-  }
+  }) : _dbTrFilters = trFilters,
+       super(filterID: trFilters.id);
 
   DateTimeRange get currentDateRange {
     final toReturn = periodState.getDates();
@@ -39,13 +48,12 @@ class Budget extends BudgetInDB {
     return DateTimeRange(start: toReturn.$1!, end: toReturn.$2!);
   }
 
-  DatePeriodState get periodState {
-    return DatePeriodState(
-      datePeriod: intervalPeriod != null
-          ? DatePeriod.withPeriods(intervalPeriod!)
-          : DatePeriod.customRange(startDate, endDate),
-    );
-  }
+  @override
+  get periodState => DatePeriodState(
+    datePeriod: intervalPeriod != null
+        ? DatePeriod.withPeriods(intervalPeriod!)
+        : DatePeriod.customRange(startDate, endDate),
+  );
 
   int get daysToTheEnd {
     return currentDateRange.end.difference(DateTime.now()).inDays;
@@ -55,64 +63,35 @@ class Budget extends BudgetInDB {
     return currentDateRange.start.difference(DateTime.now()).inDays;
   }
 
+  @override
   double get todayPercent =>
       getPercentBetweenDates(currentDateRange, DateTime.now());
 
-  /// Whether or not the budget is relative to the current datetime.
-  /// That is, if the budget has not already passed and has already started
-  bool get isActiveBudget => !isPastBudget && !isFutureBudget;
-
-  /// True if the period range of the budget has passed
-  bool get isPastBudget => DateTime.now().compareTo(currentDateRange.end) > 0;
-
-  /// True if the budget has not started yet
-  bool get isFutureBudget =>
-      DateTime.now().compareTo(currentDateRange.start) < 0;
-
-  TransactionFilters get trFilters => TransactionFilters(
-    status: TransactionStatus.notIn({
-      TransactionStatus.pending,
-      TransactionStatus.voided,
-    }),
-    transactionTypes: [TransactionType.E],
-    minDate: currentDateRange.start,
-    maxDate: currentDateRange.end,
-    categories: categories,
-    accountsIDs: accounts,
-  );
-
-  /// Get the amount of money relative to this budget for a given date
-  Stream<double> getValueOnDate(DateTime? date) {
-    date ??= DateTime.now();
-
-    return TransactionService.instance
-        .getTransactionsValueBalance(
-          filters: TransactionFilters(
-            transactionTypes: [TransactionType.E],
-            accountsIDs: accounts,
-            categories: categories,
-            minDate: currentDateRange.start,
-            maxDate: date,
-          ),
-        )
-        .map((res) {
-          res = res * -1;
-
-          if (res <= 0) {
-            return 0.0;
-          }
-
-          return res;
-        });
+  /// Get the localized label of the timeline status. This is not the
+  /// same as the enum display name. For example:
+  ///
+  /// - Enum display name: "Active"
+  /// - Timeline status label: "Active budget"
+  String timelineStatusLabel(BuildContext context) {
+    final t = Translations.of(context).budgets.target_timeline_statuses;
+    switch (timelineStatus) {
+      case TargetTimelineStatus.active:
+        return t.active;
+      case TargetTimelineStatus.past:
+        return t.past;
+      case TargetTimelineStatus.future:
+        return t.future;
+    }
   }
 
-  /// Get the amount of money relative to this budget for the current date-time
-  Stream<double> get currentValue {
-    return getValueOnDate(null);
-  }
-
-  /// Get the percentage of the budget already filled. The return value can be greather than 1 (>100%)
-  Stream<double> get percentageAlreadyUsed {
-    return currentValue.map((event) => event / limitAmount);
-  }
+  @override
+  TransactionFilterSet get trFilters =>
+      TransactionFilterSet.fromDB(_dbTrFilters).copyWith(
+        status: TransactionStatus.getStatusThatCountsForStats(
+          _dbTrFilters.status,
+        ),
+        transactionTypes: [TransactionType.expense],
+        minDate: currentDateRange.start,
+        maxDate: currentDateRange.end,
+      );
 }

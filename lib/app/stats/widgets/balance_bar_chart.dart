@@ -16,7 +16,7 @@ import 'package:monekin/core/models/date-utils/periodicity.dart';
 import 'package:monekin/core/presentation/theme.dart';
 import 'package:monekin/core/presentation/widgets/number_ui_formatters/currency_displayer.dart';
 import 'package:monekin/core/presentation/widgets/number_ui_formatters/ui_number_formatter.dart';
-import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filters.dart';
+import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filter_set.dart';
 
 import '../../../core/models/transaction/transaction_type.enum.dart';
 import '../../../core/presentation/app_colors.dart';
@@ -41,12 +41,12 @@ class BalanceBarChart extends StatefulWidget {
   const BalanceBarChart({
     super.key,
     required this.dateRange,
-    this.filters = const TransactionFilters(),
+    this.filters = const TransactionFilterSet(),
   });
 
   final DatePeriodState dateRange;
 
-  final TransactionFilters filters;
+  final TransactionFilterSet filters;
 
   @override
   State<BalanceBarChart> createState() => _BalanceBarChartState();
@@ -82,7 +82,7 @@ class _BalanceBarChartState extends State<BalanceBarChart> {
       return transactionService
           .getTransactionsValueBalance(
             filters: widget.filters.copyWith(
-              transactionTypes: [TransactionType.I]
+              transactionTypes: [TransactionType.income]
                   .intersectionWithNullable(widget.filters.transactionTypes)
                   .toList(),
               minDate: start,
@@ -96,7 +96,7 @@ class _BalanceBarChartState extends State<BalanceBarChart> {
       return transactionService
           .getTransactionsValueBalance(
             filters: widget.filters.copyWith(
-              transactionTypes: [TransactionType.E]
+              transactionTypes: [TransactionType.expense]
                   .intersectionWithNullable(widget.filters.transactionTypes)
                   .toList(),
               minDate: start,
@@ -294,7 +294,7 @@ class _BalanceBarChartState extends State<BalanceBarChart> {
     return SizedBox(
       height: 300,
       child: StreamBuilder(
-        stream: CurrencyService.instance.getUserPreferredCurrency(),
+        stream: CurrencyService.instance.ensureAndGetPreferredCurrency(),
         builder: (context, userCurrencySnapshot) {
           return FutureBuilder(
             future: getDataByPeriods(

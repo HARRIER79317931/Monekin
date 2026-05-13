@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
+import 'package:monekin/app/layout/page_framework.dart';
 import 'package:monekin/app/tags/tag_form_page.dart';
 import 'package:monekin/core/database/services/tags/tags_service.dart';
 import 'package:monekin/core/extensions/string.extension.dart';
@@ -27,7 +28,6 @@ class _TagListPageState extends State<TagListPage> {
   String searchQuery = '';
 
   final ScrollController _scrollController = ScrollController();
-  bool isFloatingButtonExtended = true;
 
   void _onSearchChanged(String query) {
     setState(() {
@@ -36,25 +36,12 @@ class _TagListPageState extends State<TagListPage> {
   }
 
   void _goToEdit() {
-    RouteUtils.pushRoute(context, const TagFormPage());
+    RouteUtils.pushRoute(const TagFormPage());
   }
 
   @override
   void initState() {
     super.initState();
-
-    _scrollController.addListener(() {
-      bool shouldExtendButton = AnimatedFloatingButton.shouldExtendButton(
-        context,
-        _scrollController,
-      );
-
-      if (isFloatingButtonExtended != shouldExtendButton) {
-        setState(() {
-          isFloatingButtonExtended = shouldExtendButton;
-        });
-      }
-    });
   }
 
   @override
@@ -76,6 +63,7 @@ class _TagListPageState extends State<TagListPage> {
         if (snapshot.data!.isEmpty) {
           return NoResults(
             title: t.general.empty_warn,
+            noSearchResultsVariation: searchQuery.isNotEmpty,
             description: searchQuery.isNotEmpty
                 ? t.general.search_no_results
                 : t.tags.empty_list,
@@ -97,8 +85,7 @@ class _TagListPageState extends State<TagListPage> {
 
             return ReorderableListTileStyling(
               child: ListTile(
-                onTap: () =>
-                    RouteUtils.pushRoute(context, TagFormPage(tag: tag)),
+                onTap: () => RouteUtils.pushRoute(TagFormPage(tag: tag)),
                 trailing: tags.length > 1
                     ? ReorderableDragIcon(index: index, enabled: isOrderEnabled)
                     : null,
@@ -136,17 +123,18 @@ class _TagListPageState extends State<TagListPage> {
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
+    final fab = BreakPoint.of(context).isLargerThan(BreakpointID.sm)
+        ? null
+        : AnimatedFloatingButtonBasedOnScroll(
+            onPressed: _goToEdit,
+            icon: const Icon(Icons.add_rounded),
+            scrollController: _scrollController,
+            text: t.tags.add,
+          );
 
-    return Scaffold(
-      appBar: AppBar(title: Text(t.tags.display(n: 10))),
-      floatingActionButton: BreakPoint.of(context).isLargerThan(BreakpointID.sm)
-          ? null
-          : AnimatedFloatingButton(
-              onPressed: _goToEdit,
-              icon: const Icon(Icons.add_rounded),
-              isExtended: isFloatingButtonExtended,
-              text: t.tags.add,
-            ),
+    return PageFramework(
+      title: t.tags.display(n: 10),
+      floatingActionButton: fab,
       body: ColumnWithReorderableListAndSearch(
         onSearchChanged: _onSearchChanged,
         onAddPressed: _goToEdit,

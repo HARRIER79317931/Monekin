@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:monekin/main.dart';
+import 'package:monekin/core/utils/unique_app_widgets_keys.dart';
 
 abstract class RouteUtils {
   static Future<T?> pushRoute<T extends Object>(
-    BuildContext context,
     Widget page, {
     bool withReplacement = false,
   }) {
@@ -20,9 +19,8 @@ abstract class RouteUtils {
 
   static Route<T> getPageRouteBuilder<T>(Widget page) {
     return PageRouteBuilder<T>(
-      opaque: false,
-      transitionDuration: const Duration(milliseconds: 250),
-      reverseTransitionDuration: const Duration(milliseconds: 125),
+      transitionDuration: const Duration(milliseconds: 350),
+      reverseTransitionDuration: const Duration(milliseconds: 350),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const transitionBuilder = FadeForwardsPageTransitionsBuilder();
         return transitionBuilder.buildTransitions(
@@ -51,5 +49,19 @@ abstract class RouteUtils {
     );
 
     navigatorKey.currentState!.pop();
+  }
+
+  static Future<bool> maybePopRoute<T extends Object?>(
+    BuildContext? context, [
+    T? result,
+  ]) async {
+    BuildContext? contextToPop = context;
+    if (context == null) contextToPop = navigatorKey.currentContext;
+    if (contextToPop == null) return false;
+    return Navigator.of(contextToPop, rootNavigator: false).maybePop(result);
+  }
+
+  static void popRoute<T extends Object?>([T? result]) {
+    return navigatorKey.currentState!.pop(result);
   }
 }

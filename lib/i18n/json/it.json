@@ -34,7 +34,6 @@
     "apply": "Applica",
     "discard": "Ignora",
     "refresh": "Aggiorna",
-    "details": "Dettagli",
     "share": "Condividi"
   },
   "GENERAL": {
@@ -42,6 +41,7 @@
     "understood": "Capito",
     "unspecified": "Non specificato",
     "quick_actions": "Azioni rapide",
+    "details": "Dettagli",
     "balance": "Saldo",
     "account": "Conto",
     "accounts": "Conti",
@@ -56,6 +56,11 @@
     "show-more-fields": "Mostra più campi",
     "show-less-fields": "Mostra meno campi",
     "tap-to-search": "Tocca per cercare",
+    "delete_success": "Elemento eliminato con successo",
+    "LEAVE-WITHOUT-SAVING": {
+      "title": "Uscire senza salvare?",
+      "message": "Hai modifiche non salvate, sei sicuro di voler uscire senza salvarle?"
+    },
     "CLIPBOARD": {
       "success": "{{x}} copiato negli appunti",
       "error": "Errore di copia"
@@ -256,6 +261,10 @@
     "balance-by-currency-subtitle": "Quanti soldi ho in valuta estera?",
     "balance-evolution": "Andamento del saldo",
     "balance-evolution-subtitle": "Ho più soldi di prima?",
+    "net-worth": "Net worth",
+    "net-worth-subtitle": "The difference between what you own and what you owe.",
+    "net-worth-composition": "Net worth composition",
+    "net-worth-composition-subtitle": "Distribution between accounts, investments and debts.",
     "compared-to-previous-period": "Rispetto al periodo precedente",
     "cash-flow": "Flusso di cassa",
     "cash-flow-subtitle": "Sto spendendo meno di quanto guadagno?",
@@ -311,6 +320,7 @@
     "delete.multiple.warning-message": "Questa azione è irreversibile ed eliminerà {{ x }} transazioni. Il saldo attuale dei tuoi conti e tutte le tue statistiche saranno ricalcolate",
     "delete.multiple.success": "{{x}} transazioni eliminate correttamente",
     "details": "Dettagli movimento",
+    "select": "Seleziona una transazione",
     "NEXT-PAYMENTS": {
       "accept": "Accetta",
       "skip": "Salta",
@@ -341,7 +351,8 @@
       "BULK_EDIT": {
         "dates": "Modifica date",
         "categories": "Modifica categorie",
-        "status": "Modifica stati"
+        "status": "Modifica stati",
+        "tags": "Modifica tag"
       }
     },
     "FILTERS": {
@@ -351,7 +362,22 @@
       "from_value_def": "Da {{ x }}",
       "to_value_def": "Fino a {{ x }}",
       "from_date_def": "Dalla data {{ date }}",
-      "to_date_def": "Fino alla data {{ date }}"
+      "to_date_def": "Fino alla data {{ date }}",
+      "reset": "Ripristina filtri",
+      "saved": {
+        "title": "Filtri salvati",
+        "new_title": "Nuovo filtro",
+        "edit_title": "Modifica filtro",
+        "name_label": "Nome del filtro",
+        "name_hint": "Il mio filtro personalizzato",
+        "save_dialog_title": "Salva filtro",
+        "save_tooltip": "Salva filtro corrente",
+        "load_tooltip": "Carica filtro salvato",
+        "empty_title": "Nessun filtro salvato trovato",
+        "empty_description": "Salva i filtri qui per accedervi rapidamente in seguito.",
+        "save_success": "Filtro salvato con successo",
+        "delete_success": "Filtro eliminato con successo"
+      }
     },
     "FORM": {
       "VALIDATORS": {
@@ -459,6 +485,7 @@
     "n_transactions": "Numero di transazioni",
     "add_money": "Aggiungi denaro",
     "withdraw_money": "Preleva denaro",
+    "correct_balance": "Correggi saldo",
     "no-accounts": "Nessuna transazione trovata da mostrare qui. Aggiungi una transazione cliccando sul pulsante '+' in basso",
     "TYPES": {
       "title": "Tipo di conto",
@@ -466,7 +493,9 @@
       "normal": "Conto normale",
       "normal.descr": "Utile per registrare le tue finanze quotidiane. È il conto più comune, ti permette di aggiungere spese, entrate...",
       "saving": "Conto risparmio",
-      "saving.descr": "Potrai solo aggiungere e prelevare denaro da esso da altri conti. Perfetto per iniziare a risparmiare denaro"
+      "saving.descr": "Potrai solo aggiungere e prelevare denaro da esso da altri conti. Perfetto per iniziare a risparmiare denaro",
+      "investment": "Conto investimento",
+      "investment.descr": "Un conto broker, exchange di criptovalute o portafoglio. Tieni traccia del tuo capitale investito e aggiorna il suo valore manualmente tramite valutazioni"
     },
     "FORM": {
       "name": "Nome conto",
@@ -481,7 +510,32 @@
       "already-exists": "Ne esiste già un altro con lo stesso nome, per favore scrivine un altro",
       "tr-before-opening-date": "Ci sono transazioni in questo conto con una data precedente alla data di apertura",
       "iban": "IBAN",
-      "swift": "SWIFT"
+      "swift": "SWIFT",
+      "include-in-net-worth": "Includi nel patrimonio netto",
+      "include-in-net-worth.descr": "Aggiungi questo conto al calcolo del patrimonio netto totale",
+      "correct_balance_description": "Regolare il saldo modifica il valore iniziale del conto. Questa correzione non sarà riflessa nelle statistiche.",
+      "valuation_before_creation_date": "In questo conto sono presenti valutazioni con una data precedente alla data di creazione"
+    },
+    "INVESTMENT": {
+      "details-header": "Investimento",
+      "correct_balance_title": "Correggi il capitale investito",
+      "correct_balance_description": "Questo conto utilizza valutazioni manuali per il valore del portafoglio. Questa azione aggiorna solo il capitale investito (valore iniziale) e non modificherà le valutazioni registrate né le statistiche sugli investimenti.",
+      "invested-capital": "Capitale investito",
+      "portfolio-value": "Valore del portafoglio",
+      "profit": "Profitto",
+      "last-valuation": "Ultima valutazione",
+      "no-valuations": "Nessuna valutazione registrata",
+      "update-value": "Aggiorna valore",
+      "update-value.descr": "Registra il valore attuale del portafoglio",
+      "update-value.success": "Valutazione registrata con successo",
+      "history": "Storico valutazioni",
+      "history-empty": "Nessuna valutazione registrata per questo conto",
+      "add-valuation": "Aggiungi valutazione",
+      "edit-valuation": "Modifica valutazione",
+      "edit-valuation.success": "Valutazione modificata con successo",
+      "delete-valuation.success": "Valutazione eliminata con successo",
+      "delete-all-valuations": "Elimina tutte le valutazioni",
+      "delete-all-valuations.success": "Tutte le valutazioni eliminate con successo"
     },
     "DELETE": {
       "warning-header": "Eliminare conto?",
@@ -506,23 +560,50 @@
   "CURRENCIES": {
     "currency-converter": "Convertitore di valuta",
     "currency": "Valuta",
+    "currency-settings": "Impostazioni valuta",
     "currency-manager": "Gestore valute",
     "currency-manager.descr": "Configura la tua valuta e i suoi tassi di cambio con altre",
     "preferred-currency": "Valuta preferita/base",
+    "tap-to-change-preferred-currency": "Tocca per modificare",
     "change-preferred-currency-title": "Cambia valuta preferita",
     "change-preferred-currency-msg": "Tutte le statistiche e i budget saranno visualizzati in questa valuta d'ora in poi. Conti e transazioni manterranno la valuta che avevano. Tutti i tassi di cambio salvati verranno eliminati se esegui questa azione. Desideri continuare?",
-    "FORM": {
+    "EXCHANGE-RATE-FORM": {
       "equal-to-preferred-warn": "La valuta non può essere uguale alla valuta dell'utente",
+      "override-existing-warn": "Esiste già un tasso di cambio per questa valuta in questa data. Se continui, quello precedente verrà sovrascritto",
       "specify-a-currency": "Per favore specifica una valuta",
       "add": "Aggiungi tasso di cambio",
       "add-success": "Tasso di cambio aggiunto con successo",
       "edit": "Modifica tasso di cambio",
-      "edit-success": "Tasso di cambio modificato con successo"
+      "edit-success": "Tasso di cambio modificato con successo",
+      "remove-all": "Elimina tutti i tassi di cambio",
+      "remove-all-warning": "Questa azione è irreversibile e cancellerà tutti i tassi di cambio per questa valuta"
+    },
+    "TYPES": {
+      "display": "Tipo di valuta",
+      "fiat": "FIAT",
+      "crypto": "Criptovaluta",
+      "other": "Altro"
+    },
+    "CURRENCY-FORM": {
+      "name": "Nome da visualizzare",
+      "code": "Codice valuta",
+      "symbol": "Simbolo",
+      "decimal-digits": "Cifre decimali",
+      "create": "Crea valuta",
+      "create-success": "Valuta creata con successo",
+      "edit": "Modifica valuta",
+      "edit-success": "Valuta modificata correttamente",
+      "delete": "Elimina valuta",
+      "delete-success": "Valuta eliminata correttamente",
+      "already-exists": "Esiste già una valuta con questo codice. Potresti volerlo modificare"
     },
     "delete-all-success": "Tassi di cambio eliminati con successo",
     "historical": "Tassi storici",
+    "historical-empty": "Nessun tasso di cambio storico trovato per questa valuta",
     "exchange-rate": "Tasso di cambio",
     "exchange-rates": "Tassi di cambio",
+    "min-exchange-rate": "Tasso di cambio minimo",
+    "max-exchange-rate": "Tasso di cambio massimo",
     "empty": "Aggiungi tassi di cambio qui in modo che se hai conti in valute diverse dalla tua valuta base i nostri grafici siano più accurati",
     "select-a-currency": "Seleziona una valuta",
     "search": "Cerca per nome o per codice valuta"
@@ -541,6 +622,7 @@
       "all": "Tutte le etichette"
     },
     "empty-list": "Non hai ancora creato alcuna etichetta. Etichette e categorie sono un ottimo modo per categorizzare i tuoi movimenti",
+    "no-tags": "Non hai ancora creato nessun tag. Vai nelle impostazioni per creare un'etichetta.",
     "without-tags": "Senza etichette",
     "add": "Aggiungi etichetta",
     "create": "Crea etichetta",
@@ -588,14 +670,10 @@
   },
   "BUDGETS": {
     "title": "Budget",
+    "status": "Stato del bilancio",
     "repeated": "Ricorrente",
     "one-time": "Una tantum",
-    "annual": "Annuali",
-    "week": "Settimanali",
-    "month": "Mensili",
     "actives": "Attivi",
-    "pending": "In attesa di inizio",
-    "finish": "Terminati",
     "from-budgeted": "rimanenti di ",
     "days-left": "giorni rimasti",
     "days-to-start": "giorni all'inizio",
@@ -617,10 +695,222 @@
       "title": "Dettagli budget",
       "statistics": "Statistiche",
       "budget-value": "A budget",
-      "expend-diary-left": "Puoi spendere {{ dailyAmount }}/giorno per {{ remainingDays }} giorni rimanenti",
       "expend-evolution": "Evoluzione della spesa",
       "no-transactions": "Sembra che tu non abbia effettuato spese relative a questo budget"
+    },
+    "TARGET_TIMELINE_STATUSES": {
+      "active": "Budget attivo",
+      "past": "Budget terminato",
+      "future": "Budget futuro"
+    },
+    "PROGRESS": {
+      "LABELS": {
+        "active-on-track": "In linea",
+        "active-overspending": "Spesa eccessiva",
+        "active-indeterminate": "Attivo",
+        "success": "Raggiunto",
+        "fail": "Budget superato"
+      },
+      "DESCRIPTION": {
+        "active-on-track": "Puoi spendere {{ dailyAmount }} al giorno per i restanti {{ remainingDays }} giorni",
+        "active-overspending": "Per tornare in linea, dovresti limitare la tua spesa a {{ dailyAmount }} al giorno per i restanti {{ remainingDays }} giorni",
+        "active-indeterminate": "Ti restano {{ amount }} da spendere.",
+        "active-exceeded": "Hai già superato il limite del budget di {{ amount }}. Se non trovi entrate per questo budget, dovresti smettere di spendere per il resto del periodo",
+        "success": "Ottimo lavoro! Questo budget è terminato con successo. Continua a creare budget per gestire le tue spese",
+        "fail": "Hai superato il budget di {{ amount }}. Cerca di fare più attenzione la prossima volta!"
+      }
     }
+  },
+  "GOALS": {
+    "title": "Obiettivi",
+    "status": "Stato dell'obiettivo",
+    "type": {
+      "display": "Tipo di obiettivo",
+      "income": {
+        "title": "Obiettivo di Risparmio",
+        "descr": "Ideale per risparmiare denaro. Hai successo quando il saldo supera il tuo obiettivo."
+      },
+      "expense": {
+        "title": "Obiettivo di Spesa",
+        "descr": "Traccia quanto spendi e mira a raggiungere un importo obiettivo. Funziona bene per donazioni..."
+      }
+    },
+    "empty_title": "Nessun obiettivo trovato",
+    "empty_description": "Crea un nuovo obiettivo per iniziare a monitorare i tuoi risparmi!",
+    "delete": "Elimina obiettivo",
+    "delete_warning": "Questa azione è irreversibile. Le categorie e le transazioni riferite a questo obiettivo non verranno eliminate",
+    "FORM": {
+      "new_title": "Nuovo obiettivo",
+      "edit_title": "Modifica obiettivo",
+      "target_amount": "Importo obiettivo",
+      "initial_amount": "Importo iniziale",
+      "name": "Nome",
+      "name_hint": "Il mio obiettivo di risparmio",
+      "create_success": "Obiettivo creato con successo",
+      "edit_success": "Obiettivo modificato con successo",
+      "negative_warn": "L'importo dell'obiettivo non può essere negativo"
+    },
+    "DETAILS": {
+      "title": "Dettagli obiettivo",
+      "statistics": "Statistiche",
+      "goal_value": "Valore obiettivo",
+      "evolution": "Evoluzione",
+      "no_transactions": "Sembra che tu non abbia effettuato alcuna transazione relativa a questo obiettivo"
+    },
+    "TARGET_TIMELINE_STATUSES": {
+      "active": "Obiettivo attivo",
+      "past": "Obiettivo terminato",
+      "future": "Obiettivo futuro"
+    },
+    "PROGRESS": {
+      "LABELS": {
+        "active-on-track": "In pista",
+        "active-behind-schedule": "In ritardo rispetto al programma",
+        "active-indeterminate": "Attivo",
+        "success": "Obiettivo raggiunto",
+        "fail": "Obiettivo fallito"
+      },
+      "DESCRIPTION": {
+        "active-on-track": "Sei sulla buona strada per raggiungere il tuo obiettivo! Devi risparmiare {{ dailyAmount }} al giorno per i restanti {{ remainingDays }} giorni",
+        "active-behind-schedule": "Sei in ritardo sulla tabella di marcia. Devi risparmiare {{ dailyAmount }} al giorno per raggiungere il tuo obiettivo in {{ remainingDays }} giorni",
+        "active-indeterminate": "Ti servono {{ amount }} in più per raggiungere il tuo obiettivo.",
+        "success": "Congratulazioni! Hai raggiunto il tuo obiettivo.",
+        "fail": "Hai mancato il tuo obiettivo di {{ amount }}."
+      }
+    }
+  },
+  "DEBTS": {
+    "display": {
+      "one": "Debito",
+      "other": "Debiti"
+    },
+    "FORM": {
+      "name": "Nome del debito",
+      "initial_amount": "Importo iniziale",
+      "total_amount": "Importo totale",
+      "step_initial_value": "Valore iniziale",
+      "step_details": "Dettagli",
+      "from_transaction": {
+        "title": "Da una transazione",
+        "tap_to_select": "Tocca per selezionare una transazione"
+      },
+      "from_amount": {
+        "title": "Da un importo iniziale",
+        "description": "Questo importo non verrà preso in considerazione per le statistiche come spesa/entrata. Verrà utilizzato per calcolare i saldi e il patrimonio netto"
+      }
+    },
+    "DIRECTION": {
+      "lent": "Prestato",
+      "borrowed": "Preso in prestito"
+    },
+    "STATUS": {
+      "active": "Attivo",
+      "close": "Chiuso"
+    },
+    "DETAILS": {
+      "collected_amount": "Importo riscosso",
+      "remaining": "Rimanente",
+      "no_deadline": "Nessuna scadenza",
+      "in_days": "Tra {{x}} giorni",
+      "due_today": "Due today",
+      "days_ago": "{{x}} giorni fa",
+      "overdue_by": "In ritardo di {{x}} giorni",
+      "per_day": "/ giorno",
+      "no_transactions": "Nessuna transazione trovata per questo debito"
+    },
+    "EMPTY": {
+      "no_debts_active": "Nessun debito attivo trovato. Inizia creando un nuovo debito facendo clic sul pulsante in basso",
+      "no_debts_closed": "Nessun debito chiuso trovato. Un debito viene chiuso quando hai incassato tutto il denaro o hai pagato tutto il denaro dovuto."
+    },
+    "ACTIONS": {
+      "edit": {
+        "title": "Modifica debito",
+        "success": "Debito modificato correttamente"
+      },
+      "delete": {
+        "warning_header": "Cancellare questo debito?",
+        "warning_text": "Questa azione non può essere annullata. Le transazioni collegate non verranno eliminate ma non saranno più associate a questo debito."
+      },
+      "add_register": {
+        "title": "Aggiungi movimento",
+        "success": "Movimento aggiunto con successo",
+        "fab_label": "Aggiungi registro",
+        "modal_title": "Aggiungi registro a questo debito",
+        "modal_subtitle": "Scegli una delle seguenti opzioni per collegare una transazione a questo debito"
+      },
+      "link_transaction": {
+        "title": "Collega la transazione esistente",
+        "description": "Scegli un record esistente per collegarlo a questo debito",
+        "success": "Operazione legata al debito",
+        "creating": "Stai creando una transazione collegata al debito <b>{{ name }}</b>"
+      },
+      "unlink_transaction": {
+        "title": "Scollegare dal debito",
+        "warning_text": "Questa transazione non sarà più associata a questo debito.",
+        "success": "Transazione scollegata dal debito"
+      },
+      "new_transaction": {
+        "title": "Aggiungi nuova transazione",
+        "description": "Aggiungi o riduci manualmente il debito creando una nuova transazione collegata a questo debito"
+      },
+      "create": {
+        "title": "Creare debito",
+        "success": "Debito creato con successo"
+      }
+    }
+  },
+  "ASSETS": {
+    "title": "Attività",
+    "empty_description": "Non hai ancora creato alcuna risorsa. Beni come immobili, veicoli o oggetti da collezione possono essere monitorati con le loro valutazioni",
+    "create": "Aggiungi risorsa",
+    "create_success": "Risorsa creata con successo",
+    "edit_success": "Risorsa modificata correttamente",
+    "delete": "Elimina risorsa",
+    "delete_success": "Risorsa eliminata correttamente",
+    "delete_confirmation": "Questa azione non può essere annullata. Verranno eliminate anche tutte le valutazioni per questo asset.",
+    "profit": "Profitto",
+    "profit_percent": "Ritorno %",
+    "total_value": "Valore totale delle attività",
+    "FORM": {
+      "name": "Nome della risorsa",
+      "name_required": "Inserisci il nome di una risorsa",
+      "description": "Descrizione",
+      "initial_value": "Valore iniziale",
+      "initial_value_required": "Inserisci un valore iniziale",
+      "initial_value_invalid": "Inserisci un numero valido",
+      "currency": "Valuta",
+      "select_currency": "Seleziona una valuta",
+      "creation_date": "Data di creazione",
+      "edit": "Modifica risorsa",
+      "create": "Crea risorsa",
+      "already_exists": "Esiste già una risorsa con questo nome. Potresti volerlo modificare",
+      "valuation_before_creation_date": "Sono presenti valutazioni in questo bene con una data antecedente alla data di acquisizione"
+    },
+    "VALUATION": {
+      "history": "Storia della valutazione",
+      "no_valuations": "Nessuna valutazione ancora registrata. Inizia aggiungendo la prima valutazione",
+      "add_valuation": "Aggiungi valutazione",
+      "edit_valuation": "Modifica valutazione",
+      "value": "Valore",
+      "value_required": "Inserisci un valore",
+      "value_invalid": "Inserisci un numero valido",
+      "update_value_success": "Valutazione aggiunta con successo",
+      "edit_valuation_success": "Valutazione aggiornata con successo",
+      "delete_valuation_success": "Valutazione eliminata correttamente",
+      "delete_all_valuations": "Elimina tutte le valutazioni",
+      "delete_all_valuations_success": "Tutte le valutazioni sono state eliminate correttamente"
+    },
+    "SORT": {
+      "name_asc": "Nome (A-Z)",
+      "name_desc": "Nome (Z-A)",
+      "value_asc": "Valore (prima il più basso)",
+      "value_desc": "Valore (prima il più alto)"
+    }
+  },
+  "TARGET_TIMELINE_STATUSES": {
+    "active": "Attivo",
+    "past": "Terminato",
+    "future": "Futuro"
   },
   "BACKUP": {
     "no_file_selected": "Nessun file selezionato",
@@ -671,7 +961,7 @@
         ],
         "steps-descr": [
           "Seleziona un file .csv dal tuo dispositivo. Assicurati che abbia una prima riga che descriva il nome di ciascuna colonna",
-          "Seleziona la colonna in cui è specificato il valore di ogni transazione. Usa valori negativi per le spese e valori positivi per le entrate. Usa un punto come separatore decimale",
+          "Seleziona la colonna in cui è specificato il valore di ogni transazione. Usa valori negativi per le spese e valori positivi per le entrate.",
           "Seleziona la colonna in cui è specificato il conto a cui appartiene ogni transazione. Puoi anche selezionare un conto predefinito nel caso in cui non riusciamo a trovare il conto che desideri. Se non viene specificato un conto predefinito, ne creeremo uno con lo stesso nome",
           "Specifica la colonna in cui si trova il nome della categoria della transazione. Devi specificare una categoria predefinita in modo da assegnare questa categoria alle transazioni, nel caso in cui la categoria non possa essere trovata",
           "Seleziona la colonna in cui è specificata la data di ogni transazione. Se non specificato, le transazioni verranno create con la data attuale",
@@ -692,52 +982,104 @@
     }
   },
   "SETTINGS": {
-    "title_long": "Impostazioni e aspetto",
+    "title_long": "Impostazioni e Personalizzazione",
     "title_short": "Impostazioni",
-    "description": "Tema dell'app, testi e altre impostazioni generali",
+    "description": "Tema, Lingua, Dati e altro",
     "edit_profile": "Modifica profilo",
-    "lang.section": "Lingua e testi",
-    "lang.title": "Lingua dell'app",
-    "lang.descr": "Lingua in cui i testi verranno visualizzati nell'app",
-    "lang.help": "Se vuoi collaborare con le traduzioni di questa app, puoi consultare <a href='https://github.com/enrique-lozano/Monekin/tree/main/lib/i18n'>la nostra guida</a>",
-    "locale": "Regione",
-    "locale_auto": "Sistema",
-    "locale.descr": "Imposta il formato da utilizzare per date, numeri...",
-    "locale.warn": "Quando cambi regione l'app si aggiornerà",
-    "first_day_of_week": "Primo giorno della settimana",
-    "theme_and_colors": "Tema e colori",
-    "theme": "Tema",
-    "theme.auto": "Sistema",
-    "theme.light": "Chiaro",
-    "theme.dark": "Scuro",
-    "amoled-mode": "Modalità AMOLED",
-    "amoled-mode.descr": "Usa uno sfondo nero puro quando possibile. Questo aiuterà leggermente la batteria dei dispositivi con schermi AMOLED",
-    "dynamic-colors": "Colori dinamici",
-    "dynamic-colors.descr": "Usa il colore di accento del tuo sistema quando possibile",
-    "accent-color": "Colore di accento",
-    "accent-color.descr": "Scegli il colore che l'app utilizzerà per enfatizzare determinate parti dell'interfaccia",
-    "font": "Font",
-    "font-platform": "Piattaforma",
-    "SWIPE-ACTIONS": {
-      "title": "Azioni di scorrimento",
-      "choose-description": "Scegli quale azione verrà attivata quando fai scorrere un elemento di transazione nell'elenco utilizzando questa direzione di scorrimento",
-      "swipe-left": "Scorri verso sinistra",
-      "swipe-right": "Scorri verso destra",
-      "none": "Nessuna azione",
-      "toggle-reconciled": "Attiva/disattiva riconciliato",
-      "toggle-pending": "Attiva/disattiva in sospeso",
-      "toggle-voided": "Attivazione/disattivazione annullata",
-      "toggle-unreconciled": "Attiva/disattiva non riconciliato",
-      "remove-status": "Rimuovi lo stato"
+    "GENERAL": {
+      "menu_title": "Impostazioni generali",
+      "menu_descr": "Lingua, privacy e altro",
+      "show_all_decimals": "Mostra tutti i decimali",
+      "show_all_decimals_descr": "Mostra tutti i decimali anche se sono zeri finali",
+      "LANGUAGE": {
+        "section": "Lingua e testi",
+        "title": "Lingua dell'app",
+        "descr": "Lingua in cui i testi verranno visualizzati nell'app",
+        "help": "Se vuoi collaborare con le traduzioni di questa app, puoi consultare <a href='https://github.com/enrique-lozano/Monekin/tree/main/lib/i18n'>la nostra guida</a>"
+      },
+      "LOCALE": {
+        "title": "Regione",
+        "auto": "Sistema",
+        "descr": "Imposta il formato da utilizzare per date, numeri...",
+        "warn": "Quando cambi regione l'app si aggiornerà",
+        "first_day_of_week": "Primo giorno della settimana"
+      }
+    },
+    "APP_STRUCTURES": {
+      "title": "Strutture dell'app",
+      "tags": "Definisci i tag per ottenere una migliore organizzazione delle tue transazioni",
+      "categories": "Organizzazione di categorie e sottocategorie",
+      "accounts": "Gestisci e modifica i tuoi account",
+      "filters": "Configura filtri globali che puoi utilizzare per transazioni e statistiche"
     },
     "SECURITY": {
       "title": "Sicurezza",
-      "private-mode-at-launch": "Modalità privata all'avvio",
-      "private-mode-at-launch.descr": "Avvia l'app in modalità privata per impostazione predefinita",
-      "private-mode": "Modalità privata",
-      "private-mode.descr": "Nascondi tutti i valori monetari",
-      "private-mode.activated": "Modalità privata attivata",
-      "private-mode.deactivated": "Modalità privata disattivata"
+      "private_mode_at_launch": "Modalità privata all'avvio",
+      "private_mode_at_launch_descr": "Avvia l'app in modalità privata per impostazione predefinita",
+      "private_mode": "Modalità privata",
+      "private_mode_descr": "Nascondi tutti i valori monetari",
+      "private_mode_activated": "Modalità privata attivata",
+      "private_mode_deactivated": "Modalità privata disattivata"
+    },
+    "TRANSACTIONS": {
+      "menu_title": "Transazioni",
+      "menu_descr": "Configura il comportamento delle tue transazioni",
+      "title": "Impostazioni transazioni",
+      "STYLE": {
+        "title": "Stile transazione",
+        "subtitle": "Configura l'aspetto delle transazioni nelle liste dell'app",
+        "show_tags": "Mostra Tag",
+        "show_time": "Mostra Ora"
+      },
+      "SWIPE_ACTIONS": {
+        "title": "Azioni di scorrimento",
+        "choose_description": "Scegli quale azione verrà attivata quando fai scorrere un elemento di transazione nell'elenco utilizzando questa direzione di scorrimento",
+        "swipe_left": "Scorri verso sinistra",
+        "swipe_right": "Scorri verso destra",
+        "none": "Nessuna azione",
+        "toggle_reconciled": "Attiva/disattiva riconciliato",
+        "toggle_pending": "Attiva/disattiva in sospeso",
+        "toggle_voided": "Attivazione/disattivazione annullata",
+        "toggle_unreconciled": "Attiva/disattiva non riconciliato",
+        "remove_status": "Rimuovi lo stato"
+      },
+      "DEFAULT_VALUES": {
+        "title": "Default Form Values",
+        "page_title": "New Transaction: Default Form Values",
+        "reuse_last_transaction": "Reuse Last Transaction Values",
+        "reuse_last_transaction_descr": "Automatically fill the form with some values from the last created transaction",
+        "fields_to_reuse": "Fields to reuse",
+        "reuse_last_values_modal_descr": "Select the fields that should be pre-filled with the values from the last created transaction.",
+        "default_values_separator": "Default Values",
+        "default_category": "Default Category",
+        "default_status": "Default Status",
+        "default_tags": "Default Tags",
+        "no_tags_selected": "No tags selected"
+      },
+      "DEFAULT_TYPE": {
+        "title": "Default Type",
+        "modal_title": "Select Default Type"
+      }
+    },
+    "APPEARANCE": {
+      "menu_title": "Tema e stile",
+      "menu_descr": "Selezione del tema, colori e altre cose relative all'aspetto dell'app",
+      "theme_and_colors": "Tema e colori",
+      "THEME": {
+        "title": "Tema",
+        "auto": "Sistema",
+        "light": "Chiaro",
+        "dark": "Scuro"
+      },
+      "amoled_mode": "Modalità AMOLED",
+      "amoled_mode_descr": "Usa uno sfondo nero puro quando possibile. Questo aiuterà leggermente la batteria dei dispositivi con schermi AMOLED",
+      "dynamic_colors": "Colori dinamici",
+      "dynamic_colors_descr": "Usa il colore di accento del tuo sistema quando possibile",
+      "accent_color": "Colore di accento",
+      "accent_color_descr": "Scegli il colore che l'app utilizzerà per enfatizzare determinate parti dell'interfaccia",
+      "text": "Testo",
+      "font": "Font",
+      "font_platform": "Piattaforma"
     }
   },
   "MORE": {
@@ -754,7 +1096,7 @@
     },
     "ABOUT_US": {
       "display": "Informazioni sull'app",
-      "description": "Consulta i termini e altre informazioni rilevanti su Monekin. Entra in contatto con la comunità segnalando bug, lasciando suggerimenti...",
+      "description": "Trova i termini di Monekin, informazioni importanti e connettiti segnalando bug o condividendo idee",
       "LEGAL": {
         "display": "Informazioni legali",
         "privacy": "Informativa sulla privacy",

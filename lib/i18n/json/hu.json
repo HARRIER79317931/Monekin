@@ -34,7 +34,6 @@
     "apply": "Alkalmaz",
     "discard": "Elvetés",
     "refresh": "Frissítés",
-    "details": "Részletek",
     "share": "Megosztás"
   },
   "GENERAL": {
@@ -42,6 +41,7 @@
     "understood": "Megértve",
     "unspecified": "Meghatározatlan",
     "quick_actions": "Gyorsműveletek",
+    "details": "Részletek",
     "balance": "Egyenleg",
     "account": "Számla",
     "accounts": "Számlák",
@@ -56,6 +56,11 @@
     "show-more-fields": "Több mező mutatása",
     "show-less-fields": "Kevesebb mező mutatása",
     "tap-to-search": "Koppintson a kereséshez",
+    "delete_success": "Az elem sikeresen törölve",
+    "LEAVE-WITHOUT-SAVING": {
+      "title": "Mentés nélkül távozik?",
+      "message": "Vannak nem mentett módosításai. Biztos, hogy mentés nélkül kilép?"
+    },
     "CLIPBOARD": {
       "success": "{{x}} a vágólapra másolva",
       "error": "Másolási hiba"
@@ -256,6 +261,10 @@
     "balance-by-currency-subtitle": "Mennyi pénzem van devizában?",
     "balance-evolution": "Egyenleg alakulása",
     "balance-evolution-subtitle": "Több pénzem van, mint korábban?",
+    "net-worth": "Net worth",
+    "net-worth-subtitle": "The difference between what you own and what you owe.",
+    "net-worth-composition": "Net worth composition",
+    "net-worth-composition-subtitle": "Distribution between accounts, investments and debts.",
     "compared-to-previous-period": "Az előző időszakhoz képest",
     "cash-flow": "Pénzforgalom",
     "cash-flow-subtitle": "Kevesebbet költök, mint amennyit megkeresek?",
@@ -311,6 +320,7 @@
     "delete.multiple.warning-message": "Ez a művelet visszafordíthatatlan, és eltávolít {{ x }} tranzakciót. A számlái aktuális egyenlege és minden statisztikája újraszámításra kerül.",
     "delete.multiple.success": "{{x}} tranzakció megfelelően törölve",
     "details": "A mozgás részletei",
+    "select": "Válasszon ki egy tranzakciót",
     "NEXT-PAYMENTS": {
       "accept": "Elfogadás",
       "skip": "Kihagyás",
@@ -341,7 +351,8 @@
       "BULK_EDIT": {
         "dates": "Dátumok szerkesztése",
         "categories": "Kategóriák szerkesztése",
-        "status": "Állapotok szerkesztése"
+        "status": "Állapotok szerkesztése",
+        "tags": "Címkék szerkesztése"
       }
     },
     "FILTERS": {
@@ -351,7 +362,22 @@
       "from_value_def": "Innen: {{ x }}",
       "to_value_def": "Ide: {{ x }}",
       "from_date_def": "Ettől: {{ date }}",
-      "to_date_def": "Eddig: {{ date }}"
+      "to_date_def": "Eddig: {{ date }}",
+      "reset": "Szűrők visszaállítása",
+      "saved": {
+        "title": "Mentett szűrők",
+        "new_title": "Új szűrő",
+        "edit_title": "Szűrő szerkesztése",
+        "name_label": "Szűrő neve",
+        "name_hint": "Saját szűrőm",
+        "save_dialog_title": "Szűrő mentése",
+        "save_tooltip": "Jelenlegi szűrő mentése",
+        "load_tooltip": "Mentett szűrő betöltése",
+        "empty_title": "Nincsenek mentett szűrők",
+        "empty_description": "Mentse el a szűrőket itt, hogy később gyorsan elérhesse őket.",
+        "save_success": "Szűrő sikeresen mentve",
+        "delete_success": "Szűrő sikeresen törölve"
+      }
     },
     "FORM": {
       "VALIDATORS": {
@@ -459,6 +485,7 @@
     "n_transactions": "Tranzakciók száma",
     "add_money": "Hozzáadás",
     "withdraw_money": "Pénzfelvétel",
+    "correct_balance": "Egyenleg javítás",
     "no-accounts": "Nem található itt megjeleníthető tranzakció. Adjon hozzá egy tranzakciót az alul található „+” gombra kattintva.",
     "TYPES": {
       "title": "Számlatípus",
@@ -466,7 +493,9 @@
       "normal": "Normál számla",
       "normal.descr": "Hasznos a napi pénzügyek rögzítéséhez. Ez a leggyakoribb számla, amely lehetővé teszi kiadások, bevételek hozzáadását...",
       "saving": "Megtakarítási számla",
-      "saving.descr": "Csak más számlákról tud pénzt hozzáadni és kivenni belőle. Tökéletes a megtakarítás megkezdéséhez."
+      "saving.descr": "Csak más számlákról tud pénzt hozzáadni és kivenni belőle. Tökéletes a megtakarítás megkezdéséhez.",
+      "investment": "Befektetési számla",
+      "investment.descr": "Bróker-, kriptotőzsde- vagy portfóliószámla. Kövesse nyomon befektetett tőkéjét és frissítse az értékét manuálisan értékeléseken keresztül"
     },
     "FORM": {
       "name": "Számla neve",
@@ -481,7 +510,32 @@
       "already-exists": "Ugyanezzel a névvel már van egy másik is. Kérjük, adjon meg egy másikat.",
       "tr-before-opening-date": "A számlán a nyitási dátumot megelőző dátumú tranzakciók vannak.",
       "iban": "IBAN",
-      "swift": "SWIFT"
+      "swift": "SWIFT",
+      "include-in-net-worth": "Beleszámítás a nettó vagyonba",
+      "include-in-net-worth.descr": "Számla hozzáadása a teljes nettó vagyon számításához",
+      "correct_balance_description": "A számlaegyenleg módosítása megváltoztatja a számla kezdeti értékét. Ez a korrekció nem jelenik meg a statisztikákban.",
+      "valuation_before_creation_date": "Ezen a számlán vannak olyan értékelések, amelyek dátuma a létrehozás dátuma előtti"
+    },
+    "INVESTMENT": {
+      "details-header": "Befektetés",
+      "correct_balance_title": "Befektetett tőke korrigálása",
+      "correct_balance_description": "Ez a számla kézi értékeléseket használ a portfólió értékének nyomon követésére. Ez a művelet csak a befektetett tőkét (kezdőérték) frissíti, és nem módosítja a rögzített értékeléseket vagy a befektetési statisztikákat.",
+      "invested-capital": "Befektetett tőke",
+      "portfolio-value": "Portfólió értéke",
+      "profit": "Nyereség",
+      "last-valuation": "Utolsó értékelés",
+      "no-valuations": "Még nincs értékelés rögzítve",
+      "update-value": "Érték frissítése",
+      "update-value.descr": "A portfólió aktuális értékének rögzítése",
+      "update-value.success": "Értékelés sikeresen rögzítve",
+      "history": "Értékelési előzmények",
+      "history-empty": "Még nincs értékelés ehhez a számlához",
+      "add-valuation": "Értékelés hozzáadása",
+      "edit-valuation": "Értékelés szerkesztése",
+      "edit-valuation.success": "Értékelés sikeresen szerkesztve",
+      "delete-valuation.success": "Értékelés sikeresen törölve",
+      "delete-all-valuations": "Összes értékelés törlése",
+      "delete-all-valuations.success": "Összes értékelés sikeresen törölve"
     },
     "DELETE": {
       "warning-header": "Törli a számlát?",
@@ -506,23 +560,50 @@
   "CURRENCIES": {
     "currency-converter": "Valutaváltó",
     "currency": "Pénznem",
+    "currency-settings": "Pénznem beállítások",
     "currency-manager": "Valutakezelő",
     "currency-manager.descr": "Konfigurálja a pénznemet és annak árfolyamait másokkal együtt",
     "preferred-currency": "Kedvelt/alap pénznem",
+    "tap-to-change-preferred-currency": "Érintse meg a módosításhoz",
     "change-preferred-currency-title": "Kedvelt pénznem módosítása",
     "change-preferred-currency-msg": "Mostantól minden statisztika és költségvetés ebben a pénznemben jelenik meg. A számlák és tranzakciók megtartják a korábbi pénznemet. Minden elmentett árfolyam törlődik, ha ezt a műveletet végrehajtja. Szeretné folytatni?",
-    "FORM": {
+    "EXCHANGE-RATE-FORM": {
       "equal-to-preferred-warn": "A pénznem nem lehet azonos a felhasználói pénznemmel",
+      "override-existing-warn": "Ebben a dátumban már létezik árfolyam ehhez a pénznemhez. Ha folytatja, az előző felülírásra kerül",
       "specify-a-currency": "Kérjük, adjon meg egy pénznemet",
       "add": "Árfolyam hozzáadása",
       "add-success": "Az árfolyam sikeresen hozzáadva",
       "edit": "Árfolyam szerkesztése",
-      "edit-success": "Az árfolyam szerkesztése sikerült"
+      "edit-success": "Az árfolyam szerkesztése sikerült",
+      "remove-all": "Törölje az összes árfolyamot",
+      "remove-all-warning": "Ez a művelet visszafordíthatatlan, és törli az összes átváltási árfolyamot ehhez a pénznemhez"
+    },
+    "TYPES": {
+      "display": "Pénznem típusa",
+      "fiat": "FIAT",
+      "crypto": "Kriptovaluta",
+      "other": "Más"
+    },
+    "CURRENCY-FORM": {
+      "name": "Megjelenítési név",
+      "code": "Pénznem kódja",
+      "symbol": "Szimbólum",
+      "decimal-digits": "Tizedesjegyek",
+      "create": "Pénznem létrehozása",
+      "create-success": "A pénznem sikeresen létrehozva",
+      "edit": "Pénznem szerkesztése",
+      "edit-success": "A pénznem sikeresen szerkesztve",
+      "delete": "Pénznem törlése",
+      "delete-success": "A pénznem sikeresen törölve",
+      "already-exists": "Már létezik ilyen kóddal rendelkező pénznem. Érdemes lehet szerkeszteni"
     },
     "delete-all-success": "Az árfolyamok sikeresen törlésre kerültek",
     "historical": "Árfolyamtörténetek",
+    "historical-empty": "Ehhez a pénznemhez nem található történelmi átváltási árfolyam",
     "exchange-rate": "Árfolyam",
     "exchange-rates": "Árfolyamok",
+    "min-exchange-rate": "Minimális árfolyam",
+    "max-exchange-rate": "Maximális árfolyam",
     "empty": "Adja hozzá az árfolyamokat, hogy ha az alapvalutától eltérő valutában vezetett számlái vannak, és így a grafikonok pontosabbak legyenek.",
     "select-a-currency": "Válasszon ki egy pénznemet",
     "search": "Keresés név vagy pénznemkód alapján"
@@ -541,6 +622,7 @@
       "all": "Minden címke"
     },
     "empty-list": "Még nem hozott létre címkéket. A címkék és kategóriák nagyszerű lehetőséget kínálnak a pénzmozgások kategorizálására.",
+    "no-tags": "Még nem hozott létre egyetlen címkét sem. A beállításokban hozhat létre címkét.",
     "without-tags": "Címkék nélkül",
     "add": "Hozzáadás",
     "create": "Felirat készítése",
@@ -588,14 +670,10 @@
   },
   "BUDGETS": {
     "title": "Költségvetések",
+    "status": "Költségkeret állapota",
     "repeated": "Ismétlődő",
     "one-time": "Egyszer",
-    "annual": "Éves",
-    "week": "Hetente",
-    "month": "Havonta",
     "actives": "Aktívok",
-    "pending": "Függőben lévő kezdés",
-    "finish": "Kész",
     "from-budgeted": "maradt ",
     "days-left": "nap van hátra",
     "days-to-start": "nap van a kezdésig",
@@ -617,10 +695,222 @@
       "title": "Költségvetés részletei",
       "statistics": "Statisztika",
       "budget-value": "Költségvetésben",
-      "expend-diary-left": "Naponta {{ dailyAmount }} -ot költhet el, még {{ remainingDays }} napig",
       "expend-evolution": "Költségek alakulása",
       "no-transactions": "Úgy tűnik, hogy ezzel a költségvetéssel kapcsolatban semmilyen kiadást nem teljesített."
+    },
+    "TARGET_TIMELINE_STATUSES": {
+      "active": "Aktív költségvetés",
+      "past": "Befejezett költségvetés",
+      "future": "Jövőbeli költségvetés"
+    },
+    "PROGRESS": {
+      "LABELS": {
+        "active-on-track": "Terv szerint",
+        "active-overspending": "Túlköltekezés",
+        "active-indeterminate": "Aktív",
+        "success": "Teljesítve",
+        "fail": "Költségvetés túllépve"
+      },
+      "DESCRIPTION": {
+        "active-on-track": "Naponta {{ dailyAmount }} összeget költhet a hátralévő {{ remainingDays }} napban",
+        "active-overspending": "Hogy visszatérjen a tervhez, korlátoznia kell kiadásait napi {{ dailyAmount }} összegre a hátralévő {{ remainingDays }} napban",
+        "active-indeterminate": "Még {{ amount }} elkölthető.",
+        "active-exceeded": "Már túllépte a költségvetési keretet {{ amount }} összeggel. Ha nem talál bevételt ehhez a költségvetéshez, abba kell hagynia a költekezést az időszak hátralévő részében",
+        "success": "Szép munka! Ez a költségvetés sikeresen lezárult. Hozzon létre további költségvetéseket kiadásai kezeléséhez",
+        "fail": "Túllépte a költségvetést {{ amount }} összeggel. Próbáljon meg óvatosabb lenni legközelebb!"
+      }
     }
+  },
+  "GOALS": {
+    "title": "Célok",
+    "status": "A cél állapota",
+    "type": {
+      "display": "Cél típusa",
+      "income": {
+        "title": "Megtakarítási cél",
+        "descr": "Ideális pénzmegtakarításhoz. Akkor sikeres, ha az egyenleg meghaladja a célösszeget."
+      },
+      "expense": {
+        "title": "Költési cél",
+        "descr": "Kövesse nyomon kiadásait, és próbáljon meg elérni egy célösszeget. Jól használható adományokhoz..."
+      }
+    },
+    "empty_title": "Nincsenek célok",
+    "empty_description": "Hozzon létre új célt megtakarításai követéséhez!",
+    "delete": "Cél törlése",
+    "delete_warning": "Ez a művelet visszafordíthatatlan. A célhoz kapcsolódó kategóriák és tranzakciók nem törlődnek",
+    "FORM": {
+      "new_title": "Új cél",
+      "edit_title": "Cél szerkesztése",
+      "target_amount": "Célösszeg",
+      "initial_amount": "Kezdő összeg",
+      "name": "Név",
+      "name_hint": "Megtakarítási célom",
+      "create_success": "Cél sikeresen létrehozva",
+      "edit_success": "Cél sikeresen szerkesztve",
+      "negative_warn": "A cél összege nem lehet negatív"
+    },
+    "DETAILS": {
+      "title": "Cél részletei",
+      "statistics": "Statisztikák",
+      "goal_value": "Célérték",
+      "evolution": "Fejlődés",
+      "no_transactions": "Úgy tűnik, nem hajtott végre ehhez a célhoz kapcsolódó tranzakciót"
+    },
+    "TARGET_TIMELINE_STATUSES": {
+      "active": "Aktív cél",
+      "past": "Befejezett cél",
+      "future": "Jövőbeli cél"
+    },
+    "PROGRESS": {
+      "LABELS": {
+        "active-on-track": "Pályán",
+        "active-behind-schedule": "A menetrend lemaradásával",
+        "active-indeterminate": "Aktív",
+        "success": "A cél elérve",
+        "fail": "A gól nem sikerült"
+      },
+      "DESCRIPTION": {
+        "active-on-track": "Jó úton haladsz a cél felé! Naponta {{ dailyAmount }} összeget kell megtakarítania a fennmaradó {{ remainingDays }} napig",
+        "active-behind-schedule": "Lemaradsz a menetrendről. Naponta {{ dailyAmount }} összeget kell megtakarítania, hogy {{ remainingDays }} napon belül elérje célját",
+        "active-indeterminate": "További {{ amount }} kell a cél eléréséhez.",
+        "success": "Gratulálok! Elérted a célodat.",
+        "fail": "{{ amount }} értékkel eltévesztette a célt."
+      }
+    }
+  },
+  "DEBTS": {
+    "display": {
+      "one": "Adósság",
+      "other": "Adósságok"
+    },
+    "FORM": {
+      "name": "Adósság neve",
+      "initial_amount": "Kezdeti összeg",
+      "total_amount": "Teljes összeg",
+      "step_initial_value": "Kezdeti érték",
+      "step_details": "Részletek",
+      "from_transaction": {
+        "title": "Egy tranzakcióból",
+        "tap_to_select": "Koppintson egy tranzakció kiválasztásához"
+      },
+      "from_amount": {
+        "title": "Kezdő összegből",
+        "description": "Ezt az összeget a statisztikában nem veszik figyelembe kiadásként/bevételként. Ezt az egyenlegek és a nettó vagyon kiszámításához fogják használni"
+      }
+    },
+    "DIRECTION": {
+      "lent": "Kölcsönadva",
+      "borrowed": "Kölcsönözve"
+    },
+    "STATUS": {
+      "active": "Aktív",
+      "close": "Zárt"
+    },
+    "DETAILS": {
+      "collected_amount": "Összegyűjtött összeg",
+      "remaining": "Többi",
+      "no_deadline": "Nincs határidő",
+      "in_days": "{{x}} napon belül",
+      "due_today": "Ma esedékes",
+      "days_ago": "{{x}} napja",
+      "overdue_by": "{{x}} napot késik",
+      "per_day": "/ nap",
+      "no_transactions": "Nem található tranzakció ehhez az adóssághoz"
+    },
+    "EMPTY": {
+      "no_debts_active": "Nem található aktív adósság. Kezdje új adósság létrehozásával az alábbi gombra kattintva",
+      "no_debts_closed": "Nem található lezárt adósság. A tartozás akkor zárul le, ha az összes pénzt beszedte, vagy kifizette az összes tartozását."
+    },
+    "ACTIONS": {
+      "edit": {
+        "title": "Adósság szerkesztése",
+        "success": "A tartozás sikeresen szerkesztve"
+      },
+      "delete": {
+        "warning_header": "Törli ezt az adósságot?",
+        "warning_text": "Ez a művelet nem vonható vissza. A kapcsolt tranzakciók nem törlődnek, de a továbbiakban nem lesznek társítva ehhez az adóssághoz."
+      },
+      "add_register": {
+        "title": "Mozgás hozzáadása",
+        "success": "A mozgás sikeresen hozzáadva",
+        "fab_label": "Regisztráció hozzáadása",
+        "modal_title": "Regiszter hozzáadása ehhez az adóssághoz",
+        "modal_subtitle": "Válasszon egyet az alábbi lehetőségek közül, ha egy tranzakciót ehhez az adóssághoz szeretne kapcsolni"
+      },
+      "link_transaction": {
+        "title": "Kapcsolja össze a meglévő tranzakciót",
+        "description": "Válasszon egy meglévő rekordot, hogy összekapcsolja ezzel a tartozással",
+        "success": "Adóssághoz kapcsolódó ügylet",
+        "creating": "Egy <b>{{ name }}</b> adóssághoz kapcsolódó tranzakciót hoz létre"
+      },
+      "unlink_transaction": {
+        "title": "Leválasztás az adósságról",
+        "warning_text": "Ez a tranzakció a továbbiakban nem lesz ehhez a tartozáshoz társítva.",
+        "success": "Tranzakció leválasztva az adósságról"
+      },
+      "new_transaction": {
+        "title": "Új tranzakció hozzáadása",
+        "description": "Manuálisan adja hozzá vagy csökkentse az adósságot úgy, hogy új tranzakciót hoz létre ehhez az adóssághoz kapcsolva"
+      },
+      "create": {
+        "title": "Adósság létrehozása",
+        "success": "Az adósság sikeresen létrehozva"
+      }
+    }
+  },
+  "ASSETS": {
+    "title": "Eszközök",
+    "empty_description": "Még nem hozott létre tartalmat. Az olyan vagyontárgyak, mint az ingatlanok, járművek vagy gyűjtemények nyomon követhetők értékelésükkel",
+    "create": "Eszköz hozzáadása",
+    "create_success": "Az elem sikeresen létrehozva",
+    "edit_success": "A tartalom sikeresen szerkesztve",
+    "delete": "Eszköz törlése",
+    "delete_success": "Az elem sikeresen törölve",
+    "delete_confirmation": "Ez a művelet nem vonható vissza. Az eszköz összes értékelése szintén törlődik.",
+    "profit": "Nyereség",
+    "profit_percent": "hozam %",
+    "total_value": "Az eszközök összértéke",
+    "FORM": {
+      "name": "Eszköz neve",
+      "name_required": "Kérjük, adjon meg egy elemnevet",
+      "description": "Leírás",
+      "initial_value": "Kezdeti érték",
+      "initial_value_required": "Adjon meg egy kezdeti értéket",
+      "initial_value_invalid": "Kérjük, adjon meg egy érvényes számot",
+      "currency": "Valuta",
+      "select_currency": "Kérjük, válasszon egy pénznemet",
+      "creation_date": "Létrehozás dátuma",
+      "edit": "Eszköz szerkesztése",
+      "create": "Eszköz létrehozása",
+      "already_exists": "Már létezik ilyen nevű tartalom. Érdemes lehet szerkeszteni",
+      "valuation_before_creation_date": "Ezen az eszközön vannak olyan értékelések, amelyek dátuma az akvizíció időpontja előtti"
+    },
+    "VALUATION": {
+      "history": "Értékelés története",
+      "no_valuations": "Még nem rögzítettek értékelést. Kezdje az első értékelés hozzáadásával",
+      "add_valuation": "Értékelés hozzáadása",
+      "edit_valuation": "Értékelés szerkesztése",
+      "value": "Érték",
+      "value_required": "Adjon meg egy értéket",
+      "value_invalid": "Kérjük, adjon meg egy érvényes számot",
+      "update_value_success": "Az értékelés sikeresen hozzáadva",
+      "edit_valuation_success": "Az értékelés sikeresen frissítve",
+      "delete_valuation_success": "Az értékelés sikeresen törölve",
+      "delete_all_valuations": "Törölje az összes értékelést",
+      "delete_all_valuations_success": "Az összes értékelés sikeresen törölve"
+    },
+    "SORT": {
+      "name_asc": "Név (A-Z)",
+      "name_desc": "Név (Z-A)",
+      "value_asc": "Érték (a legalacsonyabb először)",
+      "value_desc": "Érték (a legmagasabb először)"
+    }
+  },
+  "TARGET_TIMELINE_STATUSES": {
+    "active": "Aktív",
+    "past": "Befejezve",
+    "future": "Jövő"
   },
   "BACKUP": {
     "no_file_selected": "Nincs kiválasztva fájl",
@@ -671,7 +961,7 @@
         ],
         "steps-descr": [
           "Válasszon ki egy .csv fájlt az eszközről. Győződjön meg arról, hogy van egy első sora, amely leírja az egyes oszlopok nevét.",
-          "Válassza ki azt az oszlopot, amelyben az egyes tranzakciók dátuma meg van adva. Ha nincs megadva, a tranzakciók az aktuális dátummal jönnek létre. Válassza ki azt az oszlopot, ahol az egyes tranzakciók értéke meg van adva. Használjon negatív értékeket a kiadásokhoz és pozitív értékeket a bevételekhez. Használjon pontot tizedeselválasztóként.",
+          "Válassza ki azt az oszlopot, amelyben az egyes tranzakciók dátuma meg van adva. Ha nincs megadva, a tranzakciók az aktuális dátummal jönnek létre. Válassza ki azt az oszlopot, ahol az egyes tranzakciók értéke meg van adva. Használjon negatív értékeket a kiadásokhoz és pozitív értékeket a bevételekhez.",
           "Válassza ki azt az oszlopot, amelyben meg van adva az a számla, amelyhez az egyes tranzakciók tartoznak. Kiválaszthat egy alapértelmezett fiókot is arra az esetre, ha nem találnánk a kívánt fiókot. Ha nincs megadva alapértelmezett fiók, akkor létrehozunk egyet ugyanazzal a névvel. ",
           "Adja meg azt az oszlopot, ahol a tranzakciókategória neve található. Meg kell adnia egy alapértelmezett kategóriát, hogy ezt a kategóriát rendeljük hozzá a tranzakciókhoz, ha a kategória nem található.",
           "Válassza ki azt az oszlopot, amelyben az egyes tranzakciók dátuma meg van adva. Ha nincs megadva, a tranzakciók az aktuális dátummal jönnek létre.",
@@ -692,52 +982,104 @@
     }
   },
   "SETTINGS": {
-    "title_long": "Beállítások és megjelenés",
+    "title_long": "Beállítások és Testreszabás",
     "title_short": "Beállítások",
-    "description": "Alkalmazás témája, szövegek és egyéb általános beállítások",
+    "description": "Téma, Nyelv, Adatok és egyebek",
     "edit_profile": "Profil szerkesztése",
-    "lang.section": "Nyelv és szövegek",
-    "lang.title": "Alkalmazás nyelve",
-    "lang.descr": "Nyelv, amelyen a szövegek megjelennek az alkalmazásban",
-    "lang.help": "Ha együttműködni szeretne ennek az alkalmazásnak a fordításával, tekintse meg a <a href='https://github.com/enrique-lozano/Monekin/tree/main/lib/i18n'> útmutatónk</a>",
-    "locale": "Régió",
-    "locale_auto": "Rendszer",
-    "locale.descr": "Dátumok, számformátumok beállítása...",
-    "locale.warn": "Régióváltáskor az alkalmazás frissülni fog",
-    "first_day_of_week": "A hét első napja",
-    "theme_and_colors": "Témák és színek",
-    "theme": "Téma",
-    "theme.auto": "Rendszer",
-    "theme.light": "Világos",
-    "theme.dark": "Sötét",
-    "amoled-mode": "AMOLED mód",
-    "amoled-mode.descr": "Ha lehetséges, használjon tiszta fekete háttérképet. Ez némileg segíti az AMOLED képernyővel rendelkező készülékek akkumulátorát.",
-    "dynamic-colors": "Dinamikus színek",
-    "dynamic-colors.descr": "Amikor csak lehetséges, használja a rendszer kiemelő színét",
-    "accent-color": "Kiemelő szín",
-    "accent-color.descr": "Válassza ki, hogy az alkalmazás milyen színnel emelje ki a felület bizonyos részeit",
-    "font": "Betűtípus",
-    "font-platform": "Platform",
-    "SWIPE-ACTIONS": {
-      "title": "Csúsztatási műveletek",
-      "choose-description": "Válassza ki, hogy milyen művelet induljon el, ha a listában lévő tranzakciós tételt ezzel a csúsztatási irány segítségével csúsztatja",
-      "swipe-left": "Csúsztasson balra",
-      "swipe-right": "Csúsztasson jobbra",
-      "none": "Nincs akció",
-      "toggle-reconciled": "Váltás egyeztetve",
-      "toggle-pending": "Váltás függőben",
-      "toggle-voided": "Váltó érvénytelenítve",
-      "toggle-unreconciled": "Váltás nem egyeztetve",
-      "remove-status": "Állapot eltávolítása"
+    "GENERAL": {
+      "menu_title": "Általános beállítások",
+      "menu_descr": "Nyelv, adatvédelem és egyebek",
+      "show_all_decimals": "Összes tizedesjegy mutatása",
+      "show_all_decimals_descr": "Minden tizedesjegy megjelenítése, még akkor is, ha nullára végződik",
+      "LANGUAGE": {
+        "section": "Nyelv és szövegek",
+        "title": "Alkalmazás nyelve",
+        "descr": "Nyelv, amelyen a szövegek megjelennek az alkalmazásban",
+        "help": "Ha együttműködni szeretne ennek az alkalmazásnak a fordításával, tekintse meg a <a href='https://github.com/enrique-lozano/Monekin/tree/main/lib/i18n'> útmutatónk</a>"
+      },
+      "LOCALE": {
+        "title": "Régió",
+        "auto": "Rendszer",
+        "descr": "Dátumok, számformátumok beállítása...",
+        "warn": "Régióváltáskor az alkalmazás frissülni fog",
+        "first_day_of_week": "A hét első napja"
+      }
+    },
+    "APP_STRUCTURES": {
+      "title": "Alkalmazásstruktúrák",
+      "tags": "Határozzon meg címkéket a tranzakciók jobb megszervezéséhez",
+      "categories": "Kategóriák és alkategóriák szervezése",
+      "accounts": "Kezelje és szerkessze fiókjait",
+      "filters": "Konfiguráljon globális szűrőket, amelyeket tranzakciókhoz és statisztikákhoz használhat"
     },
     "SECURITY": {
       "title": "Biztonság",
-      "private-mode-at-launch": "Privát mód indításkor",
-      "private-mode-at-launch.descr": "Az alkalmazás alapértelmezés szerinti indítása privát módban",
-      "private-mode": "Privát mód",
-      "private-mode.descr": "Minden pénzösszeg elrejtése",
-      "private-mode.activated": "Privát mód aktiválva",
-      "private-mode.deactivated": "Privát mód letiltva"
+      "private_mode_at_launch": "Privát mód indításkor",
+      "private_mode_at_launch_descr": "Az alkalmazás alapértelmezés szerinti indítása privát módban",
+      "private_mode": "Privát mód",
+      "private_mode_descr": "Minden pénzösszeg elrejtése",
+      "private_mode_activated": "Privát mód aktiválva",
+      "private_mode_deactivated": "Privát mód letiltva"
+    },
+    "TRANSACTIONS": {
+      "menu_title": "Tranzakciók",
+      "menu_descr": "Konfigurálja tranzakciói viselkedését",
+      "title": "Tranzakciós beállítások",
+      "STYLE": {
+        "title": "Tranzakció stílusa",
+        "subtitle": "Állítsa be, hogyan jelenjenek meg a tranzakciók a listákban",
+        "show_tags": "Címkék mutatása",
+        "show_time": "Idő mutatása"
+      },
+      "SWIPE_ACTIONS": {
+        "title": "Csúsztatási műveletek",
+        "choose_description": "Válassza ki, hogy milyen művelet induljon el, ha a listában lévő tranzakciós tételt ezzel a csúsztatási irány segítségével csúsztatja",
+        "swipe_left": "Csúsztasson balra",
+        "swipe_right": "Csúsztasson jobbra",
+        "none": "Nincs akció",
+        "toggle_reconciled": "Váltás egyeztetve",
+        "toggle_pending": "Váltás függőben",
+        "toggle_voided": "Váltó érvénytelenítve",
+        "toggle_unreconciled": "Váltás nem egyeztetve",
+        "remove_status": "Állapot eltávolítása"
+      },
+      "DEFAULT_VALUES": {
+        "title": "Default Form Values",
+        "page_title": "New Transaction: Default Form Values",
+        "reuse_last_transaction": "Reuse Last Transaction Values",
+        "reuse_last_transaction_descr": "Automatically fill the form with some values from the last created transaction",
+        "fields_to_reuse": "Fields to reuse",
+        "reuse_last_values_modal_descr": "Select the fields that should be pre-filled with the values from the last created transaction.",
+        "default_values_separator": "Default Values",
+        "default_category": "Default Category",
+        "default_status": "Default Status",
+        "default_tags": "Default Tags",
+        "no_tags_selected": "No tags selected"
+      },
+      "DEFAULT_TYPE": {
+        "title": "Default Type",
+        "modal_title": "Select Default Type"
+      }
+    },
+    "APPEARANCE": {
+      "menu_title": "Téma és stílus",
+      "menu_descr": "Témaválasztás, színek és egyéb, az alkalmazás megjelenésével kapcsolatos dolgok",
+      "theme_and_colors": "Témák és színek",
+      "THEME": {
+        "title": "Téma",
+        "auto": "Rendszer",
+        "light": "Világos",
+        "dark": "Sötét"
+      },
+      "amoled_mode": "AMOLED mód",
+      "amoled_mode_descr": "Ha lehetséges, használjon tiszta fekete háttérképet. Ez némileg segíti az AMOLED képernyővel rendelkező készülékek akkumulátorát.",
+      "dynamic_colors": "Dinamikus színek",
+      "dynamic_colors_descr": "Amikor csak lehetséges, használja a rendszer kiemelő színét",
+      "accent_color": "Kiemelő szín",
+      "accent_color_descr": "Válassza ki, hogy az alkalmazás milyen színnel emelje ki a felület bizonyos részeit",
+      "text": "Szöveg",
+      "font": "Betűtípus",
+      "font_platform": "Platform"
     }
   },
   "MORE": {
@@ -754,7 +1096,7 @@
     },
     "ABOUT_US": {
       "display": "Alkalmazásinformációk",
-      "description": "Nézze meg a Monekinre vonatkozó feltételeket és egyéb fontos információkat. Lépjen kapcsolatba a közösséggel a hibák bejelentésével, javaslatok megtételével...",
+      "description": "Találja meg a Monekin feltételeit, fontos információkat, és lépjen kapcsolatba hibák bejelentésével vagy ötletek megosztásával",
       "LEGAL": {
         "display": "Jogi információk",
         "privacy": "Adatvédelem",

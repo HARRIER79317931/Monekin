@@ -8,8 +8,12 @@ import './../initial/tables.drift';
 import './../../../models/account/account.dart';
 import './../../../models/category/category.dart';
 import './../../../models/budget/budget.dart';
+import './../../../models/goal/goal.dart';
+import './../../../models/debt/debt.dart';
+import './../../../models/asset/asset.dart';
 import './../../../models/exchange-rate/exchange_rate.dart';
 import './../../../models/transaction/transaction.dart';
+import './../../../models/filters/saved_filter.dart';
 
 getAccountsWithFullData($predicate = TRUE) WITH Account: 
     SELECT a.*, currency.** 
@@ -19,6 +23,64 @@ getAccountsWithFullData($predicate = TRUE) WITH Account:
     WHERE $predicate 
     ORDER BY $orderBy
     LIMIT $limit;
+
+getDebtsWithFullData($predicate = TRUE) WITH Debt: 
+    SELECT d.*, currency.** 
+    FROM debts d 
+        INNER JOIN currencies currency 
+        ON d.currencyId = currency.code 
+    WHERE $predicate 
+    ORDER BY $orderBy
+    LIMIT $limit;
+
+getAssetsWithFullData($predicate = TRUE) WITH Asset:
+    SELECT a.*, currency.**
+    FROM assets a
+        INNER JOIN currencies currency
+        ON a.currencyId = currency.code
+    WHERE $predicate
+    ORDER BY $orderBy
+    LIMIT $limit;
+
+getValuationsForAccount(:accountId AS TEXT):
+    SELECT *
+    FROM valuations
+    WHERE accountId = :accountId
+    ORDER BY date DESC;
+
+getLatestValuationForAccount(:accountId AS TEXT):
+    SELECT *
+    FROM valuations
+    WHERE accountId = :accountId
+    ORDER BY date DESC
+    LIMIT 1;
+
+getLatestValuationForAccountAtDate(:accountId AS TEXT, :date AS DATETIME):
+    SELECT *
+    FROM valuations
+    WHERE accountId = :accountId AND date <= :date
+    ORDER BY date DESC
+    LIMIT 1;
+
+getValuationsForAsset(:assetId AS TEXT):
+    SELECT *
+    FROM valuations
+    WHERE assetId = :assetId
+    ORDER BY date DESC;
+
+getLatestValuationForAsset(:assetId AS TEXT):
+    SELECT *
+    FROM valuations
+    WHERE assetId = :assetId
+    ORDER BY date DESC
+    LIMIT 1;
+
+getLatestValuationForAssetAtDate(:assetId AS TEXT, :date AS DATETIME):
+    SELECT *
+    FROM valuations
+    WHERE assetId = :assetId AND date <= :date
+    ORDER BY date DESC
+    LIMIT 1;
 
 getTransactionsWithFullData($predicate = TRUE) WITH MoneyTransaction: 
     SELECT 
@@ -109,7 +171,7 @@ countTransactions($predicate = TRUE, :date AS DATETIME):
                                 SELECT MAX(date) 
                                 FROM exchangeRates
                                 WHERE currencyCode = er.currencyCode 
-                                AND DATE <= :date
+                                AND unixepoch(DATE) <= unixepoch(:date)
                             )
                 ORDER BY currencyCode
         )
@@ -123,7 +185,7 @@ countTransactions($predicate = TRUE, :date AS DATETIME):
                                 SELECT MAX(date) 
                                 FROM exchangeRates
                                 WHERE currencyCode = er.currencyCode 
-                                AND DATE <= :date
+                                AND unixepoch(DATE) <= unixepoch(:date)
                             )
                 ORDER BY currencyCode
         )
@@ -162,18 +224,30 @@ getLastExchangeRates(:limit AS NUMBER) WITH ExchangeRate:
     LIMIT :limit;
 
 getBudgetsWithFullData($predicate = TRUE) WITH Budget:
-    SELECT id, name, limitAmount, intervalPeriod, startDate, endDate,
-        LIST(
-            SELECT categoryID
-            FROM budgetCategory
-            WHERE budgetID = budgets.id
-        ) AS categories,
-        LIST(
-            SELECT accountID
-            FROM budgetAccount
-            WHERE budgetID = budgets.id
-        ) AS accounts
-    FROM budgets
+    SELECT b.*, trFilters.** 
+    FROM budgets b 
+        INNER JOIN transactionFilterSets trFilters 
+        ON b.filterID = trFilters.id
+    WHERE $predicate 
+    ORDER BY $orderBy
+    LIMIT $limit;
+
+
+getGoalsWithFullData($predicate = TRUE) WITH Goal:
+    SELECT g.*, trFilters.** 
+    FROM goals g 
+        INNER JOIN transactionFilterSets trFilters 
+        ON g.filterID = trFilters.id
+    WHERE $predicate 
+    ORDER BY $orderBy
+    LIMIT $limit;
+
+
+getSavedFiltersWithFullData($predicate = TRUE) WITH SavedFilter:
+    SELECT sf.*, filterSet.** 
+    FROM savedFilters sf 
+        INNER JOIN transactionFilterSets filterSet 
+        ON sf.filterID = filterSet.id
     WHERE $predicate 
     ORDER BY $orderBy
     LIMIT $limit;

@@ -15,7 +15,7 @@ import 'package:monekin/core/models/transaction/transaction.dart';
 import 'package:monekin/core/models/transaction/transaction_status.enum.dart';
 import 'package:monekin/core/presentation/widgets/number_ui_formatters/currency_displayer.dart';
 import 'package:monekin/core/presentation/widgets/number_ui_formatters/ui_number_formatter.dart';
-import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filters.dart';
+import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filter_set.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
 
 import '../../../../core/models/transaction/transaction_type.enum.dart';
@@ -25,8 +25,8 @@ class PieChartByCategories extends StatefulWidget {
     super.key,
     required this.datePeriodState,
     this.showList = false,
-    this.initialSelectedType = TransactionType.E,
-    this.filters = const TransactionFilters(),
+    this.initialSelectedType = TransactionType.expense,
+    this.filters = const TransactionFilterSet(),
   });
 
   final DatePeriodState datePeriodState;
@@ -35,7 +35,7 @@ class PieChartByCategories extends StatefulWidget {
 
   final TransactionType initialSelectedType;
 
-  final TransactionFilters filters;
+  final TransactionFilterSet filters;
 
   @override
   State<PieChartByCategories> createState() => _PieChartByCategoriesState();
@@ -47,7 +47,7 @@ class _PieChartByCategoriesState extends State<PieChartByCategories> {
 
   final centerRadius = 35;
 
-  TransactionFilters _getTransactionFilters() {
+  TransactionFilterSet _getTransactionFilters() {
     return widget.filters.copyWith(
       status: TransactionStatus.getStatusThatCountsForStats(
         widget.filters.status,
@@ -69,7 +69,7 @@ class _PieChartByCategoriesState extends State<PieChartByCategories> {
     for (final transaction in transactions) {
       final trValue =
           transaction.currentValueInPreferredCurrency *
-          (transactionsType == TransactionType.E ? -1 : 1);
+          (transactionsType == TransactionType.expense ? -1 : 1);
 
       final categoryToEdit = data.firstWhereOrNull(
         (cat) =>
@@ -234,11 +234,11 @@ class _PieChartByCategoriesState extends State<PieChartByCategories> {
               child: SegmentedButton(
                 segments: [
                   ButtonSegment(
-                    value: TransactionType.E,
+                    value: TransactionType.expense,
                     label: Text(t.transaction.types.expense(n: 1)),
                   ),
                   ButtonSegment(
-                    value: TransactionType.I,
+                    value: TransactionType.income,
                     label: Text(t.transaction.types.income(n: 1)),
                   ),
                 ],

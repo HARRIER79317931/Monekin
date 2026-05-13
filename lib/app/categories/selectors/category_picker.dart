@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:monekin/app/categories/selectors/category_button_selector.dart';
 import 'package:monekin/app/categories/selectors/draggableScrollableKeyboardAware.mixin.dart';
-import 'package:monekin/core/database/app_db.dart';
 import 'package:monekin/core/database/services/category/category_service.dart';
+import 'package:monekin/core/database/utils/drift_utils.dart';
 import 'package:monekin/core/extensions/color.extensions.dart';
 import 'package:monekin/core/extensions/string.extension.dart';
 import 'package:monekin/core/models/category/category.dart';
@@ -15,6 +15,7 @@ import 'package:monekin/core/presentation/theme.dart';
 import 'package:monekin/core/presentation/widgets/bottomSheetFooter.dart';
 import 'package:monekin/core/presentation/widgets/modal_container.dart';
 import 'package:monekin/core/presentation/widgets/scrollable_with_bottom_gradient.dart';
+import 'package:monekin/core/routes/route_utils.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
 
 Future<Category?> showCategoryPickerModal(
@@ -92,7 +93,7 @@ class _CategoryPickerState extends State<CategoryPicker>
           //     IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
           body: StreamBuilder(
             stream: CategoryService.instance.getCategories(
-              predicate: (c, p) => AppDB.instance.buildExpr([
+              predicate: (c, p) => buildDriftExpr([
                 c.parentCategoryID.isNull(),
                 c.type.isInValues(widget.categoryType),
                 c.id.isNotIn(widget.excludeCategoriesWithId),
@@ -191,7 +192,7 @@ class _CategoryPickerState extends State<CategoryPicker>
                 onSaved: selectedCategory == null
                     ? null
                     : () {
-                        Navigator.pop(context, selectedCategory);
+                        RouteUtils.popRoute(selectedCategory);
                       },
               ),
             ],

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:monekin/core/database/services/transaction/transaction_service.dart';
 import 'package:monekin/core/models/date-utils/date_period_state.dart';
 import 'package:monekin/core/presentation/widgets/number_ui_formatters/currency_displayer.dart';
-import 'package:monekin/core/presentation/widgets/skeleton.dart';
-import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filters.dart';
+import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filter_set.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../core/models/transaction/transaction_type.enum.dart';
 import '../../../core/presentation/app_colors.dart';
@@ -21,7 +21,7 @@ class IncomeOrExpenseCard extends StatelessWidget {
 
   final DatePeriodState periodState;
 
-  final TransactionFilters? filters;
+  final TransactionFilterSet? filters;
 
   final TextStyle? labelStyle;
 
@@ -50,26 +50,25 @@ class IncomeOrExpenseCard extends StatelessWidget {
               Text(type.displayName(context), style: labelStyle),
               StreamBuilder(
                 stream: TransactionService.instance.getTransactionsValueBalance(
-                  filters: TransactionFilters(
+                  filters: TransactionFilterSet(
                     accountsIDs: filters?.accountsIDs,
-                    categories: filters?.categories,
+                    categoriesIds: filters?.categoriesIds,
                     minDate: periodState.startDate,
                     maxDate: periodState.endDate,
                     transactionTypes: [type],
                   ),
                 ),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Skeleton(width: 26, height: 18);
-                  }
-
-                  return CurrencyDisplayer(
-                    amountToConvert: snapshot.data!.abs(),
-                    compactView: true,
-                    showDecimals: false,
-                    integerStyle: TextStyle(
-                      fontSize: 18,
-                      color: AppColors.of(context).onConsistentPrimary,
+                  return Skeletonizer(
+                    enabled: !snapshot.hasData,
+                    child: CurrencyDisplayer(
+                      amountToConvert: snapshot.data?.abs() ?? 9999,
+                      compactView: true,
+                      showDecimals: false,
+                      integerStyle: TextStyle(
+                        fontSize: 18,
+                        color: AppColors.of(context).onConsistentPrimary,
+                      ),
                     ),
                   );
                 },

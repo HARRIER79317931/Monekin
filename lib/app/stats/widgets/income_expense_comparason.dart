@@ -5,10 +5,10 @@ import 'package:monekin/core/database/services/transaction/transaction_service.d
 import 'package:monekin/core/extensions/lists.extensions.dart';
 import 'package:monekin/core/presentation/widgets/animated_progress_bar.dart';
 import 'package:monekin/core/presentation/widgets/number_ui_formatters/currency_displayer.dart';
-import 'package:monekin/core/presentation/widgets/skeleton.dart';
-import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filters.dart';
+import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filter_set.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../core/models/transaction/transaction_type.enum.dart';
 
@@ -17,13 +17,13 @@ class IncomeExpenseComparason extends StatelessWidget {
     super.key,
     this.startDate,
     this.endDate,
-    this.filters = const TransactionFilters(),
+    this.filters = const TransactionFilterSet(),
   });
 
   final DateTime? startDate;
   final DateTime? endDate;
 
-  final TransactionFilters filters;
+  final TransactionFilterSet filters;
 
   @override
   Widget build(BuildContext context) {
@@ -48,15 +48,14 @@ class IncomeExpenseComparason extends StatelessWidget {
                           ),
                         ),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Skeleton(width: 35, height: 32);
-                      }
-
-                      return CurrencyDisplayer(
-                        amountToConvert: snapshot.data!,
-                        integerStyle: Theme.of(
-                          context,
-                        ).textTheme.headlineSmall!,
+                      return Skeletonizer(
+                        enabled: !snapshot.hasData,
+                        child: CurrencyDisplayer(
+                          amountToConvert: snapshot.data ?? 22,
+                          integerStyle: Theme.of(
+                            context,
+                          ).textTheme.headlineSmall!,
+                        ),
                       );
                     },
                   ),
@@ -70,7 +69,7 @@ class IncomeExpenseComparason extends StatelessWidget {
             TransactionService.instance.getTransactionsValueBalance(
               filters: filters.copyWith(
                 transactionTypes: [
-                  TransactionType.I,
+                  TransactionType.income,
                 ].intersectionWithNullable(filters.transactionTypes).toList(),
                 minDate: startDate,
                 maxDate: endDate,
@@ -79,7 +78,7 @@ class IncomeExpenseComparason extends StatelessWidget {
             TransactionService.instance.getTransactionsValueBalance(
               filters: filters.copyWith(
                 transactionTypes: [
-                  TransactionType.E,
+                  TransactionType.expense,
                 ].intersectionWithNullable(filters.transactionTypes).toList(),
                 minDate: startDate,
                 maxDate: endDate,
@@ -98,12 +97,12 @@ class IncomeExpenseComparason extends StatelessWidget {
             return Column(
               children: [
                 IncomeExpenseTile(
-                  type: TransactionType.I,
+                  type: TransactionType.income,
                   value: income,
                   total: income + expense,
                 ),
                 IncomeExpenseTile(
-                  type: TransactionType.E,
+                  type: TransactionType.expense,
                   value: expense,
                   total: income + expense,
                 ),
@@ -148,7 +147,7 @@ class IncomeExpenseTile extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                type == TransactionType.E
+                type == TransactionType.expense
                     ? t.transaction.types.expense(n: 1)
                     : t.transaction.types.income(n: 1),
               ),

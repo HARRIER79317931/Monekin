@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:monekin/app/layout/page_framework.dart';
+import 'package:monekin/core/database/utils/demo_app_seeders.dart';
 import 'package:monekin/core/extensions/color.extensions.dart';
 import 'package:monekin/core/presentation/app_colors.dart';
+import 'package:monekin/core/presentation/helpers/snackbar.dart';
+import 'package:monekin/core/presentation/widgets/loading_overlay.dart';
+import 'package:monekin/core/utils/logger.dart';
 
 class DebugPage extends StatelessWidget {
   const DebugPage({super.key});
@@ -61,8 +66,8 @@ class DebugPage extends StatelessWidget {
       ),
     ];
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Debug View')),
+    return PageFramework(
+      title: 'Debug Page',
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -71,12 +76,10 @@ class DebugPage extends StatelessWidget {
           children: [
             const Text('Flutter color scheme:', style: sectionStyle),
             const SizedBox(height: 4),
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: colorSchemePairs.length,
-              itemBuilder: (context, index) {
-                final (bgName, bgColor, fgName, fgColor) =
-                    colorSchemePairs[index];
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: colorSchemePairs.map((pair) {
+                final (bgName, bgColor, fgName, fgColor) = pair;
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
@@ -102,8 +105,9 @@ class DebugPage extends StatelessWidget {
                     ],
                   ),
                 );
-              },
+              }).toList(),
             ),
+
             Column(
               spacing: 12,
               mainAxisSize: MainAxisSize.min,
@@ -214,6 +218,30 @@ class DebugPage extends StatelessWidget {
             const Text('Text styles:', style: sectionStyle),
             const SizedBox(height: 12),
             const _ThemeTextStylesPreview(),
+            const SizedBox(height: 24),
+            TextButton(
+              onPressed: () {
+                final loadingOverlay = LoadingOverlay.of(context);
+                loadingOverlay.show();
+
+                fillWithDemoData()
+                    .then((value) {
+                      loadingOverlay.hide();
+
+                      MonekinSnackbar.success(
+                        SnackbarParams('Demo data inserted successfully!'),
+                      );
+
+                      Navigator.of(context).pop();
+                    })
+                    .catchError((error) {
+                      loadingOverlay.hide();
+                      Logger.printDebug(error);
+                      MonekinSnackbar.error(SnackbarParams.fromError(error));
+                    });
+              },
+              child: Text("DEMO DATA"),
+            ),
           ],
         ),
       ),

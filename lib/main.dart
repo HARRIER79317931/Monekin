@@ -1,20 +1,28 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
-import 'package:monekin/app/layout/navigation_sidebar.dart';
-import 'package:monekin/app/layout/tabs.dart';
+import 'package:monekin/app/layout/page_switcher.dart';
+import 'package:monekin/app/layout/widgets/app_navigation_sidebar.dart';
+import 'package:monekin/app/layout/window_bar.dart';
 import 'package:monekin/app/onboarding/intro.page.dart';
 import 'package:monekin/core/database/services/app-data/app_data_service.dart';
 import 'package:monekin/core/database/services/user-setting/private_mode_service.dart';
 import 'package:monekin/core/database/services/user-setting/user_setting_service.dart';
 import 'package:monekin/core/database/services/user-setting/utils/get_theme_from_string.dart';
+import 'package:monekin/core/presentation/helpers/global_snackbar.dart';
 import 'package:monekin/core/presentation/theme.dart';
+import 'package:monekin/core/routes/handle_will_pop_scope.dart';
 import 'package:monekin/core/routes/root_navigator_observer.dart';
+import 'package:monekin/core/routes/route_utils.dart';
+import 'package:monekin/core/utils/app_utils.dart';
+import 'package:monekin/core/utils/keyboard_intents.dart';
 import 'package:monekin/core/utils/logger.dart';
 import 'package:monekin/core/utils/scroll_behavior_override.dart';
+import 'package:monekin/core/utils/unique_app_widgets_keys.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
 
 void main() async {
@@ -45,14 +53,9 @@ void main() async {
         },
   );
 
+  debugPaintSizeEnabled = false;
   runApp(InitializeApp(key: appStateKey));
 }
-
-final GlobalKey<TabsPageState> tabsPageKey = GlobalKey();
-final GlobalKey<NavigationSidebarState> navigationSidebarKey = GlobalKey();
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<ScaffoldMessengerState> snackbarKey =
-    GlobalKey<ScaffoldMessengerState>();
 
 // ignore: library_private_types_in_public_api
 GlobalKey<_InitializeAppState> appStateKey = GlobalKey();
@@ -87,7 +90,6 @@ class MonekinAppEntryPoint extends StatelessWidget {
 
     return TranslationProvider(
       child: MaterialAppContainer(
-        introSeen: appStateData[AppDataKey.introSeen] == '1',
         amoledMode: appStateSettings[SettingKey.amoledMode]! == '1',
         accentColor: appStateSettings[SettingKey.accentColor]!,
         themeMode: getThemeFromString(appStateSettings[SettingKey.themeMode]!),
@@ -156,14 +158,11 @@ class MaterialAppContainer extends StatelessWidget {
     required this.themeMode,
     required this.accentColor,
     required this.amoledMode,
-    required this.introSeen,
   });
 
   final ThemeMode themeMode;
   final String accentColor;
   final bool amoledMode;
-
-  final bool introSeen;
 
   SystemUiOverlayStyle getSystemUiOverlayStyle(Brightness brightness) {
     if (brightness == Brightness.light) {
@@ -192,11 +191,15 @@ class MaterialAppContainer extends StatelessWidget {
     // Get the language of the Intl in each rebuild of the TranslationProvider:
     Intl.defaultLocale = LocaleSettings.currentLocale.languageTag;
 
+    final introSeen = appStateData[AppDataKey.introSeen] == '1';
     return DynamicColorBuilder(
       builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
         return MaterialApp(
           title: 'Monekin',
           debugShowCheckedModeBanner: false,
+          color: Theme.of(context).colorScheme.primary,
+          shortcuts: appShortcuts,
+          actions: keyboardIntents,
           locale: TranslationProvider.of(context).flutterLocale,
           scrollBehavior: ScrollBehaviorOverride(),
           supportedLocales: AppLocaleUtils.supportedLocales,
@@ -219,42 +222,89 @@ class MaterialAppContainer extends StatelessWidget {
             accentColor: accentColor,
           ),
           themeMode: themeMode,
-          navigatorKey: navigatorKey,
+          navigatorKey: rootNavigatorKey,
           navigatorObservers: [MainLayoutNavObserver()],
           builder: (context, child) {
             SystemChrome.setSystemUIOverlayStyle(
               getSystemUiOverlayStyle(Theme.of(context).brightness),
             );
 
-            return Overlay(
-              initialEntries: [
-                OverlayEntry(
-                  builder: (context) => Stack(
+            child ??= const SizedBox.shrink();
+
+            return child;
+          },
+          home: HandleWillPopScope(
+            child: Builder(
+              builder: (context) {
+                final mainSide = Stack(
+                  children: [
+                    InitialPageRouteNavigator(introSeen: introSeen),
+                    GlobalSnackbar(key: globalSnackbarKey),
+                  ],
+                );
+
+                final mainContent = ColoredBox(
+                  color: getWindowBackgroundColor(context),
+                  child: Row(
                     children: [
-                      Row(
-                        children: [
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 1500),
-                            curve: Curves.easeInOutCubicEmphasized,
-                            width: introSeen
-                                ? getNavigationSidebarWidth(context)
-                                : 0,
-                            color: Theme.of(context).canvasColor,
-                          ),
-                          Expanded(child: child ?? const SizedBox.shrink()),
-                        ],
-                      ),
                       if (introSeen)
-                        NavigationSidebar(key: navigationSidebarKey),
+                        AppNavigationSidebar(key: navigationSidebarKey),
+                      Expanded(
+                        child: Builder(
+                          builder: (context) {
+                            if (AppUtils.isDesktop &&
+                                !AppUtils.isMobileLayout(context)) {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(12),
+                                ),
+                                child: mainSide,
+                              );
+                            }
+
+                            return mainSide;
+                          },
+                        ),
+                      ),
                     ],
                   ),
-                ),
-              ],
-            );
-          },
-          home: introSeen ? TabsPage(key: tabsPageKey) : const IntroPage(),
+                );
+
+                if (!AppUtils.isDesktop) {
+                  return mainContent;
+                }
+
+                return Column(
+                  children: [
+                    WindowBar(key: windowBarKey),
+                    Expanded(child: mainContent),
+                  ],
+                );
+              },
+            ),
+          ),
         );
       },
+    );
+  }
+}
+
+// Handles onboarding too!
+class InitialPageRouteNavigator extends StatelessWidget {
+  const InitialPageRouteNavigator({super.key, required this.introSeen});
+
+  final bool introSeen;
+
+  @override
+  Widget build(BuildContext context) {
+    return HeroControllerScope(
+      controller: MaterialApp.createMaterialHeroController(),
+      child: Navigator(
+        key: navigatorKey,
+        onGenerateRoute: (settings) => RouteUtils.getPageRouteBuilder(
+          introSeen ? PageSwitcher(key: tabsPageKey) : const IntroPage(),
+        ),
+      ),
     );
   }
 }

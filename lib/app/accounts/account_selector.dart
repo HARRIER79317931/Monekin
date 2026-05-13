@@ -2,14 +2,15 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:monekin/app/categories/selectors/draggableScrollableKeyboardAware.mixin.dart';
-import 'package:monekin/core/database/app_db.dart';
 import 'package:monekin/core/database/services/account/account_service.dart';
+import 'package:monekin/core/database/utils/drift_utils.dart';
 import 'package:monekin/core/models/account/account.dart';
 import 'package:monekin/core/presentation/app_colors.dart';
 import 'package:monekin/core/presentation/widgets/bottomSheetFooter.dart';
 import 'package:monekin/core/presentation/widgets/count_indicator.dart';
 import 'package:monekin/core/presentation/widgets/modal_container.dart';
 import 'package:monekin/core/presentation/widgets/scrollable_with_bottom_gradient.dart';
+import 'package:monekin/core/routes/route_utils.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
 
 Future<List<Account>?> showAccountSelectorBottomSheet(
@@ -83,7 +84,7 @@ class _AccountSelectorModalState extends State<AccountSelectorModal>
                 },
           body: StreamBuilder(
             stream: AccountService.instance.getAccounts(
-              predicate: (acc, curr) => AppDB.instance.buildExpr([
+              predicate: (acc, curr) => buildDriftExpr([
                 acc.name.contains(searchValue),
                 if (widget.filterSavingAccounts)
                   acc.type.equalsValue(AccountType.saving).not(),
@@ -119,7 +120,7 @@ class _AccountSelectorModalState extends State<AccountSelectorModal>
               ? null
               : BottomSheetFooter(
                   onSaved: selectedAccounts.isNotEmpty
-                      ? () => Navigator.of(context).pop(selectedAccounts)
+                      ? () => RouteUtils.popRoute(selectedAccounts)
                       : null,
                 ),
         );
@@ -210,7 +211,7 @@ class _AccountSelectorModalState extends State<AccountSelectorModal>
                     setState(() {
                       selectedAccounts = [account];
 
-                      Navigator.of(context).pop(selectedAccounts);
+                      RouteUtils.popRoute(selectedAccounts);
                     });
                   },
                 );

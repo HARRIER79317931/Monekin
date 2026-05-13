@@ -5,6 +5,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:monekin/app/accounts/account_form.dart';
 import 'package:monekin/app/accounts/details/account_details.dart';
+import 'package:monekin/app/layout/page_framework.dart';
 import 'package:monekin/core/database/services/account/account_service.dart';
 import 'package:monekin/core/extensions/string.extension.dart';
 import 'package:monekin/core/presentation/animations/animated_floating_button.dart';
@@ -28,7 +29,6 @@ class _AllAccountsPageState extends State<AllAccountsPage> {
   String searchQuery = '';
 
   final ScrollController _scrollController = ScrollController();
-  bool isFloatingButtonExtended = true;
 
   void _onSearchChanged(String query) {
     setState(() {
@@ -37,25 +37,12 @@ class _AllAccountsPageState extends State<AllAccountsPage> {
   }
 
   void _onAddPressed() {
-    RouteUtils.pushRoute(context, const AccountFormPage());
+    RouteUtils.pushRoute(const AccountFormPage());
   }
 
   @override
   void initState() {
     super.initState();
-
-    _scrollController.addListener(() {
-      bool shouldExtendButton = AnimatedFloatingButton.shouldExtendButton(
-        context,
-        _scrollController,
-      );
-
-      if (isFloatingButtonExtended != shouldExtendButton) {
-        setState(() {
-          isFloatingButtonExtended = shouldExtendButton;
-        });
-      }
-    });
   }
 
   @override
@@ -67,17 +54,19 @@ class _AllAccountsPageState extends State<AllAccountsPage> {
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
+    final floatingActionButton =
+        BreakPoint.of(context).isLargerThan(BreakpointID.sm)
+        ? null
+        : AnimatedFloatingButtonBasedOnScroll(
+            onPressed: _onAddPressed,
+            icon: const Icon(Icons.add_rounded),
+            scrollController: _scrollController,
+            text: t.account.form.create,
+          );
 
-    return Scaffold(
-      appBar: AppBar(title: Text(t.home.my_accounts)),
-      floatingActionButton: BreakPoint.of(context).isLargerThan(BreakpointID.sm)
-          ? null
-          : AnimatedFloatingButton(
-              onPressed: _onAddPressed,
-              icon: const Icon(Icons.add_rounded),
-              isExtended: isFloatingButtonExtended,
-              text: t.categories.create,
-            ),
+    return PageFramework(
+      title: t.home.my_accounts,
+      floatingActionButton: floatingActionButton,
       body: ColumnWithReorderableListAndSearch(
         onSearchChanged: _onSearchChanged,
         onAddPressed: _onAddPressed,
@@ -96,6 +85,7 @@ class _AllAccountsPageState extends State<AllAccountsPage> {
             if (accounts.isEmpty) {
               return NoResults(
                 title: t.general.empty_warn,
+                noSearchResultsVariation: searchQuery.isNotEmpty,
                 description: searchQuery.isNotEmpty
                     ? t.general.search_no_results
                     : t.account.no_accounts,
@@ -117,7 +107,6 @@ class _AllAccountsPageState extends State<AllAccountsPage> {
                 return ReorderableListTileStyling(
                   child: ListTile(
                     onTap: () => RouteUtils.pushRoute(
-                      context,
                       AccountDetailsPage(
                         account: account,
                         accountIconHeroTag:

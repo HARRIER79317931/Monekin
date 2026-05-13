@@ -1,6 +1,7 @@
 ---- * WHEN CONVERTING TO .sql:
 ---- * --- Remove the 'AS ....' after a table creation  
 ---- * --- Convert DATETIME to TEXT, BOOL to INT and ENUMS to TEXT
+---- * --- Remove the MAPPED BY to only leave the CHECK constraints
 ---- * --- Remove the imports 
 
 import './../../../models/transaction/transaction.dart';
@@ -9,8 +10,15 @@ import './../../../models/transaction/transaction_type.enum.dart';
 import './../../../models/date-utils/periodicity.dart';
 import './../../../models/category/category.dart';
 import './../../../models/account/account.dart';
+import './../../../models/goal/goal.dart';
+import './../../../models/goal/goal_type.enum.dart';
+import './../../../models/debt/debt_direction.enum.dart';
 import './../../services/user-setting/user_setting_service.dart';
 import './../../services/app-data/app_data_service.dart';
+import './../../utils/database_enum.dart';
+import './../../utils/converters/list_converters.dart';
+import './../../utils/converters/custom_enum_converter.dart';
+import './../../utils/converters/date_converters.dart';
 
 CREATE TABLE IF NOT EXISTS currencies (
     -- ISO 4217 currency code. Identifies a currency uniquely ([see more](https://en.wikipedia.org/wiki/ISO_4217#List_of_ISO_4217_currency_codes))
@@ -20,12 +28,24 @@ CREATE TABLE IF NOT EXISTS currencies (
     symbol TEXT NOT NULL,
 
     -- Name of the currency (in the user language at database creation)
-    name TEXT NOT NULL
+    name TEXT NOT NULL,
+
+    -- Number of decimal places used by this currency
+    decimalPlaces INTEGER NOT NULL,
+
+    -- Whether this currency is one of the default currencies of the app
+    isDefault BOOLEAN NOT NULL,
+
+    -- Type of currency:
+    -- 0 = fiat
+    -- 1 = crypto
+    -- 2 = other
+    type INTEGER NOT NULL
 ) AS CurrencyInDB;
 
 CREATE TABLE IF NOT EXISTS exchangeRates (
     id TEXT NOT NULL PRIMARY KEY,
-    date DATETIME NOT NULL,
+    date TEXT NOT NULL MAPPED BY `const DateTypeConverter()`,
     currencyCode TEXT NOT NULL REFERENCES currencies(code) ON DELETE CASCADE ON UPDATE CASCADE,
     exchangeRate REAL NOT NULL
 ) AS ExchangeRateInDB;
@@ -43,7 +63,9 @@ CREATE TABLE IF NOT EXISTS accounts (
     date DATETIME NOT NULL,
 
     description TEXT,
-    type ENUMNAME(AccountType) NOT NULL CHECK(type IN ('normal', 'saving')),
+
+    -- The type of the account. It can be 'normal', 'investment'...
+    type ENUMNAME(AccountType) NOT NULL CHECK(type IN ('normal', 'saving', 'investment')),
     
     iconId TEXT NOT NULL,
 
@@ -107,12 +129,20 @@ CREATE TABLE IF NOT EXISTS transactions (
   notes TEXT,
 
   -- Whether the transacton is an income, an expense or a transfer
-  type ENUMNAME(TransactionType) NOT NULL CHECK(type IN ('E', 'I', 'T')),
+  type TEXT NOT NULL CHECK(type IN ('E', 'I', 'T')) MAPPED BY `CustomEnumConverter(TransactionType.values)`,
   
-  status ENUMNAME(TransactionStatus) CHECK(status IN ('voided', 'pending', 'reconciled', 'unreconciled')),
+  status TEXT CHECK(status IN ('V', 'P', 'R', 'U')) MAPPED BY `CustomEnumConverter(TransactionStatus.values)`,
   categoryID TEXT REFERENCES categories(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  valueInDestiny REAL,
+
+  -- If this transaction is related to a debt, the ID of the debt. This field is independent of the account and category fields, so it can be used in transactions of different accounts and categories as long as they are related to the same debt. It will be null for transactions that are not related to any debt.
+  debtId TEXT REFERENCES debts(id) ON DELETE SET NULL ON UPDATE CASCADE,
+
+  -- In case this transaction is a transfer, the account that receives the transfer. Only one of categoryID or receivingAccountID can be defined, never both or none
   receivingAccountID TEXT REFERENCES accounts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+
+  -- In case this transaction is a transfer, the value that will be added to the receiving account. This value can be different from the `value` field if the transfer involves a currency exchange. It will always be in the currency of the receiving account.
+  valueInDestiny REAL,
+
   isHidden BOOLEAN NOT NULL DEFAULT 0,
 
   ----------- Location data --------------
@@ -178,6 +208,41 @@ CREATE TABLE IF NOT EXISTS transactionTags (
   tagID TEXT NOT NULL REFERENCES tags(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS transactionFilterSets (
+    id TEXT NOT NULL PRIMARY KEY,
+
+    -- JSON list of account IDs. Will be null if this filter is not in use, or if all accounts are selected
+    accountsIDs TEXT MAPPED BY `const StringListTypeConverter()`, 
+    
+    -- JSON list of category IDs. Will be null if this filter is not in use, or if all categories are selected
+    categoriesIds TEXT MAPPED BY `const StringListTypeConverter()`,
+
+    -- JSON list of transaction statuses
+    status TEXT MAPPED BY `OptEnumListTypeConverter(TransactionStatus.values)`, 
+
+    minDate DATETIME,
+    maxDate DATETIME,
+    searchValue TEXT,
+
+    -- JSON list of transaction types
+    transactionTypes TEXT MAPPED BY `EnumListTypeConverter(TransactionType.values)`, 
+
+    minValue REAL,
+    maxValue REAL,
+
+    -- JSON list of tag IDs
+    tagsIDs TEXT MAPPED BY `const OptStringListTypeConverter()`
+) AS TransactionFilterSetInDB;
+
+CREATE TABLE IF NOT EXISTS savedFilters (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    
+    -- The display order when listing the saved filters
+    displayOrder INTEGER NOT NULL,
+
+    filterID TEXT NOT NULL REFERENCES transactionFilterSets(id) ON DELETE CASCADE ON UPDATE CASCADE
+) AS SavedFilterInDB;
 
 CREATE TABLE IF NOT EXISTS budgets (
   id TEXT NOT NULL PRIMARY KEY,
@@ -197,18 +262,95 @@ CREATE TABLE IF NOT EXISTS budgets (
   -- Custom end date. Only if the budget has no periodicity
   endDate DATETIME,
 
+  filterID TEXT NOT NULL REFERENCES transactionFilterSets(id) ON DELETE CASCADE ON UPDATE CASCADE,
+
   CHECK ((startDate IS NULL AND endDate IS NULL) != (intervalPeriod IS NULL))
 ) AS BudgetInDB;
 
-CREATE TABLE IF NOT EXISTS budgetCategory (
-  budgetID TEXT NOT NULL REFERENCES budgets(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  categoryID TEXT NOT NULL REFERENCES categories(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
+CREATE TABLE IF NOT EXISTS goals (
+  id TEXT NOT NULL PRIMARY KEY,
 
-CREATE TABLE IF NOT EXISTS budgetAccount (
-  budgetID TEXT NOT NULL REFERENCES budgets(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  accountID TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
+  -- Title of the goal and its identificator. For instance, this name is unique (the user can not have another goal with the same name) 
+  name TEXT NOT NULL UNIQUE,
+
+  --  Target amount of the goal. It will always be in the user's preferred currency
+  amount REAL NOT NULL,
+
+  initialAmount REAL NOT NULL DEFAULT 0,
+
+  -- Custom start date
+  startDate DATETIME NOT NULL,
+
+  -- Custom end date
+  endDate DATETIME,
+
+  type INTEGER NOT NULL CHECK(type IN (0, 1)) MAPPED BY `CustomEnumConverter(GoalType.values)`,
+
+  filterID TEXT NOT NULL REFERENCES transactionFilterSets(id) ON DELETE CASCADE ON UPDATE CASCADE
+) AS GoalInDB;
+
+
+CREATE TABLE IF NOT EXISTS debts (
+    id TEXT NOT NULL PRIMARY KEY,
+    
+    -- Debt name (unique among user debts)
+    name TEXT UNIQUE NOT NULL,
+
+    type INTEGER NOT NULL CHECK(type IN (0, 1)) MAPPED BY `CustomEnumConverter(DebtDirection.values)`,
+
+    iconId TEXT NOT NULL,
+
+    -- ID of the currency used by this debt. The transactions related to this debt can be in different accounts and therefore in different currencies, but they will all be converted to this currency when calculating the total amount of the debt
+    currencyId TEXT NOT NULL REFERENCES currencies(code) ON DELETE CASCADE ON UPDATE CASCADE,
+    
+    -- Initial amount of the debt, in the currency of the debt. This amount will not be used to calculate user balances
+    initialAmount REAL NOT NULL DEFAULT 0,
+
+    -- Date on which the debt was created or the money was lent/borrowed. Before this date, no transactions can exists on it.
+    startDate DATETIME NOT NULL,
+
+    -- The closing date of the debt. After this date, no transactions can exists on it.
+    endDate DATETIME
+) AS DebtInDB;
+
+
+CREATE TABLE IF NOT EXISTS assets (
+    id TEXT NOT NULL PRIMARY KEY,
+
+    -- Asset name (unique among user assets)
+    name TEXT UNIQUE NOT NULL,
+
+    -- Optional description
+    description TEXT,
+
+    -- ID of the reference currency for this asset
+    currencyId TEXT NOT NULL REFERENCES currencies(code) ON DELETE CASCADE ON UPDATE CASCADE,
+
+    -- Initial/purchase value of the asset
+    initialValue REAL NOT NULL DEFAULT 0,
+
+    -- Date this asset was acquired or created
+    creationDate DATETIME NOT NULL
+) AS AssetInDB;
+
+CREATE TABLE IF NOT EXISTS valuations (
+    id TEXT NOT NULL PRIMARY KEY,
+
+    -- FK to the account this valuation belongs to (mutually exclusive with assetId)
+    accountId TEXT REFERENCES accounts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+
+    -- FK to the asset this valuation belongs to (mutually exclusive with accountId)
+    assetId TEXT REFERENCES assets(id) ON DELETE CASCADE ON UPDATE CASCADE,
+
+    -- Date of this valuation snapshot
+    date TEXT NOT NULL MAPPED BY `const DateTypeConverter()`,
+
+    -- Value at the time of this snapshot, in the currency of the account or asset
+    value REAL NOT NULL,
+
+    -- Exactly one of accountId or assetId must be set
+    CHECK ((accountId IS NULL) != (assetId IS NULL))
+) AS ValuationInDB;
 
 CREATE TABLE IF NOT EXISTS userSettings (
   settingKey ENUMNAME(SettingKey) NOT NULL PRIMARY KEY,

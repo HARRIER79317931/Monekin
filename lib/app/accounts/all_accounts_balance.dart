@@ -9,13 +9,13 @@ import 'package:monekin/core/database/services/account/account_service.dart';
 import 'package:monekin/core/models/account/account.dart';
 import 'package:monekin/core/presentation/widgets/animated_progress_bar.dart';
 import 'package:monekin/core/presentation/widgets/card_with_header.dart';
-import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filters.dart';
+import 'package:monekin/core/presentation/widgets/transaction_filter/transaction_filter_set.dart';
 import 'package:monekin/core/routes/route_utils.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../core/database/services/currency/currency_service.dart';
 import '../../core/presentation/widgets/number_ui_formatters/currency_displayer.dart';
-import '../../core/presentation/widgets/skeleton.dart';
 
 class AccountWithMoney {
   final double money;
@@ -35,12 +35,12 @@ class AllAccountBalancePage extends StatefulWidget {
   const AllAccountBalancePage({
     super.key,
     required this.date,
-    this.filters = const TransactionFilters(),
+    this.filters = const TransactionFilterSet(),
   });
 
   final DateTime date;
 
-  final TransactionFilters filters;
+  final TransactionFilterSet filters;
 
   @override
   State<AllAccountBalancePage> createState() => _AllAccountBalancePageState();
@@ -49,7 +49,7 @@ class AllAccountBalancePage extends StatefulWidget {
 class _AllAccountBalancePageState extends State<AllAccountBalancePage> {
   Future<List<AccountWithMoney>> getAccountsWithMoney(
     DateTime date, {
-    TransactionFilters filters = const TransactionFilters(),
+    TransactionFilterSet filters = const TransactionFilterSet(),
   }) async {
     final accounts = (await filters.accounts().first).where(
       (element) =>
@@ -126,6 +126,7 @@ class _AllAccountBalancePageState extends State<AllAccountBalancePage> {
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 16,
           children: [
             CardWithHeader(
               title: t.stats.balance_by_account,
@@ -145,7 +146,6 @@ class _AllAccountBalancePageState extends State<AllAccountBalancePage> {
                             context,
                           ),
                           onTap: () => RouteUtils.pushRoute(
-                            context,
                             AccountFormPage(account: accountWithMoney.account),
                           ),
                           title: Column(
@@ -185,7 +185,6 @@ class _AllAccountBalancePageState extends State<AllAccountBalancePage> {
                       shrinkWrap: true,
                     ),
             ),
-            const SizedBox(height: 16),
             CardWithHeader(
               title: t.stats.balance_by_currency,
               subtitle: t.stats.balance_by_currency_subtitle,
@@ -211,18 +210,17 @@ class _AllAccountBalancePageState extends State<AllAccountBalancePage> {
                             currencyWithMoney.currency.code,
                           ),
                           builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Skeleton(width: 42, height: 42);
-                            }
+                            final currency = snapshot.data;
 
-                            final currency = snapshot.data!;
-
-                            return Container(
-                              clipBehavior: Clip.hardEdge,
-                              decoration: BoxDecoration(
+                            return Skeletonizer(
+                              enabled: currency == null,
+                              child: ClipRRect(
+                                clipBehavior: Clip.hardEdge,
                                 borderRadius: BorderRadius.circular(100),
+                                child: currency == null
+                                    ? Bone.square(size: 32)
+                                    : currency.displayFlagIcon(size: 32),
                               ),
-                              child: currency.displayFlagIcon(size: 32),
                             );
                           },
                         ),
@@ -238,20 +236,16 @@ class _AllAccountBalancePageState extends State<AllAccountBalancePage> {
                                         currencyWithMoney.currency.code,
                                       ),
                                   builder: (context, snapshot) {
-                                    if (!snapshot.hasData) {
-                                      return const Skeleton(
-                                        width: 42,
-                                        height: 42,
-                                      );
-                                    }
-
-                                    final currency = snapshot.data!;
+                                    final currency = snapshot.data;
 
                                     return Flexible(
-                                      child: Text(
-                                        currency.name,
-                                        softWrap: false,
-                                        overflow: TextOverflow.fade,
+                                      child: Skeletonizer(
+                                        enabled: currency == null,
+                                        child: Text(
+                                          currency?.name ?? BoneMock.name,
+                                          softWrap: false,
+                                          overflow: TextOverflow.fade,
+                                        ),
                                       ),
                                     );
                                   },

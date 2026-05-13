@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:monekin/core/database/services/user-setting/enum/app-fonts.enum.dart';
 import 'package:monekin/core/database/services/user-setting/user_setting_service.dart';
 import 'package:monekin/core/extensions/color.extensions.dart';
+import 'package:monekin/core/presentation/styles/borders.dart';
 
 import 'app_colors.dart';
 
@@ -12,6 +15,10 @@ bool isAppInDarkBrightness(BuildContext context) =>
     Theme.of(context).brightness == Brightness.dark;
 bool isAppInLightBrightness(BuildContext context) =>
     !isAppInDarkBrightness(context);
+
+double getCardBorderRadius() {
+  return Platform.isIOS || Platform.isMacOS ? 16.0 : 12.0;
+}
 
 extension TextThemeExtension on TextTheme {
   /// Returns a new [TextTheme] where selected body and label text styles have their
@@ -55,13 +62,16 @@ ThemeData getThemeData(
     lightColorScheme = ColorScheme.fromSeed(
       seedColor: lightDynamic.primary,
       brightness: Brightness.light,
+      surface: lightDynamic.primary.lightenPastel(amount: 0.91),
     ).harmonized();
 
     // Repeat for the dark color scheme.
     darkColorScheme = ColorScheme.fromSeed(
       seedColor: darkDynamic.primary,
       brightness: Brightness.dark,
-      surface: amoledMode ? Colors.black : null,
+      surface: amoledMode
+          ? Colors.black
+          : darkDynamic.primary.darkenPastel(amount: 0.92),
     );
 
     // TODO: We can directly use the dynamic palette here, in the following way
@@ -81,11 +91,19 @@ ThemeData getThemeData(
   } else {
     // Otherwise, use fallback schemes:
 
+    final accentColorValue = accentColor == 'auto'
+        ? brandBlue
+        : ColorHex.get(accentColor);
+
     /// Fallback scheme for a not-dynamic mode in dark or light mode:
     ColorScheme fallbackScheme = ColorScheme.fromSeed(
-      seedColor: accentColor == 'auto' ? brandBlue : ColorHex.get(accentColor),
+      seedColor: accentColorValue,
       brightness: isDark ? Brightness.dark : Brightness.light,
-      surface: isDark && amoledMode ? Colors.black : null,
+      surface: isDark
+          ? (amoledMode
+                ? Colors.black
+                : accentColorValue.darkenPastel(amount: 0.92))
+          : accentColorValue.lightenPastel(amount: 0.91),
     );
 
     lightColorScheme = fallbackScheme;
@@ -105,6 +123,7 @@ ThemeData getThemeData(
     brightness: isDark ? Brightness.dark : Brightness.light,
     useMaterial3: true,
     fontFamily: fontFamily,
+    //materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     extensions: [customAppColors],
   );
 
@@ -112,32 +131,29 @@ ThemeData getThemeData(
     customAppColors.textBody,
   );
 
-  final listTileSmallText = textTheme.bodyMedium?.copyWith(
-    fontSize: 14,
-    wordSpacing: 0,
-    decorationThickness: 1,
-    fontWeight: FontWeight.bold,
-    fontFamily: fontFamily,
-  );
+  final cardColor = isDark
+      ? theme.colorScheme.primary.darkenPastel(amount: .85)
+      : theme.colorScheme.primary.lightenPastel(amount: .96);
 
   return theme.copyWith(
     textTheme: textTheme,
     scaffoldBackgroundColor: theme.colorScheme.surface,
     dividerTheme: const DividerThemeData(space: 0),
-    cardColor: theme.colorScheme.surfaceContainer,
-    cardTheme: CardThemeData(color: theme.colorScheme.surfaceContainer),
+    cardColor: cardColor,
+    cardTheme: CardThemeData(
+      color: cardColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(getCardBorderRadius()),
+      ),
+    ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: theme.colorScheme.surfaceContainerHighest,
-      isDense: true,
+      isDense: false,
+      contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      floatingLabelBehavior: FloatingLabelBehavior.auto,
       hintStyle: TextStyle(color: customAppColors.textHint),
-      floatingLabelStyle: TextStyle(
-        backgroundColor: theme.colorScheme.surface.withOpacity(0.5),
-      ),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10.0),
-        borderSide: const BorderSide(width: 0, style: BorderStyle.none),
-      ),
+      border: appInputBorder,
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: theme.colorScheme.primary,
@@ -150,12 +166,6 @@ ThemeData getThemeData(
       dragHandleColor: Colors.grey[300],
       clipBehavior: Clip.hardEdge,
     ),
-    listTileTheme: theme.listTileTheme.copyWith(
-      minVerticalPadding: 8,
-      subtitleTextStyle: listTileSmallText?.copyWith(
-        fontWeight: FontWeight.w300,
-      ),
-      leadingAndTrailingTextStyle: listTileSmallText,
-    ),
+    listTileTheme: ListTileThemeData(minVerticalPadding: 12),
   );
 }

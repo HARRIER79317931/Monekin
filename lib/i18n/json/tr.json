@@ -34,7 +34,6 @@
     "apply": "Uygula",
     "discard": "Vazgeç",
     "refresh": "Yenile",
-    "details": "Detaylar",
     "share": "Paylaş"
   },
   "GENERAL": {
@@ -42,6 +41,7 @@
     "understood": "Anlaşıldı",
     "unspecified": "Belirtilmemiş",
     "quick_actions": "Hızlı İşlemler",
+    "details": "Detaylar",
     "balance": "Bakiye",
     "account": "Hesap",
     "accounts": "Hesaplar",
@@ -56,6 +56,11 @@
     "show-more-fields": "Daha fazla alan göster",
     "show-less-fields": "Daha az alan göster",
     "tap-to-search": "Aramak için dokunun",
+    "delete_success": "Öğe başarıyla silindi",
+    "LEAVE-WITHOUT-SAVING": {
+      "title": "Kaydetmeden ayrılmak mı istiyorsunuz?",
+      "message": "Kaydedilmemiş değişiklikleriniz var, bunları kaydetmeden ayrılmak istediğinizden emin misiniz?"
+    },
     "CLIPBOARD": {
       "success": "{{x}} panoya kopyalandı",
       "error": "Kopyalama hatası"
@@ -256,6 +261,10 @@
     "balance-by-currency-subtitle": "Yabancı para biriminde ne kadar param var?",
     "balance-evolution": "Bakiye trendi",
     "balance-evolution-subtitle": "Eskisinden daha çok param var mı?",
+    "net-worth": "Net worth",
+    "net-worth-subtitle": "The difference between what you own and what you owe.",
+    "net-worth-composition": "Net worth composition",
+    "net-worth-composition-subtitle": "Distribution between accounts, investments and debts.",
     "compared-to-previous-period": "Önceki döneme göre",
     "cash-flow": "Nakit akışı",
     "cash-flow-subtitle": "Kazandığımdan daha az mı harcıyorum?",
@@ -311,6 +320,7 @@
     "delete.multiple.warning-message": "Bu eylem geri alınamaz ve {{ x }} işlem silinecektir. Hesaplarınızın mevcut bakiyesi ve tüm istatistikleriniz yeniden hesaplanacaktır",
     "delete.multiple.success": "{{x}} işlem başarıyla silindi",
     "details": "Hareket detayları",
+    "select": "Bir işlem seçin",
     "NEXT-PAYMENTS": {
       "accept": "Kabul et",
       "skip": "Atla",
@@ -341,7 +351,8 @@
       "BULK_EDIT": {
         "dates": "Tarihleri düzenle",
         "categories": "Kategorileri düzenle",
-        "status": "Durumları düzenle"
+        "status": "Durumları düzenle",
+        "tags": "Etiketleri düzenle"
       }
     },
     "FILTERS": {
@@ -351,7 +362,22 @@
       "from_value_def": "{{ x }} dan",
       "to_value_def": "{{ x }} a kadar",
       "from_date_def": "{{ date }} tarihinden",
-      "to_date_def": "{{ date }} tarihine kadar"
+      "to_date_def": "{{ date }} tarihine kadar",
+      "reset": "Filtreleri sıfırla",
+      "saved": {
+        "title": "Kaydedilen filtreler",
+        "new_title": "Yeni Filtre",
+        "edit_title": "Filtreyi Düzenle",
+        "name_label": "Filtre Adı",
+        "name_hint": "Özel filtrem",
+        "save_dialog_title": "Filtreyi Kaydet",
+        "save_tooltip": "Mevcut filtreyi kaydet",
+        "load_tooltip": "Kaydedilen filtreyi yükle",
+        "empty_title": "Kaydedilen filtre bulunamadı",
+        "empty_description": "Filtreleri daha sonra hızlıca erişmek için buraya kaydedin.",
+        "save_success": "Filtre başarıyla kaydedildi",
+        "delete_success": "Filtre başarıyla silindi"
+      }
     },
     "FORM": {
       "VALIDATORS": {
@@ -459,6 +485,7 @@
     "n_transactions": "İşlem sayısı",
     "add_money": "Para ekle",
     "withdraw_money": "Para çek",
+    "correct_balance": "Bakiye düzelt",
     "no-accounts": "Burada görüntülenecek işlem bulunamadı. Alttaki '+' düğmesine tıklayarak bir işlem ekleyin",
     "TYPES": {
       "title": "Hesap türü",
@@ -466,7 +493,9 @@
       "normal": "Normal hesap",
       "normal.descr": "Günlük mali durumunuzu kaydetmek için kullanışlıdır. En yaygın hesaptır, giderler, gelirler eklemenize olanak tanır...",
       "saving": "Tasarruf hesabı",
-      "saving.descr": "Yalnızca diğer hesaplardan para ekleyebilecek ve çekebileceksiniz. Para biriktirmeye başlamak için mükemmel"
+      "saving.descr": "Yalnızca diğer hesaplardan para ekleyebilecek ve çekebileceksiniz. Para biriktirmeye başlamak için mükemmel",
+      "investment": "Yatırım hesabı",
+      "investment.descr": "Bir aracı kurum, kripto borsa veya portföy hesabı. Yatırdığınız sermayeyi takip edin ve değerini değerlemeler aracılığıyla manuel olarak güncelleyin"
     },
     "FORM": {
       "name": "Hesap adı",
@@ -481,7 +510,32 @@
       "already-exists": "Aynı ada sahip başka bir hesap zaten var, lütfen başka bir tane yazın",
       "tr-before-opening-date": "Bu hesapta açılış tarihinden önce bir tarihe sahip işlemler var",
       "iban": "IBAN",
-      "swift": "SWIFT"
+      "swift": "SWIFT",
+      "include-in-net-worth": "Net değere dahil et",
+      "include-in-net-worth.descr": "Bu hesabı toplam net değer hesaplamasına dahil et",
+      "correct_balance_description": "Bakiyeyi düzeltmek, hesabın başlangıç değerini değiştirir. Bu düzeltme istatistiklere yansımayacaktır.",
+      "valuation_before_creation_date": "Bu hesapta oluşturulma tarihinden önceki bir tarihe sahip değerlemeler mevcut"
+    },
+    "INVESTMENT": {
+      "details-header": "Yatırım",
+      "correct_balance_title": "Yatırılan sermayeyi düzelt",
+      "correct_balance_description": "Bu hesap, portföy değerini manuel değerlemelerle takip eder. Bu işlem yalnızca yatırılan sermayeyi (başlangıç değeri) günceller ve kaydedilmiş değerlemeleri veya yatırım istatistiklerini değiştirmez.",
+      "invested-capital": "Yatırılan sermaye",
+      "portfolio-value": "Portföy değeri",
+      "profit": "Kâr",
+      "last-valuation": "Son değerleme",
+      "no-valuations": "Henüz değerleme kaydedilmedi",
+      "update-value": "Değeri güncelle",
+      "update-value.descr": "Mevcut portföy değerini kaydet",
+      "update-value.success": "Değerleme başarıyla kaydedildi",
+      "history": "Değerleme geçmişi",
+      "history-empty": "Bu hesap için henüz değerleme kaydedilmedi",
+      "add-valuation": "Değerleme ekle",
+      "edit-valuation": "Değerlemeyi düzenle",
+      "edit-valuation.success": "Değerleme başarıyla düzenlendi",
+      "delete-valuation.success": "Değerleme başarıyla silindi",
+      "delete-all-valuations": "Tüm değerlemeleri sil",
+      "delete-all-valuations.success": "Tüm değerlemeler başarıyla silindi"
     },
     "DELETE": {
       "warning-header": "Hesap silinsin mi?",
@@ -506,23 +560,50 @@
   "CURRENCIES": {
     "currency-converter": "Para birimi dönüştürücü",
     "currency": "Para birimi",
+    "currency-settings": "Para birimi ayarları",
     "currency-manager": "Para birimi yöneticisi",
     "currency-manager.descr": "Para biriminizi ve diğerleriyle döviz kurlarını yapılandırın",
     "preferred-currency": "Tercih edilen/temel para birimi",
+    "tap-to-change-preferred-currency": "Değiştirmek için dokunun",
     "change-preferred-currency-title": "Tercih edilen para birimini değiştir",
     "change-preferred-currency-msg": "Tüm istatistikler ve bütçeler bundan sonra bu para biriminde görüntülenecektir. Hesaplar ve işlemler sahip oldukları para birimini koruyacaktır. Bu eylemi gerçekleştirirseniz, kaydedilen tüm döviz kurları silinecektir. Devam etmek istiyor musunuz?",
-    "FORM": {
+    "EXCHANGE-RATE-FORM": {
       "equal-to-preferred-warn": "Para birimi, kullanıcı para birimine eşit olamaz",
+      "override-existing-warn": "Bu tarihte bu para birimi için bir döviz kuru zaten mevcut. Devam ederseniz öncekinin üzerine yazılacak",
       "specify-a-currency": "Lütfen bir para birimi belirtin",
       "add": "Döviz kuru ekle",
       "add-success": "Döviz kuru başarıyla eklendi",
       "edit": "Döviz kurunu düzenle",
-      "edit-success": "Döviz kuru başarıyla düzenlendi"
+      "edit-success": "Döviz kuru başarıyla düzenlendi",
+      "remove-all": "Tüm döviz kurlarını sil",
+      "remove-all-warning": "Bu işlem geri alınamaz ve bu para biriminin tüm döviz kurlarını silecektir"
+    },
+    "TYPES": {
+      "display": "Para birimi türü",
+      "fiat": "FIAT",
+      "crypto": "Kripto para birimi",
+      "other": "Diğer"
+    },
+    "CURRENCY-FORM": {
+      "name": "Ekran adı",
+      "code": "Para Birimi Kodu",
+      "symbol": "Sembol",
+      "decimal-digits": "Ondalık Basamaklar",
+      "create": "Para birimi oluştur",
+      "create-success": "Para birimi başarıyla oluşturuldu",
+      "edit": "Para birimini düzenle",
+      "edit-success": "Para birimi başarıyla düzenlendi",
+      "delete": "Para birimini sil",
+      "delete-success": "Para birimi başarıyla silindi",
+      "already-exists": "Bu koda sahip bir para birimi zaten mevcut. Düzenlemek isteyebilirsiniz"
     },
     "delete-all-success": "Döviz kurları başarıyla silindi",
     "historical": "Geçmiş oranlar",
+    "historical-empty": "Bu para birimi için geçmiş döviz kuru bulunamadı",
     "exchange-rate": "Döviz kuru",
     "exchange-rates": "Döviz kurları",
+    "min-exchange-rate": "Asgari döviz kuru",
+    "max-exchange-rate": "Maksimum döviz kuru",
     "empty": "Buraya döviz kurları ekleyin, böylece temel para biriminizden farklı para birimlerinde hesaplarınız varsa grafiklerimiz daha doğru olur",
     "select-a-currency": "Bir para birimi seçin",
     "search": "Adına veya para birimi koduna göre arayın"
@@ -541,6 +622,7 @@
       "all": "Tüm etiketler"
     },
     "empty-list": "Henüz etiket oluşturmadınız. Etiketler ve kategoriler, hareketlerinizi kategorize etmek için harika bir yoldur",
+    "no-tags": "Henüz hiç etiket oluşturmadınız. Etiketi oluşturmak için ayarlara gidin.",
     "without-tags": "Etiketsiz",
     "add": "Etiket ekle",
     "create": "Etiket oluştur",
@@ -588,14 +670,10 @@
   },
   "BUDGETS": {
     "title": "Bütçeler",
+    "status": "Bütçe durumu",
     "repeated": "Tekrarlayan",
     "one-time": "Tek seferlik",
-    "annual": "Yıllık",
-    "week": "Haftalık",
-    "month": "Aylık",
     "actives": "Aktifler",
-    "pending": "Başlangıcı Bekliyor",
-    "finish": "Bitti",
     "from-budgeted": "kalan ",
     "days-left": "gün kaldı",
     "days-to-start": "başlangıca kalan gün",
@@ -617,10 +695,222 @@
       "title": "Bütçe Detayları",
       "statistics": "İstatistikler",
       "budget-value": "Bütçelenen",
-      "expend-diary-left": "{{ remainingDays }} kalan gün için günde {{ dailyAmount }} harcayabilirsiniz",
       "expend-evolution": "Harcama gelişimi",
       "no-transactions": "Bu bütçeyle ilgili herhangi bir harcama yapmamışsınız gibi görünüyor"
+    },
+    "TARGET_TIMELINE_STATUSES": {
+      "active": "Aktif bütçe",
+      "past": "Tamamlanan bütçe",
+      "future": "Gelecek bütçe"
+    },
+    "PROGRESS": {
+      "LABELS": {
+        "active-on-track": "Yolunda",
+        "active-overspending": "Aşırı harcama",
+        "active-indeterminate": "Aktif",
+        "success": "Başarılı",
+        "fail": "Bütçe aşıldı"
+      },
+      "DESCRIPTION": {
+        "active-on-track": "Kalan {{ remainingDays }} gün için günde {{ dailyAmount }} harcayabilirsiniz",
+        "active-overspending": "Tekrar rayına oturmak için, kalan {{ remainingDays }} gün boyunca harcamalarınızı günde {{ dailyAmount }} ile sınırlamalısınız",
+        "active-indeterminate": "Harcayabileceğiniz {{ amount }} kaldı.",
+        "active-exceeded": "Bütçe limitinizi {{ amount }} aştınız. Bu bütçe için herhangi bir gelir bulamazsanız, dönemin geri kalanında harcama yapmayı bırakmalısınız",
+        "success": "Harika iş! Bu bütçe başarıyla tamamlandı. Harcamalarınızı yönetmek için bütçe oluşturmaya devam edin",
+        "fail": "Bütçeyi {{ amount }} aştınız. Bir dahaki sefere daha dikkatli olmaya çalışın!"
+      }
     }
+  },
+  "GOALS": {
+    "title": "Hedefler",
+    "status": "Hedef durumu",
+    "type": {
+      "display": "Hedef Türü",
+      "income": {
+        "title": "Tasarruf Hedefi",
+        "descr": "Para biriktirmek için ideal. Bakiye hedefinizi aştığında başarılı olursunuz."
+      },
+      "expense": {
+        "title": "Harcama Hedefi",
+        "descr": "Ne kadar harcadığınızı takip edin ve bir hedef tutara ulaşmayı amaçlayın. Bağışlar için ..."
+      }
+    },
+    "empty_title": "Hedef bulunamadı",
+    "empty_description": "Tasarruflarınızı takip etmek için yeni bir hedef oluşturun!",
+    "delete": "Hedefi sil",
+    "delete_warning": "Bu işlem geri alınamaz. Bu hedefi referans alan kategoriler ve işlemler silinmeyecektir",
+    "FORM": {
+      "new_title": "Yeni Hedef",
+      "edit_title": "Hedefi Düzenle",
+      "target_amount": "Hedef Tutar",
+      "initial_amount": "Başlangıç Tutarı",
+      "name": "İsim",
+      "name_hint": "Tasarruf Hedefim",
+      "create_success": "Hedef başarıyla oluşturuldu",
+      "edit_success": "Hedef başarıyla düzenlendi",
+      "negative_warn": "Hedef tutar negatif olamaz"
+    },
+    "DETAILS": {
+      "title": "Hedef Detayları",
+      "statistics": "İstatistikler",
+      "goal_value": "Hedef Değeri",
+      "evolution": "Gelişim",
+      "no_transactions": "Bu hedefle ilgili herhangi bir işlem yapmamışsınız gibi görünüyor"
+    },
+    "TARGET_TIMELINE_STATUSES": {
+      "active": "Aktif hedef",
+      "past": "Tamamlanmış hedef",
+      "future": "Gelecek hedef"
+    },
+    "PROGRESS": {
+      "LABELS": {
+        "active-on-track": "Yolda",
+        "active-behind-schedule": "Programın gerisinde",
+        "active-indeterminate": "Aktif",
+        "success": "Hedefe ulaşıldı",
+        "fail": "Hedef başarısız oldu"
+      },
+      "DESCRIPTION": {
+        "active-on-track": "Hedefinizi arama yolundasınız! Kalan {{ remainingDays }} gün boyunca günde {{ dailyAmount }} tasarruf etmelisiniz",
+        "active-behind-schedule": "Programın gerisindesiniz. Hedefinize {{ remainingDays }} gün içinde ulaşmak için günde {{ dailyAmount }} tasarruf etmeniz gerekiyor",
+        "active-indeterminate": "Hedefinize ulaşmak için {{ amount }} daha fazlasına ihtiyacınız var.",
+        "success": "Tebrikler! Hedefine ulaştın.",
+        "fail": "Hedefinizi {{ amount }} kadar kaçırdınız."
+      }
+    }
+  },
+  "DEBTS": {
+    "display": {
+      "one": "Borç",
+      "other": "Borçlar"
+    },
+    "FORM": {
+      "name": "Borç adı",
+      "initial_amount": "Başlangıç ​​tutarı",
+      "total_amount": "Toplam tutar",
+      "step_initial_value": "Başlangıç ​​değeri",
+      "step_details": "Detaylar",
+      "from_transaction": {
+        "title": "Bir işlemden",
+        "tap_to_select": "Bir işlemi seçmek için dokunun"
+      },
+      "from_amount": {
+        "title": "Başlangıç ​​tutarından",
+        "description": "Bu tutar istatistiklerde gider/gelir olarak dikkate alınmayacaktır. Bakiyeleri ve net değeri hesaplamak için kullanılacak"
+      }
+    },
+    "DIRECTION": {
+      "lent": "Ödünç verilmiş",
+      "borrowed": "Ödünç alındı"
+    },
+    "STATUS": {
+      "active": "Aktif",
+      "close": "Kapalı"
+    },
+    "DETAILS": {
+      "collected_amount": "Toplanan miktar",
+      "remaining": "Geriye kalan",
+      "no_deadline": "Son tarih yok",
+      "in_days": "{{x}} gün içinde",
+      "due_today": "Bugün vadesi doluyor",
+      "days_ago": "{{x}} gün önce",
+      "overdue_by": "{{x}} gün gecikti",
+      "per_day": "/ gün",
+      "no_transactions": "Bu borç için işlem bulunamadı"
+    },
+    "EMPTY": {
+      "no_debts_active": "Aktif borç bulunamadı. Aşağıdaki butona tıklayarak yeni bir borç oluşturarak başlayın",
+      "no_debts_closed": "Kapatılan borç bulunamadı. Borç, borcunuzun tamamını topladığınızda veya borcunuzun tamamını ödediğinizde kapatılır."
+    },
+    "ACTIONS": {
+      "edit": {
+        "title": "Borcu düzenle",
+        "success": "Borç başarıyla düzenlendi"
+      },
+      "delete": {
+        "warning_header": "Bu borç silinsin mi?",
+        "warning_text": "Bu eylem geri alınamaz. Bağlantılı işlemler silinmeyecek ancak artık bu borçla ilişkilendirilmeyecektir."
+      },
+      "add_register": {
+        "title": "Hareket ekle",
+        "success": "Hareket başarıyla eklendi",
+        "fab_label": "Kayıt ekle",
+        "modal_title": "Bu borca ​​kayıt ekle",
+        "modal_subtitle": "Bir işlemi bu borca ​​bağlamak için aşağıdaki seçeneklerden birini seçin"
+      },
+      "link_transaction": {
+        "title": "Mevcut işlemi bağla",
+        "description": "Bu borca ​​bağlamak için mevcut bir kaydı seçin",
+        "success": "Borca bağlı işlem",
+        "creating": "<b>{{ name }}</b> borcuna bağlı bir işlem oluşturuyorsunuz"
+      },
+      "unlink_transaction": {
+        "title": "Borçtan bağlantıyı kaldır",
+        "warning_text": "Bu işlem artık bu borçla ilişkilendirilmeyecek.",
+        "success": "İşlemin borca bağlantısı kaldırıldı"
+      },
+      "new_transaction": {
+        "title": "Yeni işlem ekle",
+        "description": "Bu borca ​​bağlı yeni bir işlem oluşturarak borcu manuel olarak ekleyin veya azaltın"
+      },
+      "create": {
+        "title": "Borç oluştur",
+        "success": "Borç başarıyla oluşturuldu"
+      }
+    }
+  },
+  "ASSETS": {
+    "title": "Varlıklar",
+    "empty_description": "Henüz herhangi bir öğe oluşturmadınız. Gayrimenkul, araç veya koleksiyon gibi varlıklar değerlemeleriyle takip edilebilir",
+    "create": "Öğe ekle",
+    "create_success": "Öğe başarıyla oluşturuldu",
+    "edit_success": "Öğe başarıyla düzenlendi",
+    "delete": "Öğeyi sil",
+    "delete_success": "Öğe başarıyla silindi",
+    "delete_confirmation": "Bu eylem geri alınamaz. Bu varlığa ilişkin tüm değerlemeler de silinecek.",
+    "profit": "Kâr",
+    "profit_percent": "Geri dönmek %",
+    "total_value": "Varlıkların toplam değeri",
+    "FORM": {
+      "name": "Öğe adı",
+      "name_required": "Lütfen bir varlık adı girin",
+      "description": "Tanım",
+      "initial_value": "Başlangıç ​​değeri",
+      "initial_value_required": "Lütfen bir başlangıç ​​değeri girin",
+      "initial_value_invalid": "Lütfen geçerli bir numara girin",
+      "currency": "Para birimi",
+      "select_currency": "Lütfen bir para birimi seçin",
+      "creation_date": "Oluşturulma tarihi",
+      "edit": "Öğeyi düzenle",
+      "create": "Öğe oluştur",
+      "already_exists": "Bu ada sahip bir öğe zaten mevcut. Düzenlemek isteyebilirsiniz",
+      "valuation_before_creation_date": "Bu varlıkta satın alma tarihinden önceki bir tarihe sahip değerlemeler mevcut"
+    },
+    "VALUATION": {
+      "history": "Değerleme geçmişi",
+      "no_valuations": "Henüz değerleme kaydedilmedi. İlk değerlemeyi ekleyerek başlayın",
+      "add_valuation": "Değerleme ekle",
+      "edit_valuation": "Değerlemeyi düzenle",
+      "value": "Değer",
+      "value_required": "Lütfen bir değer girin",
+      "value_invalid": "Lütfen geçerli bir numara girin",
+      "update_value_success": "Değerleme başarıyla eklendi",
+      "edit_valuation_success": "Değerleme başarıyla güncellendi",
+      "delete_valuation_success": "Değerleme başarıyla silindi",
+      "delete_all_valuations": "Tüm değerlemeleri sil",
+      "delete_all_valuations_success": "Tüm değerlemeler başarıyla silindi"
+    },
+    "SORT": {
+      "name_asc": "İsim (A'dan Z'ye)",
+      "name_desc": "İsim (Z-A)",
+      "value_asc": "Değer (önce en düşük)",
+      "value_desc": "Değer (önce en yüksek)"
+    }
+  },
+  "TARGET_TIMELINE_STATUSES": {
+    "active": "Aktif",
+    "past": "Tamamlandı",
+    "future": "Gelecek"
   },
   "BACKUP": {
     "no_file_selected": "Hiçbir dosya seçilmedi",
@@ -671,7 +961,7 @@
         ],
         "steps-descr": [
           "Cihazınızdan bir .csv dosyası seçin. Her sütunun adını açıklayan bir ilk satıra sahip olduğundan emin olun",
-          "Her işlemin değerinin belirtildiği sütunu seçin. Giderler için negatif değerler ve gelirler için pozitif değerler kullanın. Ondalık ayırıcı olarak nokta kullanın",
+          "Her işlemin değerinin belirtildiği sütunu seçin. Giderler için negatif değerler ve gelirler için pozitif değerler kullanın.",
           "Her işlemin ait olduğu hesabın belirtildiği sütunu seçin. İstediğiniz hesabı bulamamamız durumunda varsayılan bir hesap da seçebilirsiniz. Varsayılan bir hesap belirtilmezse, aynı adla bir tane oluşturacağız",
           "İşlem kategorisi adının bulunduğu sütunu belirtin. Kategoriyi bulamamamız durumunda işlemlere bu kategoriyi atayabilmemiz için varsayılan bir kategori belirtmeniz gerekir",
           "Her işlemin tarihinin belirtildiği sütunu seçin. Belirtilmezse, işlemler mevcut tarihle oluşturulacaktır",
@@ -692,52 +982,104 @@
     }
   },
   "SETTINGS": {
-    "title_long": "Ayarlar ve görünüm",
+    "title_long": "Ayarlar ve Özelleştirme",
     "title_short": "Ayarlar",
-    "description": "Uygulama teması, metinler ve diğer genel ayarlar",
+    "description": "Tema, Dil, Veriler ve daha fazlası",
     "edit_profile": "Profili düzenle",
-    "lang.section": "Dil ve metinler",
-    "lang.title": "Uygulama dili",
-    "lang.descr": "Metinlerin uygulamada görüntüleneceği dil",
-    "lang.help": "Bu uygulamanın çevirilerine katkıda bulunmak isterseniz, <a href='https://github.com/enrique-lozano/Monekin/tree/main/lib/i18n'>kılavuzumuza</a> başvurabilirsiniz",
-    "locale": "Bölge",
-    "locale_auto": "Sistem",
-    "locale.descr": "Tarihler, sayılar için kullanılacak biçimi ayarlayın...",
-    "locale.warn": "Bölge değiştirildiğinde uygulama güncellenecektir",
-    "first_day_of_week": "Haftanın ilk günü",
-    "theme_and_colors": "Tema ve renkler",
-    "theme": "Tema",
-    "theme.auto": "Sistem",
-    "theme.light": "Açık",
-    "theme.dark": "Koyu",
-    "amoled-mode": "AMOLED modu",
-    "amoled-mode.descr": "Mümkün olduğunda saf siyah bir duvar kağıdı kullanın. Bu, AMOLED ekranlara sahip cihazların pili için biraz yardımcı olacaktır",
-    "dynamic-colors": "Dinamik renkler",
-    "dynamic-colors.descr": "Mümkün olduğunda sistem vurgu renginizi kullanın",
-    "accent-color": "Vurgu rengi",
-    "accent-color.descr": "Uygulamanın arayüzün belirli kısımlarını vurgulamak için kullanacağı rengi seçin",
-    "font": "Yazı tipi",
-    "font-platform": "platformu",
-    "SWIPE-ACTIONS": {
-      "title": "Kaydırma eylemleri",
-      "choose-description": "Bu kaydırma yönünü kullanarak listedeki bir işlem öğesini kaydırdığınızda hangi eylemin tetikleneceğini seçin",
-      "swipe-left": "Sola kaydırın",
-      "swipe-right": "Sağa kaydırın",
-      "none": "Eylem yok",
-      "toggle-reconciled": "Mutabık kılınmayı aç/kapat",
-      "toggle-pending": "Beklemede'yi aç/kapat",
-      "toggle-voided": "Geçiş iptal edildi",
-      "toggle-unreconciled": "Mutabık kılınmayanları aç/kapat",
-      "remove-status": "Durumu kaldır"
+    "GENERAL": {
+      "menu_title": "Genel Ayarlar",
+      "menu_descr": "Dil, gizlilik ve daha fazlası",
+      "show_all_decimals": "Tüm ondalık basamakları göster",
+      "show_all_decimals_descr": "Sondaki sıfırlar olsa bile tüm ondalık basamakları göster",
+      "LANGUAGE": {
+        "section": "Dil ve metinler",
+        "title": "Uygulama dili",
+        "descr": "Metinlerin uygulamada görüntüleneceği dil",
+        "help": "Bu uygulamanın çevirilerine katkıda bulunmak isterseniz, <a href='https://github.com/enrique-lozano/Monekin/tree/main/lib/i18n'>kılavuzumuza</a> başvurabilirsiniz"
+      },
+      "LOCALE": {
+        "title": "Bölge",
+        "auto": "Sistem",
+        "descr": "Tarihler, sayılar için kullanılacak biçimi ayarlayın...",
+        "warn": "Bölge değiştirildiğinde uygulama güncellenecektir",
+        "first_day_of_week": "Haftanın ilk günü"
+      }
+    },
+    "APP_STRUCTURES": {
+      "title": "Uygulama yapıları",
+      "tags": "İşlemlerinizi daha iyi organize etmek için etiketleri tanımlayın",
+      "categories": "Kategoriler ve alt kategorilerin organizasyonu",
+      "accounts": "Hesaplarınızı yönetin ve düzenleyin",
+      "filters": "İşlemler ve istatistikler için kullanabileceğiniz genel filtreleri yapılandırın"
     },
     "SECURITY": {
       "title": "Güvenlik",
-      "private-mode-at-launch": "Başlangıçta özel mod",
-      "private-mode-at-launch.descr": "Uygulamayı varsayılan olarak özel modda başlatın",
-      "private-mode": "Özel mod",
-      "private-mode.descr": "Tüm parasal değerleri gizle",
-      "private-mode.activated": "Özel mod etkinleştirildi",
-      "private-mode.deactivated": "Özel mod devre dışı bırakıldı"
+      "private_mode_at_launch": "Başlangıçta özel mod",
+      "private_mode_at_launch_descr": "Uygulamayı varsayılan olarak özel modda başlatın",
+      "private_mode": "Özel mod",
+      "private_mode_descr": "Tüm parasal değerleri gizle",
+      "private_mode_activated": "Özel mod etkinleştirildi",
+      "private_mode_deactivated": "Özel mod devre dışı bırakıldı"
+    },
+    "TRANSACTIONS": {
+      "menu_title": "İşlemler",
+      "menu_descr": "İşlemlerinizin davranışını yapılandırın",
+      "title": "İşlem Ayarları",
+      "STYLE": {
+        "title": "İşlem stili",
+        "subtitle": "İşlemlerin listelerde nasıl görüneceğini yapılandırın",
+        "show_tags": "Etiketleri Göster",
+        "show_time": "Saati Göster"
+      },
+      "SWIPE_ACTIONS": {
+        "title": "Kaydırma eylemleri",
+        "choose_description": "Bu kaydırma yönünü kullanarak listedeki bir işlem öğesini kaydırdığınızda hangi eylemin tetikleneceğini seçin",
+        "swipe_left": "Sola kaydırın",
+        "swipe_right": "Sağa kaydırın",
+        "none": "Eylem yok",
+        "toggle_reconciled": "Mutabık kılınmayı aç/kapat",
+        "toggle_pending": "Beklemede'yi aç/kapat",
+        "toggle_voided": "Geçiş iptal edildi",
+        "toggle_unreconciled": "Mutabık kılınmayanları aç/kapat",
+        "remove_status": "Durumu kaldır"
+      },
+      "DEFAULT_VALUES": {
+        "title": "Default Form Values",
+        "page_title": "New Transaction: Default Form Values",
+        "reuse_last_transaction": "Reuse Last Transaction Values",
+        "reuse_last_transaction_descr": "Automatically fill the form with some values from the last created transaction",
+        "fields_to_reuse": "Fields to reuse",
+        "reuse_last_values_modal_descr": "Select the fields that should be pre-filled with the values from the last created transaction.",
+        "default_values_separator": "Default Values",
+        "default_category": "Default Category",
+        "default_status": "Default Status",
+        "default_tags": "Default Tags",
+        "no_tags_selected": "No tags selected"
+      },
+      "DEFAULT_TYPE": {
+        "title": "Default Type",
+        "modal_title": "Select Default Type"
+      }
+    },
+    "APPEARANCE": {
+      "menu_title": "Tema ve Stil",
+      "menu_descr": "Tema seçimi, renkler ve uygulama görünümüyle ilgili diğer şeyler",
+      "theme_and_colors": "Tema ve renkler",
+      "THEME": {
+        "title": "Tema",
+        "auto": "Sistem",
+        "light": "Açık",
+        "dark": "Koyu"
+      },
+      "amoled_mode": "AMOLED modu",
+      "amoled_mode_descr": "Mümkün olduğunda saf siyah bir duvar kağıdı kullanın. Bu, AMOLED ekranlara sahip cihazların pili için biraz yardımcı olacaktır",
+      "dynamic_colors": "Dinamik renkler",
+      "dynamic_colors_descr": "Mümkün olduğunda sistem vurgu renginizi kullanın",
+      "accent_color": "Vurgu rengi",
+      "accent_color_descr": "Uygulamanın arayüzün belirli kısımlarını vurgulamak için kullanacağı rengi seçin",
+      "text": "Metin",
+      "font": "Yazı tipi",
+      "font_platform": "platformu"
     }
   },
   "MORE": {
@@ -754,7 +1096,7 @@
     },
     "ABOUT_US": {
       "display": "Uygulama bilgileri",
-      "description": "Monekin hakkında şartları ve diğer ilgili bilgileri inceleyin. Hata bildirerek, önerilerde bulunarak toplulukla etkileşime geçin...",
+      "description": "Monekin'in şartlarını, önemli bilgilerini bulun ve hata bildirerek veya fikir paylaşımları ile iletişime geçin",
       "LEGAL": {
         "display": "Yasal bilgiler",
         "privacy": "Gizlilik politikası",

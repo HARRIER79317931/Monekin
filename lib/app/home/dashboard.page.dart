@@ -6,26 +6,29 @@ import 'package:monekin/app/home/widgets/dashboard_cards.dart';
 import 'package:monekin/app/home/widgets/horizontal_scrollable_account_list.dart';
 import 'package:monekin/app/home/widgets/income_or_expense_card.dart';
 import 'package:monekin/app/home/widgets/new_transaction_fl_button.dart';
-import 'package:monekin/app/settings/edit_profile_modal.dart';
+import 'package:monekin/app/layout/page_context.dart';
+import 'package:monekin/app/layout/page_framework.dart';
+import 'package:monekin/app/settings/widgets/edit_profile_modal.dart';
 import 'package:monekin/core/database/services/account/account_service.dart';
 import 'package:monekin/core/database/services/user-setting/private_mode_service.dart';
 import 'package:monekin/core/database/services/user-setting/user_setting_service.dart';
 import 'package:monekin/core/extensions/color.extensions.dart';
-import 'package:monekin/core/models/account/account.dart';
 import 'package:monekin/core/models/date-utils/date_period_state.dart';
 import 'package:monekin/core/presentation/animations/animated_expanded.dart';
-import 'package:monekin/core/presentation/animations/animated_floating_button.dart';
 import 'package:monekin/core/presentation/debug_page.dart';
 import 'package:monekin/core/presentation/helpers/snackbar.dart';
 import 'package:monekin/core/presentation/responsive/breakpoints.dart';
+import 'package:monekin/core/presentation/theme.dart';
 import 'package:monekin/core/presentation/widgets/dates/date_period_modal.dart';
 import 'package:monekin/core/presentation/widgets/number_ui_formatters/currency_displayer.dart';
-import 'package:monekin/core/presentation/widgets/skeleton.dart';
 import 'package:monekin/core/presentation/widgets/tappable.dart';
 import 'package:monekin/core/presentation/widgets/trending_value.dart';
 import 'package:monekin/core/presentation/widgets/user_avatar.dart';
 import 'package:monekin/core/routes/route_utils.dart';
+import 'package:monekin/core/utils/app_utils.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../core/models/transaction/transaction_type.enum.dart';
 import '../../core/presentation/app_colors.dart';
@@ -42,7 +45,7 @@ class _DashboardPageState extends State<DashboardPage> {
   final ScrollController _scrollController = ScrollController();
   bool showSmallHeader = false;
 
-  bool isFloatingButtonExtended = true;
+  late Stream<double> _balanceVariationStream;
 
   @override
   void initState() {
@@ -50,18 +53,9 @@ class _DashboardPageState extends State<DashboardPage> {
 
     _scrollController.addListener(() {
       _setSmallHeaderVisible();
-
-      bool shouldExtendButton = AnimatedFloatingButton.shouldExtendButton(
-        context,
-        _scrollController,
-      );
-
-      if (isFloatingButtonExtended != shouldExtendButton) {
-        setState(() {
-          isFloatingButtonExtended = shouldExtendButton;
-        });
-      }
     });
+
+    _balanceVariationStream = _getBalanceVariationStream();
   }
 
   @override
@@ -69,6 +63,17 @@ class _DashboardPageState extends State<DashboardPage> {
     _scrollController.removeListener(_setSmallHeaderVisible);
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Stream<double> _getBalanceVariationStream() {
+    return AccountService.instance.getAccounts().switchMap(
+      (accounts) => AccountService.instance.getAccountsMoneyVariation(
+        accounts: accounts,
+        startDate: dateRangeService.startDate,
+        endDate: dateRangeService.endDate,
+        convertToPreferredCurrency: true,
+      ),
+    );
   }
 
   void _setSmallHeaderVisible() {
@@ -84,22 +89,31 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   bool _isIncomeExpenseAtSameLevel(BuildContext context) {
-    return BreakPoint.of(context).isLargerOrEqualTo(BreakpointID.lg);
+    return BreakPoint.of(context).isLargerOrEqualTo(BreakpointID.sm);
   }
 
   @override
   Widget build(BuildContext context) {
     final accountService = AccountService.instance;
 
-    return Scaffold(
-      appBar: EmptyAppBar(color: AppColors.of(context).consistentPrimary),
-      floatingActionButton: NewTransactionButton(
-        isExtended: isFloatingButtonExtended,
-      ),
+    return PageFramework(
+      title: t.home.title,
+      enableAppBar: false,
+      appBarBackgroundColor:
+          BreakPoint.of(context).isLargerOrEqualTo(BreakpointID.md)
+          ? Colors.transparent
+          : AppColors.of(context).consistentPrimary,
+      floatingActionButton: ifIsInTabs(context)
+          ? null
+          : NewTransactionButton(
+              key: const Key('dashboard--new-transaction-button'),
+              scrollController: _scrollController,
+            ),
       body: Stack(
         children: [
           SingleChildScrollView(
             controller: _scrollController,
+            padding: const EdgeInsets.only(bottom: 24),
             child: Column(
               children: [
                 buildDashboadHeader(context, accountService),
@@ -110,19 +124,14 @@ class _DashboardPageState extends State<DashboardPage> {
 
                 // ------------- STATS GENERAL CARDS --------------
                 Padding(
-                  padding: const EdgeInsets.only(
-                    left: 12,
-                    right: 12,
-                    top: 20,
-                    bottom: 64,
-                  ),
+                  padding: const EdgeInsets.only(left: 12, right: 12, top: 0),
                   child: DashboardCards(dateRangeService: dateRangeService),
                 ),
 
                 if (kDebugMode)
                   TextButton(
                     onPressed: () {
-                      RouteUtils.pushRoute(context, const DebugPage());
+                      RouteUtils.pushRoute(const DebugPage());
                     },
                     child: const Text('DEBUG PAGE'),
                   ),
@@ -143,96 +152,99 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Card buildDashboadHeader(
+  Widget buildDashboadHeader(
     BuildContext context,
     AccountService accountService,
   ) {
-    return Card(
-      color: AppColors.of(context).consistentPrimary,
-      margin: const EdgeInsets.only(bottom: 24),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(16),
-          bottomRight: Radius.circular(16),
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          _isIncomeExpenseAtSameLevel(context) ? 24 : 16,
-          16,
-          _isIncomeExpenseAtSameLevel(context) ? 24 : 16,
-          _isIncomeExpenseAtSameLevel(context) ? 24 : 14,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(child: buildWelcomeMsgAndAvatar(context)),
-                buildDatePeriodSelector(context),
-              ],
-            ),
-            Divider(
-              height: 16,
-              color: AppColors.of(context).onConsistentPrimary.withOpacity(0.5),
-            ),
-            const SizedBox(height: 8),
-            StreamBuilder(
-              stream: AccountService.instance.getAccounts(),
-              builder: (context, accounts) {
-                final labelStyle = Theme.of(context).textTheme.labelMedium!
-                    .copyWith(color: onHeaderSmallTextColor(context));
+    final shouldHavePadding =
+        !AppUtils.isDesktop && !AppUtils.isMobileLayout(context);
 
-                if (_isIncomeExpenseAtSameLevel(context)) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return SkeletonizerConfig(
+      data: _getSkeletonizerConfig(context),
+      child: Card(
+        color: AppColors.of(context).consistentPrimary,
+        margin: EdgeInsets.only(
+          bottom: 0,
+          top: shouldHavePadding ? 8 : 0,
+          left: shouldHavePadding ? 12 : 0,
+          right: shouldHavePadding ? 12 : 0,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(getCardBorderRadius()),
+            top: Radius.circular(shouldHavePadding ? getCardBorderRadius() : 0),
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            _isIncomeExpenseAtSameLevel(context) ? 24 : 16,
+            16,
+            _isIncomeExpenseAtSameLevel(context) ? 24 : 16,
+            _isIncomeExpenseAtSameLevel(context) ? 24 : 14,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(child: buildWelcomeMsgAndAvatar(context)),
+                  buildDatePeriodSelector(context),
+                ],
+              ),
+              Divider(
+                height: 16,
+                color: AppColors.of(
+                  context,
+                ).onConsistentPrimary.withOpacity(0.5),
+              ),
+              const SizedBox(height: 8),
+              Builder(
+                builder: (context) {
+                  final labelStyle = Theme.of(context).textTheme.labelMedium!
+                      .copyWith(color: onHeaderSmallTextColor(context));
+
+                  final incomeAndExpenseCards = [
+                    IncomeOrExpenseCard(
+                      type: TransactionType.expense,
+                      periodState: dateRangeService,
+                      labelStyle: labelStyle,
+                    ),
+                    IncomeOrExpenseCard(
+                      type: TransactionType.income,
+                      periodState: dateRangeService,
+                      labelStyle: labelStyle,
+                    ),
+                  ];
+
+                  if (_isIncomeExpenseAtSameLevel(context)) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      spacing: 16,
+                      children: [
+                        totalBalanceIndicator(context),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: incomeAndExpenseCards,
+                        ),
+                      ],
+                    );
+                  }
+
+                  return Column(
+                    spacing: 24,
                     children: [
-                      totalBalanceIndicator(context, accounts, accountService),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          IncomeOrExpenseCard(
-                            type: TransactionType.E,
-                            periodState: dateRangeService,
-                            labelStyle: labelStyle,
-                          ),
-                          IncomeOrExpenseCard(
-                            type: TransactionType.I,
-                            periodState: dateRangeService,
-                            labelStyle: labelStyle,
-                          ),
-                        ],
+                      totalBalanceIndicator(context),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: incomeAndExpenseCards,
                       ),
                     ],
                   );
-                }
-
-                return Column(
-                  children: [
-                    totalBalanceIndicator(context, accounts, accountService),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IncomeOrExpenseCard(
-                          type: TransactionType.E,
-                          periodState: dateRangeService,
-                          labelStyle: labelStyle,
-                        ),
-                        IncomeOrExpenseCard(
-                          type: TransactionType.I,
-                          periodState: dateRangeService,
-                          labelStyle: labelStyle,
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              },
-            ),
-          ],
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -267,6 +279,8 @@ class _DashboardPageState extends State<DashboardPage> {
               periodModifier: 0,
               datePeriod: value,
             );
+
+            _balanceVariationStream = _getBalanceVariationStream();
           });
         });
       },
@@ -291,25 +305,18 @@ class _DashboardPageState extends State<DashboardPage> {
         padding: const EdgeInsets.fromLTRB(4, 8, 24, 8),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          spacing: 12,
           children: [
-            StreamBuilder(
-              stream: UserSettingService.instance.getSettingFromDB(
-                SettingKey.avatar,
+            UserAvatar(
+              avatar: appStateSettings[SettingKey.avatar],
+              backgroundColor: AppColors.of(
+                context,
+              ).onConsistentPrimary.darken(0.25),
+              border: Border.all(
+                width: 2,
+                color: AppColors.of(context).onConsistentPrimary,
               ),
-              builder: (context, snapshot) {
-                return UserAvatar(
-                  avatar: snapshot.data,
-                  backgroundColor: AppColors.of(
-                    context,
-                  ).onConsistentPrimary.darken(0.25),
-                  border: Border.all(
-                    width: 2,
-                    color: AppColors.of(context).onConsistentPrimary,
-                  ),
-                );
-              },
             ),
-            const SizedBox(width: 12),
             Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -323,26 +330,16 @@ class _DashboardPageState extends State<DashboardPage> {
                       color: onHeaderSmallTextColor(context),
                     ),
                   ),
-                  StreamBuilder(
-                    stream: UserSettingService.instance.getSettingFromDB(
-                      SettingKey.userName,
+                  Text(
+                    appStateSettings[SettingKey.userName] ?? 'User',
+                    softWrap: false,
+                    style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                      fontSize: 18,
+                      overflow: TextOverflow.fade,
+                      color: AppColors.of(context).onConsistentPrimary,
                     ),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Skeleton(width: 70, height: 12);
-                      }
-
-                      return Text(
-                        snapshot.data!,
-                        softWrap: false,
-                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                          fontSize: 18,
-                          overflow: TextOverflow.fade,
-                          color: AppColors.of(context).onConsistentPrimary,
-                        ),
-                      );
-                    },
                   ),
+
                   const SizedBox(width: 8),
                 ],
               ),
@@ -354,84 +351,94 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget buildSmallHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(16),
-          bottomRight: Radius.circular(16),
+    return SkeletonizerConfig(
+      data: _getSkeletonizerConfig(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(16),
+            bottomRight: Radius.circular(16),
+          ),
+          color: AppColors.of(context).consistentPrimary,
         ),
-        color: AppColors.of(context).consistentPrimary,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                t.home.total_balance,
-                style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                  color: onHeaderSmallTextColor(context),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  t.home.total_balance,
+                  style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                    color: onHeaderSmallTextColor(context),
+                  ),
                 ),
-              ),
-              StreamBuilder(
-                stream: AccountService.instance.getAccountsMoney(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return CurrencyDisplayer(
-                      amountToConvert: snapshot.data!,
-                      integerStyle: TextStyle(
-                        fontSize:
-                            snapshot.data! >= 10000000 &&
-                                BreakPoint.of(
-                                  context,
-                                ).isSmallerOrEqualTo(BreakpointID.xs)
-                            ? 22
-                            : 26,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.of(context).onConsistentPrimary,
+                StreamBuilder(
+                  stream: AccountService.instance.getAccountsMoney(),
+                  builder: (context, snapshot) {
+                    return Skeletonizer(
+                      enabled: !snapshot.hasData,
+                      child: Builder(
+                        builder: (context) {
+                          if (!snapshot.hasData) {
+                            return Text('9999', style: TextStyle(fontSize: 22));
+                          }
+
+                          return CurrencyDisplayer(
+                            amountToConvert: snapshot.data!,
+                            integerStyle: TextStyle(
+                              fontSize:
+                                  snapshot.data! >= 10000000 &&
+                                      BreakPoint.of(
+                                        context,
+                                      ).isSmallerOrEqualTo(BreakpointID.xs)
+                                  ? 22
+                                  : 26,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.of(context).onConsistentPrimary,
+                            ),
+                          );
+                        },
                       ),
                     );
-                  }
-
-                  return const Skeleton(width: 90, height: 40);
-                },
-              ),
-            ],
-          ),
-          const SizedBox(width: 12),
-          Flexible(child: buildDatePeriodSelector(context)),
-        ],
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(width: 12),
+            Flexible(child: buildDatePeriodSelector(context)),
+          ],
+        ),
       ),
     );
   }
 
-  Widget totalBalanceIndicator(
-    BuildContext context,
-    AsyncSnapshot<List<Account>> accounts,
-    AccountService accountService,
-  ) {
+  Future<void> _togglePrivateModeValue({bool showSnackbar = false}) async {
+    final privateMode =
+        await PrivateModeService.instance.privateModeStream.first;
+
+    PrivateModeService.instance.setPrivateMode(!privateMode);
+
+    await HapticFeedback.lightImpact();
+
+    if (showSnackbar) {
+      MonekinSnackbar.success(
+        SnackbarParams(
+          !privateMode
+              ? t.settings.security.private_mode_activated
+              : t.settings.security.private_mode_deactivated,
+        ),
+      );
+    }
+  }
+
+  Widget totalBalanceIndicator(BuildContext context) {
     final t = Translations.of(context);
 
     return SuccessiveTapDetector(
       delayTrackingAfterGoal: 4000,
-      onClickGoalReached: () async {
-        final privateMode =
-            await PrivateModeService.instance.privateModeStream.first;
-
-        PrivateModeService.instance.setPrivateMode(!privateMode);
-
-        await HapticFeedback.lightImpact();
-
-        MonekinSnackbar.success(
-          SnackbarParams(
-            !privateMode
-                ? t.settings.security.private_mode_activated
-                : t.settings.security.private_mode_deactivated,
-          ),
-        );
-      },
+      onClickGoalReached: () => _togglePrivateModeValue(showSnackbar: true),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: _isIncomeExpenseAtSameLevel(context)
@@ -439,83 +446,103 @@ class _DashboardPageState extends State<DashboardPage> {
             : CrossAxisAlignment.center,
         spacing: 2,
         children: [
-          Text(
-            t.home.total_balance,
-            style: Theme.of(context).textTheme.labelSmall!.copyWith(
-              color: onHeaderSmallTextColor(context),
-            ),
-          ),
-          if (!accounts.hasData) ...[
-            const Skeleton(width: 70, height: 40),
-            const Skeleton(width: 30, height: 14),
-          ],
-          if (accounts.hasData) ...[
-            StreamBuilder(
-              stream: AccountService.instance.getAccountsMoney(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return CurrencyDisplayer(
-                    amountToConvert: snapshot.data!,
-                    integerStyle: Theme.of(context).textTheme.headlineLarge!
-                        .copyWith(
-                          fontSize:
-                              snapshot.data! >= 100000000 &&
-                                  BreakPoint.of(
-                                    context,
-                                  ).isSmallerOrEqualTo(BreakpointID.xs)
-                              ? 26
-                              : 32,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.of(context).onConsistentPrimary,
-                        ),
-                  );
-                }
-
-                return const Skeleton(width: 90, height: 40);
-              },
-            ),
-            if (dateRangeService.startDate != null &&
-                dateRangeService.endDate != null)
-              StreamBuilder(
-                stream: accountService.getAccountsMoneyVariation(
-                  accounts: accounts.data!,
-                  startDate: dateRangeService.startDate,
-                  endDate: dateRangeService.endDate,
-                  convertToPreferredCurrency: true,
+          Row(
+            mainAxisAlignment: _isIncomeExpenseAtSameLevel(context)
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
+            spacing: 4,
+            children: [
+              Text(
+                t.home.total_balance,
+                style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                  color: onHeaderSmallTextColor(context),
                 ),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Skeleton(width: 52, height: 22);
-                  }
+              ),
+              Tappable(
+                bgColor: Colors.transparent,
+                shape: const CircleBorder(),
+                onTap: () => _togglePrivateModeValue(),
+                child: Padding(
+                  padding: const EdgeInsets.all(2),
+                  child: StreamBuilder(
+                    stream: PrivateModeService.instance.privateModeStream,
+                    initialData: false,
+                    builder: (context, snapshot) {
+                      return Icon(
+                        snapshot.data!
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                        size: 16,
+                        color: onHeaderSmallTextColor(context),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
 
-                  return TrendingValue(
-                    percentage: snapshot.data!,
+          // ----- CURRENT BALANCE AMOUNT HEADER -----
+          StreamBuilder(
+            stream: AccountService.instance.getAccountsMoney(),
+            builder: (context, snapshot) {
+              return Skeletonizer(
+                enabled: !snapshot.hasData,
+                child: !snapshot.hasData
+                    ? Bone(width: 90, height: 40)
+                    : CurrencyDisplayer(
+                        amountToConvert: snapshot.data!,
+                        integerStyle: Theme.of(context).textTheme.headlineLarge!
+                            .copyWith(
+                              fontSize:
+                                  snapshot.data! >= 100000000 &&
+                                      BreakPoint.of(
+                                        context,
+                                      ).isSmallerOrEqualTo(BreakpointID.xs)
+                                  ? 26
+                                  : 32,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.of(context).onConsistentPrimary,
+                            ),
+                      ),
+              );
+            },
+          ),
+
+          //  ----- BALANCE TRENDING VALUE DURING THE SELECTED PERIOD -----
+          if (dateRangeService.startDate != null &&
+              dateRangeService.endDate != null)
+            StreamBuilder(
+              stream: _balanceVariationStream,
+              builder: (context, snapshot) {
+                return Skeletonizer(
+                  enabled: !snapshot.hasData,
+                  child: TrendingValue(
+                    percentage: snapshot.data ?? 0,
                     fontWeight: FontWeight.bold,
                     filled: true,
                     outlined: true,
                     fontSize: 16,
-                  );
-                },
-              ),
-          ],
+                  ),
+                );
+              },
+            ),
         ],
       ),
     );
   }
-}
 
-class EmptyAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final Color color;
-
-  const EmptyAppBar({required this.color, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(color: color);
+  SkeletonizerConfigData _getSkeletonizerConfig(BuildContext context) {
+    return SkeletonizerConfigData(
+      effect: ShimmerEffect(
+        baseColor: AppColors.of(context).onConsistentPrimary.withOpacity(0.1),
+        highlightColor: AppColors.of(
+          context,
+        ).onConsistentPrimary.withOpacity(0.25),
+        duration: const Duration(seconds: 1),
+      ),
+    );
   }
-
-  @override
-  Size get preferredSize => const Size(0.0, 0.0);
 }
 
 Color onHeaderSmallTextColor(BuildContext context) =>

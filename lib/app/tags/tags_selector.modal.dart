@@ -10,13 +10,24 @@ import 'package:monekin/core/presentation/widgets/bottomSheetFooter.dart';
 import 'package:monekin/core/presentation/widgets/count_indicator.dart';
 import 'package:monekin/core/presentation/widgets/modal_container.dart';
 import 'package:monekin/core/presentation/widgets/scrollable_with_bottom_gradient.dart';
+import 'package:monekin/core/routes/route_utils.dart';
 import 'package:monekin/i18n/generated/translations.g.dart';
 
-Future<List<Tag?>?> showTagListModal(
+class TagSelectorResult {
+  final List<Tag?> selectedTags;
+  final List<Tag?> explicitlyRemovedTags;
+
+  const TagSelectorResult({
+    required this.selectedTags,
+    required this.explicitlyRemovedTags,
+  });
+}
+
+Future<TagSelectorResult?> showTagListModal(
   BuildContext context, {
   required TagSelector modal,
 }) {
-  return showModalBottomSheet<List<Tag?>>(
+  return showModalBottomSheet<TagSelectorResult>(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
@@ -30,14 +41,14 @@ class TagSelector extends StatefulWidget {
   const TagSelector({
     super.key,
     this.selectedTags = const [],
+    this.indeterminateTags = const [],
     required this.allowEmptySubmit,
     required this.includeNullTag,
   });
 
   final List<Tag?> selectedTags;
-
+  final List<Tag?> indeterminateTags;
   final bool allowEmptySubmit;
-
   final bool includeNullTag;
 
   @override
@@ -47,13 +58,17 @@ class TagSelector extends StatefulWidget {
 class _TagSelectorState extends State<TagSelector>
     with DraggableScrollableKeyboardAware {
   late List<Tag?> selectedTags;
+  late List<Tag?> indeterminateTags;
+  late List<Tag?> explicitlyRemovedTags;
 
   String searchValue = '';
+
   @override
   void initState() {
     super.initState();
-
     selectedTags = [...widget.selectedTags];
+    indeterminateTags = [...widget.indeterminateTags];
+    explicitlyRemovedTags = [];
   }
 
   @override
@@ -67,16 +82,16 @@ class _TagSelectorState extends State<TagSelector>
         return ModalContainer(
           title: t.tags.select.title,
           titleBuilder: selectedTags.isEmpty
-              ? null
-              : (title) {
-                  return Row(
-                    children: [
-                      Text(title),
-                      const SizedBox(width: 12),
-                      CountIndicator(selectedTags.length),
-                    ],
-                  );
-                },
+            ? null
+            : (title) {
+            return Row(
+              children: [
+                Text(title),
+                const SizedBox(width: 12),
+                CountIndicator(selectedTags.length),
+              ],
+            );
+          },
           body: StreamBuilder(
             stream: TagService.instance.getTags(
               filter: (p0) => p0.name.contains(searchValue),
@@ -96,7 +111,6 @@ class _TagSelectorState extends State<TagSelector>
                     ),
                     onChanged: (value) {
                       searchValue = value;
-
                       rebuild();
                     },
                   ),
@@ -108,8 +122,11 @@ class _TagSelectorState extends State<TagSelector>
           ),
           footer: BottomSheetFooter(
             onSaved: selectedTags.isNotEmpty || widget.allowEmptySubmit
-                ? () => Navigator.of(context).pop(selectedTags)
-                : null,
+              ? () => RouteUtils.popRoute(TagSelectorResult(
+              selectedTags: selectedTags,
+              explicitlyRemovedTags: explicitlyRemovedTags,
+            ))
+              : null,
           ),
         );
       },
@@ -131,14 +148,13 @@ class _TagSelectorState extends State<TagSelector>
     if (allTags.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(16),
-        child: Text(t.account.no_accounts, textAlign: TextAlign.center),
+        child: Text(t.tags.no_tags, textAlign: TextAlign.center),
       );
     }
 
     return Expanded(
       child: Stack(
         children: [
-          // TODO : Shrink list??
           ListView.separated(
             controller: scrollController,
             itemCount: snapshot.data!.length + (widget.includeNullTag ? 1 : 0),
@@ -171,28 +187,52 @@ class _TagSelectorState extends State<TagSelector>
 
               // TAG NOT NULL --> Rest of the tags:
 
+              final isSelected = selectedTags.any(
+                (element) => element != null && element.id == tag.id,
+              );
+
+              final isIndeterminate = !isSelected &&
+                indeterminateTags.any(
+                  (element) => element != null && element.id == tag.id,
+                );
+
               return CheckboxListTile.adaptive(
-                value: selectedTags.any(
-                  (element) =>
-                      element != null && element.id == tag.id || element == tag,
-                ),
+                value: isIndeterminate ? null : isSelected,
+                tristate: true,
                 secondary: tag.displayIcon(),
                 title: Text(tag.name),
                 subtitle: !tag.description.isNullOrEmpty
-                    ? Text(tag.description!)
-                    : null,
+                  ? Text(tag.description!)
+                  : null,
                 onChanged: (newValue) {
-                  if (newValue == null) return;
-
-                  if (!newValue) {
-                    selectedTags.removeWhere(
+                  setState(() {
+                    final isIndeterminate = indeterminateTags.any(
+                      (element) => element != null && element.id == tag.id,
+                    );
+                    indeterminateTags.removeWhere(
                       (element) => element?.id == tag.id,
                     );
-                  } else {
-                    selectedTags.add(tag);
-                  }
-
-                  rebuild();
+                    if (isIndeterminate) {
+                      explicitlyRemovedTags.add(tag);
+                      selectedTags.removeWhere(
+                        (element) => element?.id == tag.id,
+                      );
+                    } else {
+                      final currentlySelected = selectedTags.any(
+                        (element) => element != null && element.id == tag.id,
+                      );
+                      if (currentlySelected) {
+                        selectedTags.removeWhere(
+                          (element) => element?.id == tag.id,
+                        );
+                      } else {
+                        explicitlyRemovedTags.removeWhere(
+                          (element) => element?.id == tag.id,
+                        );
+                        selectedTags.add(tag);
+                      }
+                    }
+                  });
                 },
               );
             },
@@ -213,12 +253,12 @@ class _TagSelectorState extends State<TagSelector>
     ];
 
     final filteredSelectedTags = selectedTags
-        .where(
-          (selAcc) =>
-              selAcc == null ||
-              filteredTags.nonNulls.map((e) => e.id).contains(selAcc.id),
+      .where(
+        (selAcc) =>
+          selAcc == null ||
+          filteredTags.nonNulls.map((e) => e.id).contains(selAcc.id),
         )
-        .toList();
+      .toList();
 
     return CheckboxListTile(
       value: filteredSelectedTags.isEmpty
